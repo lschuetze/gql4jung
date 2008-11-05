@@ -10,8 +10,11 @@
 
 package nz.ac.massey.cs.gpl4jung;
 
+import java.util.List;
+
 import edu.uci.ics.jung.graph.Graph;
 
 public interface GQL {
 	void query(Graph graph,Motif motif,ResultListener listener);
+
 }

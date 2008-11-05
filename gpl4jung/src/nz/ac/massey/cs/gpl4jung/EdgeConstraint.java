@@ -10,15 +10,26 @@
 
 package nz.ac.massey.cs.gpl4jung;
 
-import java.util.List;
+import java.util.Iterator;
 
-public interface Motif {
-	/**
-	 * Roles are the vertex variables in the query.
-	 * @return
-	 */
-	List<String> getRoles();
-	List<Constraint> getConstraints();
-	void setConstraints(List<Constraint> constraints);
+import edu.uci.ics.jung.graph.Edge;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
+/**
+ * Constraint to check the existence of edges connecting nodes.
+ * @author jens.dietrich@gmail.com
+ *
+ */
+public class EdgeConstraint implements BinaryConstraint<Edge> {
+
+	public Iterator<ConnectedVertex<Edge>> getPossibleSources(Graph g,Vertex source) {
+		return null; // TODO
+	}
+	public Iterator<ConnectedVertex<Edge>>  getPossibleTargets(Graph g,Vertex source){
+		return null; // TODO
+	}
+	public Edge  check(Graph g,Vertex source,Vertex target){
+		return null; // TODO
+	}
 	
 }

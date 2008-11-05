@@ -10,15 +10,11 @@
 
 package nz.ac.massey.cs.gpl4jung;
 
-import java.util.List;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.utils.UserDataContainer;
 
-public interface Motif {
-	/**
-	 * Roles are the vertex variables in the query.
-	 * @return
-	 */
-	List<String> getRoles();
-	List<Constraint> getConstraints();
-	void setConstraints(List<Constraint> constraints);
-	
+public interface PropertyConstraint<T extends UserDataContainer> {
+
+	public abstract boolean check(Graph g, T edgeOrVertex);
+
 }
