@@ -10,15 +10,14 @@
 
 package nz.ac.massey.cs.gpl4jung;
 
-import java.util.List;
+import java.util.Iterator;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
 
-public interface Motif {
-	/**
-	 * Roles are the vertex variables in the query.
-	 * @return
-	 */
-	List<String> getRoles();
-	List<Constraint> getConstraints();
-	void setConstraints(List<Constraint> constraints);
+public interface UnaryConstraint  {
+
+	  String key = null;
+	  Object value = null;
 	
+	boolean check(Graph g,Vertex source);
 }
