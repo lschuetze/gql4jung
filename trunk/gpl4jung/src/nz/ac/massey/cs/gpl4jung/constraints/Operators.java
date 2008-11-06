@@ -8,20 +8,17 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gpl4jung;
+package nz.ac.massey.cs.gpl4jung.constraints;
 
-import java.util.List;
 /**
- * This is the type for queries. Queries are usually build from query language expressions (query DSL, XML, ..).
+ * Definition of operators.  
+ * TODO complete
+ * The query parser must map operators to these constants, for instance, in an XML based language it
+ * must map URIs defined in http://www.w3.org/TR/xpath-functions/ to instances.
  * @author jens.dietrich@gmail.com
  */
-public interface Motif {
-	/**
-	 * Roles are the vertex variables in the query.
-	 * @return
-	 */
-	List<String> getRoles();
-	List<Constraint> getConstraints();
-	void setConstraints(List<Constraint> constraints);
+public enum Operators  {
+	EQUALS,
+	MATCHES
 	
 }

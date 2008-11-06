@@ -25,7 +25,18 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements Pr
 
 	private String key = null;
 	private Object value = null;
+	// operators are string defined in http://www.w3.org/TR/xpath-functions/#regex-syntax
+	// the default operator is 
+	private Operators operator = Operators.EQUALS;
 	
+	public Operators getOperator() {
+		return operator;
+	}
+
+	public void setOperator(Operators operator) {
+		this.operator = operator;
+	}
+
 	/* (non-Javadoc)
 	 * @see nz.ac.massey.cs.gpl4jung.PropertyConstraint#check(edu.uci.ics.jung.graph.Graph, T)
 	 */

@@ -1,0 +1,21 @@
+<!-- no class should depend on UI and DB classes (and therefore the respective layers) at the same time -->
+<query>
+    <vertex id="class"><property key="type" value="class"/></vertex>
+    <vertex id="ui">
+    	<property key="type" value="package"/>
+    	<or>
+    		<property key="name" value="javax.swing"/>
+    		<property key="name" value="java.awt"/>
+    	</or>
+   	</vertex>
+    <vertex id="db">
+    	<property key="type" value="package"/>
+    	<or>
+    		<!--  here an operator is used, this attribute is optional, the default is = , matches means regular expressions -->
+    		<property key="name" value="java\.sql(.)*" operator="http://www.w3.org/2005/02/xpath-functions:matches"/>
+    		<property key="name" value="org\.hibernate(.)*" operator="http://www.w3.org/2005/02/xpath-functions:matches"/>
+    	</or>
+   	</vertex>
+    <path from="class" to="ui"></path>
+    <path from="class" to="db"></path>
+</query>
