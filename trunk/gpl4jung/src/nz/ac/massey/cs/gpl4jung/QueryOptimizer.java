@@ -10,14 +10,15 @@
 
 package nz.ac.massey.cs.gpl4jung;
 
+import java.util.List;
 
 import edu.uci.ics.jung.graph.Graph;
 /**
- * Interface for engines processing queries.
+ * Optimises the constraints. This is usually done by rearranging the order of the constraints
+ * based on the graph (statistics), and existing bindings (resolved variables). 
  * @author jens.dietrich@gmail.com
+ *
  */
-public interface GQL {
-	void query(Graph graph,Motif motif,ResultListener listener);
-	void query(Graph graph,Motif motif,ResultListener listener,QueryOptimizer optimizer);
-
+public interface QueryOptimizer {
+	void optimize(Motif query,MotifInstance partialInstance,List<Constraint> remainingConstraints,Graph graph);
 }
