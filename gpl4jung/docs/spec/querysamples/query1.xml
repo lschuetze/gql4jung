@@ -25,6 +25,6 @@
         <property key="type" value="uses"/>
     </path>
     <path from="client" to="service_impl">
-       <vertexType>uses</vertexType>
+       <property key="type" value="uses"/>
     </path>
 </query>

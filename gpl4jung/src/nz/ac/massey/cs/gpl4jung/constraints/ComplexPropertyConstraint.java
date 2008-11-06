@@ -8,15 +8,24 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gpl4jung;
+package nz.ac.massey.cs.gpl4jung.constraints;
+
+import java.util.List;
+
+import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
+import edu.uci.ics.jung.utils.UserDataContainer;
+
+public abstract class ComplexPropertyConstraint<T extends UserDataContainer> implements PropertyConstraint<T>{
+	protected List<PropertyConstraint<T>> parts = null;
+
+	public List<PropertyConstraint<T>> getParts() {
+		return parts;
+	}
+
+	public void setParts(List<PropertyConstraint<T>> parts) {
+		this.parts = parts;
+	}
 
 
-import edu.uci.ics.jung.graph.Graph;
-/**
- * Interface for engines processing queries.
- * @author jens.dietrich@gmail.com
- */
-public interface GQL {
-	void query(Graph graph,Motif motif,ResultListener listener);
 
 }

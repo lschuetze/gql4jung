@@ -8,9 +8,12 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gpl4jung;
+package nz.ac.massey.cs.gpl4jung.constraints;
 
 import java.util.Iterator;
+
+import nz.ac.massey.cs.gpl4jung.LinkConstraint;
+import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
 
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
@@ -20,7 +23,7 @@ import edu.uci.ics.jung.graph.Vertex;
  * @author jens.dietrich@gmail.com
  *
  */
-public class EdgeConstraint implements BinaryConstraint<Edge> {
+public class EdgeConstraint extends LinkConstraint<Edge> {
 
 	public Iterator<ConnectedVertex<Edge>> getPossibleSources(Graph g,Vertex source) {
 		return null; // TODO

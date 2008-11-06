@@ -8,16 +8,25 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gpl4jung;
+package nz.ac.massey.cs.gpl4jung.constraints;
 
-import java.util.Iterator;
+import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.Vertex;
-
-public interface UnaryConstraint  {
-
-	  String key = null;
-	  Object value = null;
+import edu.uci.ics.jung.utils.UserDataContainer;
+/**
+ * Complex condition using OR.
+ * @author jens.dietrich@gmail.com
+ *
+ * @param <T>
+ */
+public class PropertyConstraintDisjunction<T  extends UserDataContainer> extends ComplexPropertyConstraint<T> {
 	
-	boolean check(Graph g,Vertex source);
+	public boolean check(Graph g, T edgeOrVertex) {
+		for (PropertyConstraint part:parts) {
+			if (part.check(g,edgeOrVertex)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
