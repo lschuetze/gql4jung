@@ -8,21 +8,25 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gpl4jung;
+package nz.ac.massey.cs.gpl4jung.constraints;
 
+import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
-
-public class NegatedPropertyConstraint<T extends UserDataContainer> {
-	private PropertyConstraint<T> part = null;
+/**
+ * Complex condition using AND.
+ * @author jens.dietrich@gmail.com
+ *
+ * @param <T>
+ */
+public class PropertyConstraintConjunction<T  extends UserDataContainer> extends ComplexPropertyConstraint<T> {
+	
 	public boolean check(Graph g, T edgeOrVertex) {
-		return !part.check(g,edgeOrVertex);
+		for (PropertyConstraint part:parts) {
+			if (!part.check(g,edgeOrVertex)) {
+				return false;
+			}
+		}
+		return true;
 	}
-	public PropertyConstraint<T> getPart() {
-		return part;
-	}
-	public void setPart(PropertyConstraint<T> part) {
-		this.part = part;
-	}
-
 }

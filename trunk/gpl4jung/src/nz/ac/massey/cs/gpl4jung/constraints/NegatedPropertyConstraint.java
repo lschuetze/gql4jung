@@ -8,15 +8,22 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gpl4jung;
+package nz.ac.massey.cs.gpl4jung.constraints;
 
-
+import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import edu.uci.ics.jung.graph.Graph;
-/**
- * Interface for engines processing queries.
- * @author jens.dietrich@gmail.com
- */
-public interface GQL {
-	void query(Graph graph,Motif motif,ResultListener listener);
+import edu.uci.ics.jung.utils.UserDataContainer;
+
+public class NegatedPropertyConstraint<T extends UserDataContainer> {
+	private PropertyConstraint<T> part = null;
+	public boolean check(Graph g, T edgeOrVertex) {
+		return !part.check(g,edgeOrVertex);
+	}
+	public PropertyConstraint<T> getPart() {
+		return part;
+	}
+	public void setPart(PropertyConstraint<T> part) {
+		this.part = part;
+	}
 
 }

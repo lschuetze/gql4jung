@@ -11,25 +11,33 @@
 package nz.ac.massey.cs.gpl4jung;
 
 import java.util.Iterator;
+
+import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
+/**
+ * Constraint describing that vertexes are connected (by an edge or a path).
+ * @author jens.dietrich@gmail.com
+ *
+ * @param <T>
+ */
+public abstract class LinkConstraint<T> implements Constraint {
 
-public interface BinaryConstraint<T> extends Constraint {
-
+	private PropertyConstraint<Edge> edgePropertyConstraint = null;
 	/**
 	 * Given the target of the link returns possible pairs consisting of a source vertex and a link.
 	 * @param g
 	 * @param source
 	 * @return
 	 */
-	Iterator<ConnectedVertex<T>> getPossibleSources(Graph g,Vertex source);
+	public abstract Iterator<ConnectedVertex<T>> getPossibleSources(Graph g,Vertex source);
 	/**
 	 * Given the source of the link returns possible pairs consisting of a target vertex and a link.
 	 * @param g
 	 * @param source
 	 * @return
 	 */
-	Iterator<ConnectedVertex<T>>  getPossibleTargets(Graph g,Vertex source);
+	public abstract Iterator<ConnectedVertex<T>>  getPossibleTargets(Graph g,Vertex source);
 	/**
 	 * returns a link (edge or path) if one exists, null otherwise.
 	 * @param g
@@ -37,5 +45,16 @@ public interface BinaryConstraint<T> extends Constraint {
 	 * @param target
 	 * @return
 	 */
-	T  check(Graph g,Vertex source,Vertex target);
+	public abstract T  check(Graph g,Vertex source,Vertex target);
+	/**
+	 * Get the property constraints for the link. If there are more than one,
+	 * use conjunction.
+	 * @return
+	 */
+	public PropertyConstraint<Edge> getEdgePropertyConstraint() {
+		return edgePropertyConstraint;		
+	}
+	public void setEdgePropertyConstraint(PropertyConstraint<Edge> edgePropertyConstraint) {
+		this.edgePropertyConstraint = edgePropertyConstraint;
+	};
 }

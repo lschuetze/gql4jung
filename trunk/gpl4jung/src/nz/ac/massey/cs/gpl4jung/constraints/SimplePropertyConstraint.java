@@ -8,8 +8,9 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gpl4jung;
+package nz.ac.massey.cs.gpl4jung.constraints;
 
+import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
 

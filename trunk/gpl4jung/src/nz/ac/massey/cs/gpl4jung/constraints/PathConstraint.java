@@ -8,19 +8,21 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gpl4jung;
+package nz.ac.massey.cs.gpl4jung.constraints;
 
 import java.util.Iterator;
 
-import edu.uci.ics.jung.graph.Edge;
+import nz.ac.massey.cs.gpl4jung.LinkConstraint;
+import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
+import nz.ac.massey.cs.gpl4jung.Path;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 /**
- * Constraint to check the existance of paths between nodes.
+ * Constraint to check the existence of paths between nodes.
  * @author jens.dietrich@gmail.com
  *
  */
-public class PathConstraint implements BinaryConstraint<Path> {
+public class PathConstraint extends LinkConstraint<Path> {
 	private int minLength = 1;
 	private int maxLength = -1; // this means unbound
 	public int getMaxLength() {

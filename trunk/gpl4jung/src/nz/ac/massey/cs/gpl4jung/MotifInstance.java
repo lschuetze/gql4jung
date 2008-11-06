@@ -25,6 +25,10 @@ public interface MotifInstance {
 	 * @return
 	 */
 	Vertex getVertex(String roleName);
-	
-	
+	/**
+	 * Get the edge or path found. 
+	 * @param constraint
+	 * @return
+	 */
+	Object getLink(LinkConstraint constraint); 
 }
