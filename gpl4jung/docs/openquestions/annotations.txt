@@ -1,0 +1,3 @@
+annotation tools must be used before querying to add certain properties to verexes and edges
+example: clustering
+question: should we reference annotation tools in queries?
