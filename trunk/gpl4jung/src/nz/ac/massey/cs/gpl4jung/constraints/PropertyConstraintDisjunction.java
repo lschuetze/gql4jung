@@ -21,7 +21,7 @@ import edu.uci.ics.jung.utils.UserDataContainer;
  */
 public class PropertyConstraintDisjunction<T  extends UserDataContainer> extends ComplexPropertyConstraint<T> {
 	
-	public boolean check(Graph g, T edgeOrVertex) {
+	public boolean check(Graph g, T... edgeOrVertex) {
 		for (PropertyConstraint part:parts) {
 			if (part.check(g,edgeOrVertex)) {
 				return true;

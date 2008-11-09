@@ -10,23 +10,35 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
-import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
-import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
 /**
- * Complex condition using AND.
+ * Property term. For instance, when a vertex with the id (role name) "class1" is used, 
+ * then a property term might refer to the "isAbstract" property. 
+ * "isAbstract" would be the key.
  * @author jens.dietrich@gmail.com
- *
- * @param <T>
  */
-public class PropertyConstraintConjunction<T  extends UserDataContainer> extends ComplexPropertyConstraint<T> {
+
+public class PropertyTerm  implements Term {
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	private String owner = null; // this is the role name of the owner, such as "class1"
+	private String key = null;  // this is the property key that can be used to query the property
 	
-	public boolean check(Graph g, T... edgeOrVertex) {
-		for (PropertyConstraint part:parts) {
-			if (!part.check(g,edgeOrVertex)) {
-				return false;
-			}
-		}
-		return true;
+	public Object getValue(UserDataContainer vertexOrEdge) {
+		return vertexOrEdge.getUserDatum(key);
 	}
 }

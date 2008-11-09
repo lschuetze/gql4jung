@@ -23,9 +23,9 @@ import edu.uci.ics.jung.utils.UserDataContainer;
  */
 public class SimplePropertyConstraint<T extends UserDataContainer> implements PropertyConstraint<T> {
 
-	private String key = null;
-	private Object value = null;
-	// operators are string defined in http://www.w3.org/TR/xpath-functions/#regex-syntax
+
+	private Term[] terms = null;
+	
 	// the default operator is 
 	private Operators operator = Operators.EQUALS;
 	
@@ -40,24 +40,10 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements Pr
 	/* (non-Javadoc)
 	 * @see nz.ac.massey.cs.gpl4jung.PropertyConstraint#check(edu.uci.ics.jung.graph.Graph, T)
 	 */
-	public boolean check(Graph g,T edgeOrVertex) {
+	public boolean check(Graph g,T... edgeOrVertex) {
 		// TODO
 		return false;
 	}
 
-	public String getKey() {
-		return key;
-	}
 
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	public Object getValue() {
-		return value;
-	}
-
-	public void setValue(Object value) {
-		this.value = value;
-	}
 }
