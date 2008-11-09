@@ -1,0 +1,16 @@
+<!-- packages with multiple clusters -->
+<query>
+    <vertex id="class1"><property key="type" value="class"/></vertex>
+    <!-- here we use negations: no such class should exist -->
+    <exists_not><vertex id="class2"><property key="type" value="class"/></vertex></exists_not>
+    <condition predicate="equals">
+    	<attribute vertex="class1" key="cluster"/> 
+    	<attribute vertex="class2" key="cluster"/> 
+    </condition>
+    <not>
+	    <condition predicate="equals">
+	    	<attribute vertex="class1" key="package"/> 
+	    	<attribute vertex="class2" key="package"/> 
+	    </condition>
+    </not>
+</query>
