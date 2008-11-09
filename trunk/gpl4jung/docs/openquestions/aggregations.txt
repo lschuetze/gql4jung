@@ -1,0 +1,4 @@
+aggregations describe that different results are only flavours of the same result
+this concept is used in WebOfPattern as well
+example: clustering
+we could describe aggregations through properties describing when two results are the same
