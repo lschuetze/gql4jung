@@ -19,6 +19,9 @@ package nz.ac.massey.cs.gpl4jung.constraints;
  */
 public enum Operators  {
 	EQUALS,
-	MATCHES
-	
+	MATCHES,
+	LESS_THAN,
+	GREATER_THAN,
+	LESS_THAN_OR_EQUALS,
+	GREATER_THAN_OR_EQUALS
 }
