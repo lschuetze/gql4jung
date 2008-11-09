@@ -15,6 +15,6 @@ import edu.uci.ics.jung.utils.UserDataContainer;
 
 public interface PropertyConstraint<T extends UserDataContainer> {
 
-	public abstract boolean check(Graph g, T edgeOrVertex);
+	public abstract boolean check(Graph g, T... edgeOrVertex);
 
 }

@@ -4,6 +4,12 @@
 	<!-- ids are of type ID, references in path and edge of type IDREF -->
     <vertex id="client">
     	<property key="type" value="class"/>
+    	<!--  this syntax is short for the following: -->
+    	<!--  <condition predicate="equals"> -->
+	    <!--  	<attribute owner="client" key="type"/>  -->
+	    <!--  	<value>class</value>  -->
+	    <!--  </condition> -->
+	    <!--   -->
     </vertex>
     <vertex id="service" type="class">    
         <property key="isAbstract" value="true"/>

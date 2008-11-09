@@ -11,10 +11,15 @@
     <vertex id="db">
     	<property key="type" value="package"/>
     	<or>
-    		<!--  here an operator is used, this attribute is optional, the default is = , matches means regular expressions -->
-    		<property key="name" value="java\.sql(.)*" operator="http://www.w3.org/2005/02/xpath-functions:matches"/>
-    		<property key="name" value="org\.hibernate(.)*" operator="http://www.w3.org/2005/02/xpath-functions:matches"/>
-    	</or>
+    	    <condition predicate="http://www.w3.org/2005/02/xpath-functions:matches">
+    			<attribute vertex="db" key="vertex"/> <!-- could skip vertex here as this is a context node -->
+    			<value>java\.sql(.)*</value> <!-- could use special syntax for value set here with implicit OR like in SQL sets  -->
+    		</condition>
+    		<condition predicate="http://www.w3.org/2005/02/xpath-functions:matches">
+    			<attribute vertex="db" key="vertex"/>
+    			<value>org\.hibernate(.)*</value>
+    		</condition>
+   		</or>
    	</vertex>
     <path from="class" to="ui"></path>
     <path from="class" to="db"></path>

@@ -10,20 +10,19 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
-import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.utils.UserDataContainer;
+/**
+ * Value term. Simple wrapper for objects. 
+ * @author jens.dietrich@gmail.com
+ */
 
-public class NegatedPropertyConstraint<T extends UserDataContainer> implements PropertyConstraint<T> {
-	private PropertyConstraint<T> part = null;
-	public boolean check(Graph g, T... edgeOrVertex) {
-		return !part.check(g,edgeOrVertex);
-	}
-	public PropertyConstraint<T> getPart() {
-		return part;
-	}
-	public void setPart(PropertyConstraint<T> part) {
-		this.part = part;
+public class ValueTerm  implements Term {
+	private Object value = null;
+
+	public Object getValue() {
+		return value;
 	}
 
+	public void setValue(Object value) {
+		this.value = value;
+	}
 }

@@ -9,21 +9,13 @@
  */
 
 package nz.ac.massey.cs.gpl4jung.constraints;
-
-import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.utils.UserDataContainer;
-
-public class NegatedPropertyConstraint<T extends UserDataContainer> implements PropertyConstraint<T> {
-	private PropertyConstraint<T> part = null;
-	public boolean check(Graph g, T... edgeOrVertex) {
-		return !part.check(g,edgeOrVertex);
-	}
-	public PropertyConstraint<T> getPart() {
-		return part;
-	}
-	public void setPart(PropertyConstraint<T> part) {
-		this.part = part;
-	}
+/**
+ * Term used in property constraints. A term can be one of the following:
+ * - a property of a vertex or edge (a property term)
+ * - a constant (a value term)
+ * Terms are not explicitly typed.
+ * @author jens.dietrich@gmail.com
+ */
+public interface Term {
 
 }
