@@ -29,4 +29,10 @@
 	    	<attribute vertex="class4" key="package"/> 
 	    </condition>
     </not>
+    <not>
+	    <condition predicate="equals">
+	    	<attribute vertex="class1" key="cluster"/> 
+	    	<attribute vertex="class2" key="cluster"/> 
+	    </condition>
+    </not>
 </query>
