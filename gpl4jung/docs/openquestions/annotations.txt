@@ -2,4 +2,4 @@ annotation tools must be used before querying to add certain properties to verex
 example: clustering
 question: should we reference annotation tools in queries?
 
-*Comments for testing*
+
