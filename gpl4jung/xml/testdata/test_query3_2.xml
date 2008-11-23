@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- no class should depend on UI and DB classes (and therefore the respective layers) at the same time -->
+<query>
+  <vertex id="class">
+    <property key="type" value="class"/>
+  </vertex>
+  <vertex id="ui">
+    <property key="type" value="package"/>
+    <or>
+      <property key="name" value="javax.swing"/>
+      <property key="name" value="java.awt"/>
+    </or>
+  </vertex>
+  <vertex id="db">
+    <property key="type" value="package"/>
+    <or>
+      <condition predicate="http://www.w3.org/2005/02/xpath-functions:matches">
+        <attribute vertex="db" key="vertex"/>
+        <!-- could skip vertex here as this is a context node -->
+        <!--remove value element <value>java\.sql(.)*</value>-->
+        <!-- could use special syntax for value set here with implicit OR like in SQL sets  -->
+      </condition>
+      <condition predicate="http://www.w3.org/2005/02/xpath-functions:matches">
+        <attribute vertex="db" key="vertex"/>
+        <!-- <value>org\.hibernate(.)*</value>-->
+      </condition>
+    </or>
+  </vertex>
+  <path from="class" to="ui"></path>
+  <path from="class" to="db"></path>
+</query>

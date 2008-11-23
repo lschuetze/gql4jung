@@ -45,7 +45,77 @@ public class ValidationTests {
 	
 	@Test
 	public void test1() throws Exception {
-		test("docs/spec/querysamples/query1.xml",false);
+		test("xml/query1.xml",false);
 
 	} 
-}
+	
+	@Test
+	public void test2() throws Exception {
+		test("xml/query2.xml",false);
+
+	} 
+	
+	@Test
+	public void test3() throws Exception {
+		test("xml/query3.xml",false);
+
+	} 
+	
+	@Test
+	public void test4() throws Exception {
+		test("xml/query4.xml",false);
+	}
+	
+	@Test
+	public void test_empty_query() throws Exception {
+		test("xml/testdata/test_empty_query.xml",false);		
+	}
+	
+	@Test
+	public void test_query1_1() throws Exception {
+		test("xml/testdata/test_query1_1.xml",false);
+	}
+	
+	@Test
+	public void test_query1_2() throws Exception {
+		test("xml/testdata/test_query1_2.xml",false);	
+	}
+	
+	@Test
+	public void test_query1_3() throws Exception {			
+		test("xml/testdata/test_query1_3.xml",false);
+	}
+
+	@Test
+	public void test_query1_4() throws Exception {
+		test("xml/testdata/test_query1_4.xml",false);	
+	}
+
+	@Test
+	public void test_query1_5() throws Exception {
+		test("xml/testdata/test_query1_5.xml",false);		
+	}
+	
+	@Test
+	public void test_query2_1() throws Exception {
+		test("xml/testdata/test_query2_1.xml",false);
+	}
+	
+	@Test
+	public void test_query3_1() throws Exception {
+		test("xml/testdata/test_query3_1.xml",false);	
+	}
+	
+	@Test
+	public void test_query3_2() throws Exception {			
+		test("xml/testdata/test_query3_2.xml",false);
+	}
+
+	@Test
+	public void test_query4_1() throws Exception {
+		test("xml/testdata/test_query4_1.xml",false);	
+	}
+	
+	
+} 
+
