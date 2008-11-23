@@ -1,0 +1,21 @@
+<!-- circular dependencies between packages -->
+<query>
+    <vertex id="class1"><property key="type" value="class"/></vertex>
+    <vertex id="class3"><property key="type" value="class"/></vertex>
+    <vertex id="class2"><property key="type" value="class"/></vertex>
+    <path from="class1" to="class2"/>
+    <path from="class2" to="class3"/>
+    <!--  todo: URI for equals should be used here -->
+    <!--  could also use <and> here -->
+    <condition predicate="equals">
+    	<!--  attributes map to property terms -->
+    	<attribute vertex="class1" key="package"/> 
+    	<attribute vertex="class3" key="package"/> 
+    </condition>
+    <not>
+	    <condition predicate="equals">
+	    	<attribute owner="class1" key="package"/> 
+	    	<attribute owner="class2" key="package"/> 
+	    </condition>
+    </not>
+</query>
