@@ -78,7 +78,7 @@ public class ValidationTests {
 	
 	@Test
 	public void test_query1_2() throws Exception {
-		test("xml/testdata/test_query1_2.xml",false);	
+		test("xml/testdata/test_query1_2.xml",true);	
 	}
 	
 	@Test
