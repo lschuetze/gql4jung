@@ -1,28 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <!--  no decoupling through abstraction -->
-<!--test query "replaced OR operator with AND inside path elements"-->
+<!-- test query for nested logical connectives and or not xor inside path element-->
 <!-- for properties, see edu.uci.ics.jung.utils.UserDataContainer - these are general purpose key-value annotations key-datum-->
 <query>
   <!-- ids are of type ID, references in path and edge of type IDREF -->
   <vertex id="client">
     <property key="type" value="class"/>
+    <!--  this syntax is short for the following: -->
+    <!--  <condition predicate="equals"> -->
+    <!--  	<attribute owner="client" key="type"/>  -->
+    <!--  	<value>class</value>  -->
+    <!--  </condition> -->
+    <!--   -->
   </vertex>
   <vertex id="service" type="class">
-    <property key="isAbstract" value='true'/>
+    <property key="isAbstract" value="istrue"/>
     <property key="type" value="class"/>
   </vertex>
   <vertex id="service_impl" type="class">
-    <property key="isAbstract" value='false'/>
+    <property key="isAbstract" value="isfalse"/>
     <property key="type" value="class"/>
   </vertex>
   <!-- minLength and maxLength are optional, defaults are 1 and  infinite-->
-  
   <path minLength="1" maxLength="42" from="service_impl" to="service">
     <!-- properties can be complex using standard boolean operators AND,OR,NOT,XOR  -->
-    <!--changed 'or' operator to 'and'-->
+    <!--added deep nesting of logical connectives-->
+    <or>
+      <and>
+        <xor>
+          <property type="test" value="test"/>
+        </xor>
+      </and>
+    </or>
+    <!--added another deep nesting-->
     <and>
-      <property key="type" value="extends"/>
-      <property key="type" value="implements"/>
+      <or>
+        <not>
+          <or>
+            <condition>
+              <property value="test"/>
+            </condition>
+          </or>
+        </not>
+      </or>
     </and>
   </path>
   <path from="client" to="service">

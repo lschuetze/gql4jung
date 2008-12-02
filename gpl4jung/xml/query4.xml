@@ -17,7 +17,7 @@
     	<attribute vertex="class1" key="package"/> 
     	<attribute vertex="class2" key="package"/> 
     </condition> 
-<!--    <not>
+    <not>
 	    <condition predicate="equals">
 	    	<attribute vertex="class1" key="package"/> 
 	    	<attribute vertex="class3" key="package"/> 
@@ -34,5 +34,5 @@
 	    	<attribute vertex="class1" key="cluster"/> 
 	    	<attribute vertex="class2" key="cluster"/> 
 	    </condition>
-    </not>-->
+    </not>
 </query>

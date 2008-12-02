@@ -1,5 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!-- no class should depend on UI and DB classes (and therefore the respective layers) at the same time -->
+<!--Test query for comparison of attribute with attribute, and removed value element by commenting it. -->
 <query>
   <vertex id="class">
     <property key="type" value="class"/>

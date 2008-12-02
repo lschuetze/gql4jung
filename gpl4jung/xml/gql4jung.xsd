@@ -3,12 +3,12 @@
   <xs:element name="query">
     <xs:complexType>
       <xs:sequence>
-        <xs:choice maxOccurs="unbounded">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
           <!--'vertex' element definition-->
           <xs:element name="vertex" maxOccurs="unbounded" >
             <xs:complexType>
               <xs:sequence>
-                <xs:element name="property" maxOccurs="unbounded" >
+                <xs:element name="property" minOccurs="0" maxOccurs="unbounded" >
                   <xs:complexType>
                     <xs:attribute name="key" type="xs:string" use="required" />
                     <xs:attribute name="value" type="xs:string" use="required" />
@@ -26,7 +26,7 @@
                                 <xs:attribute name="key" type="xs:string" use="required" />
                               </xs:complexType>
                             </xs:element>
-                            <xs:element name="value" type="xs:string" />
+                            <xs:element name="value" type="xs:string" minOccurs="0"/>
                           </xs:sequence>
                           <xs:attribute name="predicate" type="xs:string" use="required" />
                         </xs:complexType>
@@ -67,6 +67,51 @@
                     </xs:sequence>
                   </xs:complexType>
                 </xs:element>
+                <!--Added AND operator -->
+                <xs:element name="and" minOccurs="0" >
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="property" maxOccurs="unbounded" >
+                        <xs:complexType>
+                          <xs:attribute name="key" type="xs:string" use="required" />
+                          <xs:attribute name="value" type="xs:string" use="required" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <!--Added XOR operator -->
+                <xs:element name="xor" minOccurs="0" >
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="property" maxOccurs="unbounded" >
+                        <xs:complexType>
+                          <xs:attribute name="key" type="xs:string" use="required" />
+                          <xs:attribute name="value" type="xs:string" use="required" />
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <!--Added NAND operator -->
+                <xs:element name="not" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="and">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="property">
+                            <xs:complexType>
+                              <xs:attribute name="key" type="xs:string" use="required" />
+                              <xs:attribute name="value" type="xs:string" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
               </xs:sequence>
               <xs:attribute name="minLength" type="xs:positiveInteger" use="optional" />
               <xs:attribute name="maxLength" type="xs:positiveInteger" use="optional" />

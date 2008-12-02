@@ -97,6 +97,16 @@ public class ValidationTests {
 	}
 	
 	@Test
+	public void test_query1_6() throws Exception {
+		test("xml/testdata/test_query1_6.xml",false);		
+	}
+	
+	@Test
+	public void test_query1_7() throws Exception {
+		test("xml/testdata/test_query1_7.xml",true);		
+	}
+	
+	@Test
 	public void test_query2_1() throws Exception {
 		test("xml/testdata/test_query2_1.xml",false);
 	}
