@@ -7,6 +7,7 @@ import java.util.List;
 import nz.ac.massey.cs.gpl4jung.GQL;
 import nz.ac.massey.cs.gpl4jung.Motif;
 import nz.ac.massey.cs.gpl4jung.MotifInstance;
+import nz.ac.massey.cs.gpl4jung.MotifReader;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,8 +38,12 @@ public class GQLTests {
 		return g;
 	}
 	private Motif readMotif(String motifSource) throws Exception {
-		// FIXME
-		return null;
+		GraphMLFile input = new GraphMLFile();
+		Reader motif_reader = new FileReader(motifSource);
+		Motif q = (Motif) input.load(motif_reader);
+		motif_reader.close();
+		return q;
+		
 	}
 	@Test
 	public void test1 () throws Exception {
