@@ -29,7 +29,7 @@ public class ConversionScript {
 			}});
 		System.out.println(""+files.length+" files will be converted");
 		int counter = 0;
-		OdemReader odem2graphml = new OdemReader();
+		Odem2GraphML odem2graphml = new Odem2GraphML();
 		Reader reader = null;
 		Writer writer = null;
 		
@@ -52,7 +52,7 @@ public class ConversionScript {
 				
 				reader = new FileReader(in);
 				writer = new FileWriter(out);
-				odem2graphml.read(reader, writer);
+				odem2graphml.convert(reader, writer);
 				
 				System.out.println("success");
 
