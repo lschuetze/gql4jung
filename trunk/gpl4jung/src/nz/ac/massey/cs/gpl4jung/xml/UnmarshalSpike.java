@@ -15,7 +15,8 @@ public class UnmarshalSpike {
 	 * @throws JAXBException 
 	 */
 	public static void main(String[] args) throws JAXBException {
-		JAXBContext jc = JAXBContext.newInstance("nz.ac.massey.cs.gpl4jung.xml");
+		JAXBContext jc = JAXBContext.n		GraphMLFile input = new GraphMLFile();
+ewInstance("nz.ac.massey.cs.gpl4jung.xml");
 		Unmarshaller unmarshaller = jc.createUnmarshaller();
 		Query q= (Query)unmarshaller.unmarshal(new File( "xml/query1.xml"));
 		System.out.println(q);
