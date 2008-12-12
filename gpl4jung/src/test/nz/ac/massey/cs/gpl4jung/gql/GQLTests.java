@@ -3,6 +3,7 @@ package test.nz.ac.massey.cs.gpl4jung.gql;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
@@ -11,6 +12,7 @@ import java.util.List;
 import nz.ac.massey.cs.gpl4jung.GQL;
 import nz.ac.massey.cs.gpl4jung.Motif;
 import nz.ac.massey.cs.gpl4jung.MotifInstance;
+import nz.ac.massey.cs.gpl4jung.xml.XMLMotifReader;
 import nz.ac.massey.cs.utils.odem2graphml.Odem2GraphML;
 import org.junit.After;
 import org.junit.Before;
@@ -76,7 +78,8 @@ public class GQLTests {
 	@Test
 	public void test1 () throws Exception {
 		Graph g = this.readJungGraphFromODEM("test_examples/dependency.odem");
-		Motif q = this.readMotif("xml/testgraphs/query1.xml");
+		XMLMotifReader r = new XMLMotifReader();
+		Motif q = r.read(new FileInputStream ("xml/query1.xml"));
 		ResultCollector rc = new ResultCollector();
 		this.gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
