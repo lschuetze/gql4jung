@@ -12,5 +12,4 @@ package nz.ac.massey.cs.gpl4jung;
 public interface MotifReader {
 
 	Motif read(java.io.InputStream source) throws MotifReaderException ; 
-
 }

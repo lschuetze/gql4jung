@@ -3,6 +3,7 @@
 	<name>gpl4jung</name>
 	<comment></comment>
 	<projects>
+		<project>odem2graphml</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
