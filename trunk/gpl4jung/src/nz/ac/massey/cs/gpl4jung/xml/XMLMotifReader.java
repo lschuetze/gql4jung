@@ -10,39 +10,37 @@
 
 package nz.ac.massey.cs.gpl4jung.xml;
 
-import java.io.File;
 import java.io.InputStream;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
-import edu.uci.ics.jung.io.GraphMLFile;
-
-import nz.ac.massey.cs.gpl4jung.Motif;
-import nz.ac.massey.cs.gpl4jung.MotifReader;
-import nz.ac.massey.cs.gpl4jung.MotifReaderException;
+import nz.ac.massey.cs.gpl4jung.*;
 
 public class XMLMotifReader implements MotifReader {
 
 	@Override
 	public Motif read(InputStream source) throws MotifReaderException {
 		try {
-		JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gpl4jung.xml");
-		Unmarshaller unmarshaller = jc.createUnmarshaller();
-		Query q= (Query)unmarshaller.unmarshal(source);
-		System.out.println(q);
-		/*for (Object o:q.getVertexOrPathOrCondition()) {
-			if (o instanceof Query.Path) {
-				Query.Path p = (Query.Path)o;
-				System.out.println("path from " + p.getFrom() + " to " + p.getTo());
-			}
-		}*/
+			DefaultMotif motif = new DefaultMotif();
+			
+			JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gpl4jung.xml");
+			Unmarshaller unmarshaller = jc.createUnmarshaller();
+			Query q= (Query)unmarshaller.unmarshal(source);
+			System.out.println(q);
+			/*for (Object o:q.getVertexOrPathOrCondition()) {
+				if (o instanceof Query.Path) {
+					Query.Path p = (Query.Path)o;
+					System.out.println("path from " + p.getFrom() + " to " + p.getTo());
+				}
+			}*/
+			// TODO: set up motif 
+			
+			
+			return motif;
 		
 		} catch (JAXBException e) {
-			e.printStackTrace();
+			throw new MotifReaderException("exception reading motif from xml",e);
 		}	
-		return null;	//what to return eith whole query q or list of objects
-		
+				
 	}
 }
