@@ -77,14 +77,18 @@ public class GQLTests {
 	}
 	@Test
 	public void test1 () throws Exception {
-		Graph g = this.readJungGraphFromODEM("test_examples/dependency.odem");
+		Graph g = this.readJungGraphFromGraphML("test_examples/test1.graphml");
 		XMLMotifReader r = new XMLMotifReader();
 		Motif q = r.read(new FileInputStream ("xml/query1.xml"));
 		ResultCollector rc = new ResultCollector();
 		this.gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
 		
-		// TODO asserts
-		assertTrue(true); // YEAH!
+		// TODO replace dummies
+		assertEquals(1,results.size());
+		MotifInstance instance1 = results.get(0);
+		assertEquals("java.util.Collection",instance1.getVertex("service").getUserDatum("name"));
+		assertEquals("MyApplication",instance1.getVertex("client").getUserDatum("name"));
+		assertEquals("java.util.ArrayList",instance1.getVertex("service_impl").getUserDatum("name"));
 	}
 }
