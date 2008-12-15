@@ -10,8 +10,6 @@
 
 package nz.ac.massey.cs.gpl4jung;
 
-import edu.uci.ics.jung.graph.Vertex;
-
-public interface Constraint<T,P> {
+public interface Constraint {
 
 }

@@ -38,7 +38,7 @@ public class PathConstraint extends LinkConstraint<Path> {
 		this.minLength = minLength;
 	}
 	
-	public Iterator<ConnectedVertex<Path>> getPossibleSources(Graph g,Vertex source) {
+	public Iterator<ConnectedVertex<Path>> getPossibleSources(Graph g,Vertex target) {
 		return null; // TODO
 	}
 	public Iterator<ConnectedVertex<Path>>  getPossibleTargets(Graph g,Vertex source){
