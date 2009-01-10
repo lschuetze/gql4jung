@@ -21,16 +21,16 @@ import edu.uci.ics.jung.graph.Vertex;
  *
  * @param <T>
  */
-public abstract class LinkConstraint<T> implements Constraint {
+public abstract class LinkConstraint<T>{
 
 	private PropertyConstraint<Edge> edgePropertyConstraint = null;
 	/**
 	 * Given the target of the link returns possible pairs consisting of a source vertex and a link.
 	 * @param g
-	 * @param source
+	 * @param target
 	 * @return
 	 */
-	public abstract Iterator<ConnectedVertex<T>> getPossibleSources(Graph g,Vertex source);
+	public abstract Iterator<ConnectedVertex<T>> getPossibleSources(Graph g,Vertex target);
 	/**
 	 * Given the source of the link returns possible pairs consisting of a target vertex and a link.
 	 * @param g

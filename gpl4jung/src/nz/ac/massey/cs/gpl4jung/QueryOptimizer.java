@@ -20,5 +20,5 @@ import edu.uci.ics.jung.graph.Graph;
  *
  */
 public interface QueryOptimizer {
-	void optimize(Motif query,MotifInstance partialInstance,List<Constraint> remainingConstraints,Graph graph);
+	void optimize(Motif query,MotifInstance partialInstance,List<LinkConstraint> remainingConstraints,Graph graph);
 }

@@ -12,7 +12,6 @@ package nz.ac.massey.cs.gpl4jung;
 
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
 /**
  * This is the type for queries. Queries are usually build from query language expressions (query DSL, XML, ..).
  * @author jens.dietrich@gmail.com
@@ -23,8 +22,8 @@ public interface Motif {
 	 * @return
 	 * @throws JAXBException 
 	 */
-	List<String> getRoles() throws JAXBException;
-	List<Constraint> getConstraints();
-	void setConstraints(List<Constraint> constraints);
+	List<String> getRoles();
+	List<LinkConstraint> getConstraints();
+	void setConstraints(List<LinkConstraint> constraints);
 	
 }
