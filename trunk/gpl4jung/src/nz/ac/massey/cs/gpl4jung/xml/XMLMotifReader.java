@@ -11,10 +11,14 @@
 package nz.ac.massey.cs.gpl4jung.xml;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import nz.ac.massey.cs.gpl4jung.*;
+import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
 
 public class XMLMotifReader implements MotifReader {
 
@@ -22,20 +26,39 @@ public class XMLMotifReader implements MotifReader {
 	public Motif read(InputStream source) throws MotifReaderException {
 		try {
 			DefaultMotif motif = new DefaultMotif();
+			List<String> v_roles = new ArrayList<String>();
+			List<LinkConstraint> constraints = new ArrayList<LinkConstraint>();
+			PathConstraint pc = new PathConstraint();
 			
+			//unmarshalling xml query
 			JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gpl4jung.xml");
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			Query q= (Query)unmarshaller.unmarshal(source);
-			System.out.println(q);
-			/*for (Object o:q.getVertexOrPathOrCondition()) {
+			//System.out.println(q);
+			
+			//getting path constraint from query
+			for (Object o:q.getVertexOrPathOrCondition()) {
 				if (o instanceof Query.Path) {
 					Query.Path p = (Query.Path)o;
-					System.out.println("path from " + p.getFrom() + " to " + p.getTo());
+					//System.out.println("path from " + p.getFrom() + " to " + p.getTo());
+					pc.setMinLength(p.getMinLength());
+					pc.setMaxLength(p.getMaxLength());
 				}
-			}*/
+			}
+			
+			
+			//getting roles (vertex id) from query
+			for (Object o:q.getVertexOrPathOrCondition()) {
+				if (o instanceof Query.Vertex) {
+					Query.Vertex v = (Query.Vertex)o;
+					v_roles.add(v.id);
+					}
+			}
+			
 			// TODO: set up motif 
 			
-			
+			motif.setRoles(v_roles);
+			motif.setConstraints(constraints);
 			return motif;
 		
 		} catch (JAXBException e) {

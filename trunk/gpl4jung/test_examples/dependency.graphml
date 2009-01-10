@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<graph edgedefault="directed" file="">
+<node id="0" class.id="0" class.jar="dependency.jar" class.packageName="packageA" class.name="Class3" class.cluster="null" class.isInterface="false" class.isAbstract="false" class.isException="false" class.access="public" node.isSelected="false" reference="java.lang.Object|packageB.Class2|" classification="null" />
+<node id="1" class.id="1" class.jar="dependency.jar" class.packageName="packageA" class.name="Class1" class.cluster="null" class.isInterface="false" class.isAbstract="false" class.isException="false" class.access="public" node.isSelected="false" reference="java.lang.Object|java.lang.String|packageA.Class3|java.lang.System|java.io.PrintStream|java.lang.StringBuilder|" classification="null" />
+<node id="2" class.id="2" class.jar="dependency.jar" class.packageName="packageB" class.name="Class2" class.cluster="null" class.isInterface="false" class.isAbstract="false" class.isException="false" class.access="public" node.isSelected="false" reference="java.lang.Object|packageA.Class1|" classification="null" />
+<node id="3" class.id="3" class.jar="dependency.jar" class.packageName="packageB" class.name="Class4" class.cluster="null" class.isInterface="false" class.isAbstract="false" class.isException="false" class.access="public" node.isSelected="false" reference="java.lang.Object|packageB.Class2|" classification="null" />
+<edge id="edge-1" source="0" target="2" sourceId="0" targetId="2" relationship.type="uses" edge.isSelected="false" relationship.state="null" relationship.betweenness="null" relationship.separation="null" />
+<edge id="edge-4" source="1" target="0" sourceId="1" targetId="0" relationship.type="uses" edge.isSelected="false" relationship.state="null" relationship.betweenness="null" relationship.separation="null" />
+<edge id="edge-9" source="2" target="1" sourceId="2" targetId="1" relationship.type="uses" edge.isSelected="false" relationship.state="null" relationship.betweenness="null" relationship.separation="null" />
+<edge id="edge-11" source="3" target="2" sourceId="3" targetId="2" relationship.type="uses" edge.isSelected="false" relationship.state="null" relationship.betweenness="null" relationship.separation="null" />
+</graph>
+</graphml>

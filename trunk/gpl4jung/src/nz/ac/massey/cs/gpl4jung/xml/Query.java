@@ -1188,10 +1188,10 @@ public class Query {
         protected Query.Path.Not not;
         @XmlAttribute
         @XmlSchemaType(name = "positiveInteger")
-        protected BigInteger minLength;
+        protected int minLength;
         @XmlAttribute
         @XmlSchemaType(name = "positiveInteger")
-        protected BigInteger maxLength;
+        protected int maxLength;
         @XmlAttribute(required = true)
         protected String from;
         @XmlAttribute(required = true)
@@ -1325,7 +1325,7 @@ public class Query {
          *     {@link BigInteger }
          *     
          */
-        public BigInteger getMinLength() {
+        public int getMinLength() {
             return minLength;
         }
 
@@ -1337,7 +1337,7 @@ public class Query {
          *     {@link BigInteger }
          *     
          */
-        public void setMinLength(BigInteger value) {
+        public void setMinLength(int value) {
             this.minLength = value;
         }
 
@@ -1349,7 +1349,7 @@ public class Query {
          *     {@link BigInteger }
          *     
          */
-        public BigInteger getMaxLength() {
+        public int getMaxLength() {
             return maxLength;
         }
 
@@ -1361,7 +1361,7 @@ public class Query {
          *     {@link BigInteger }
          *     
          */
-        public void setMaxLength(BigInteger value) {
+        public void setMaxLength(int value) {
             this.maxLength = value;
         }
 
