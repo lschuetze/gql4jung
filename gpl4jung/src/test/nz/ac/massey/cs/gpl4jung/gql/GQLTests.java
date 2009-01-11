@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import nz.ac.massey.cs.gpl4jung.DefaultMotif;
@@ -79,6 +80,7 @@ public class GQLTests {
 		
 	}
 	@Test
+	//No decoupling through abstraction
 	public void test1 () throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/abstraction.graphml");
 		XMLMotifReader r = new XMLMotifReader();
@@ -87,15 +89,16 @@ public class GQLTests {
 		this.gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
 		
-		// TODO replace dummies
+		// when client "MyApplication" accesses both "Animal" abstract class & "Horse" Impl of animal
 		assertEquals(1,results.size());
 		MotifInstance instance1 = results.get(0);
-		assertEquals("java.util.Collection",instance1.getVertex("service").getUserDatum("name"));
+		assertEquals("Animal",instance1.getVertex("service").getUserDatum("name"));
 		assertEquals("MyApplication",instance1.getVertex("client").getUserDatum("name"));
-		assertEquals("java.util.ArrayList",instance1.getVertex("service_impl").getUserDatum("name"));
+		assertEquals("Horse",instance1.getVertex("service_impl").getUserDatum("name"));
 		//assertEquals(expected, actual)
 	}
 	@Test
+	//to test circular dependency between classes and packages. 
 	public void test2 () throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/dependency.graphml");
 		XMLMotifReader r = new XMLMotifReader();
@@ -104,12 +107,33 @@ public class GQLTests {
 		this.gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
 		
-		// TODO replace dummies
 		assertEquals(1,results.size());
 		MotifInstance instance1 = results.get(0);
-		assertEquals("java.util.Collection",instance1.getVertex("service").getUserDatum("name"));
-		assertEquals("MyApplication",instance1.getVertex("client").getUserDatum("name"));
-		assertEquals("java.util.ArrayList",instance1.getVertex("service_impl").getUserDatum("name"));
+		assertEquals("Class1",instance1.getVertex("Class1").getUserDatum("name"));
+		assertEquals("Class3",instance1.getVertex("Class3").getUserDatum("name"));
+		assertEquals("Class2",instance1.getVertex("Class2").getUserDatum("name"));
 		//assertEquals(expected, actual)
 	}
+	
+	@Test
+	// to test: no decoupling through abstraction
+	// class depends on ui layer and db layer
+	public void test3() throws Exception {
+		Graph g = this.readJungGraphFromGraphML("test_examples/separation.graphml");
+		XMLMotifReader r = new XMLMotifReader();
+		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/query3.xml"));
+		ResultCollector rc = new ResultCollector();
+		this.gql.query(g,q,rc);
+		List<MotifInstance> results = rc.getInstances();
+		
+		assertEquals(1,results.size());
+		MotifInstance instance1 = results.get(0);
+		assertEquals("MyClass",instance1.getVertex("ui").getUserDatum("name"));
+		assertEquals("MyClass",instance1.getVertex("db").getUserDatum("name"));
+		//assertEquals(expected, actual)
+	}
+	
+	
+		
 }
+
