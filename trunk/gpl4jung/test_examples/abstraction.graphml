@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
-<graph edgedefault="directed" file="">
-<node id="0" class.id="0" class.jar="abstraction.jar" class.packageName="animal" class.name="Animal" class.cluster="null" class.isInterface="false" class.isAbstract="true" class.isException="false" class.access="public" node.isSelected="false" reference="java.lang.Object|" classification="null" />
-</graph>
-</graphml>
