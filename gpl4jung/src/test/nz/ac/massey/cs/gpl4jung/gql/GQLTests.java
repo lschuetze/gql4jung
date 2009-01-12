@@ -97,8 +97,13 @@ public class GQLTests {
 		assertEquals("Horse",instance1.getVertex("service_impl").getUserDatum("name"));
 		//assertEquals(expected, actual)
 	}
+	// Testcase 1.1: Execute the above test case for both interfaces and abstract classes. 
+	// Testcase 1.2: Test for packages instead of classes. 
+	// Testcase 1.3: Test for inheritence hierarchies i.e. when abstrac class is extended to multiple levels
+	
+	
 	@Test
-	//to test circular dependency between classes and packages. 
+	//Testcase 2: circular dependency between classes and packages. 
 	public void test2 () throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/dependency.graphml");
 		XMLMotifReader r = new XMLMotifReader();
@@ -112,12 +117,16 @@ public class GQLTests {
 		assertEquals("Class1",instance1.getVertex("Class1").getUserDatum("name"));
 		assertEquals("Class3",instance1.getVertex("Class3").getUserDatum("name"));
 		assertEquals("Class2",instance1.getVertex("Class2").getUserDatum("name"));
-		//assertEquals(expected, actual)
 	}
+	// Testcase 2.1: Test for circular dependency between packages
+	// Testcase 2.2: Test for circular dependency between more than 3 classes/packages
+	// Testcase 2.3: Test for dependency path (uses relationship) of length 3 or more to 
+	//               detect the ripple effect in the software.
+		
 	
 	@Test
-	// to test: no decoupling through abstraction
-	// class depends on ui layer and db layer
+	// Testcase 3: Test for a class depending on both UI layer and DB layer
+	
 	public void test3() throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/separation.graphml");
 		XMLMotifReader r = new XMLMotifReader();
@@ -130,9 +139,13 @@ public class GQLTests {
 		MotifInstance instance1 = results.get(0);
 		assertEquals("MyClass",instance1.getVertex("ui").getUserDatum("name"));
 		assertEquals("MyClass",instance1.getVertex("db").getUserDatum("name"));
-		//assertEquals(expected, actual)
 	}
+	// Testcase 3.1: Test for different types of Database files e.g. MySQL, PostgreSQL, Access
+	// Testcase 3.2: Test for swing & awt classes, used in a class 
 	
+	
+	// Testcase 4: Test for multiple clusters in one package
+	// Testcase 4.1: Test for no clusters in one package
 	
 		
 }
