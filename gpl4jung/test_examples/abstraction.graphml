@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<graph edgedefault="directed" file="">
+<node id="0" class.id="0" class.jar="abstraction1.jar" class.packageName="animal" class.name="Animal" class.cluster="null" class.isInterface="false" class.isAbstract="true" class.isException="false" class.access="public" node.isSelected="false" reference="java.lang.Object|" classification="null" />
+<node id="1" class.id="1" class.jar="abstraction1.jar" class.packageName="animal" class.name="Horse" class.cluster="null" class.isInterface="false" class.isAbstract="false" class.isException="false" class.access="public" node.isSelected="false" reference="animal.Animal|" classification="null" />
+<node id="2" class.id="2" class.jar="abstraction1.jar" class.packageName="client" class.name="MyApplication" class.cluster="null" class.isInterface="false" class.isAbstract="false" class.isException="false" class.access="public" node.isSelected="false" reference="java.lang.Object|java.lang.String|animal.Animal|animal.Horse|java.lang.System|java.io.PrintStream|java.lang.StringBuilder|" classification="null" />
+<edge id="edge-1" source="1" target="0" sourceId="1" targetId="0" relationship.type="extends" edge.isSelected="false" relationship.state="null" relationship.betweenness="null" relationship.separation="null" />
+<edge id="edge-4" source="2" target="0" sourceId="2" targetId="0" relationship.type="uses" edge.isSelected="false" relationship.state="null" relationship.betweenness="null" relationship.separation="null" />
+<edge id="edge-5" source="2" target="1" sourceId="2" targetId="1" relationship.type="uses" edge.isSelected="false" relationship.state="null" relationship.betweenness="null" relationship.separation="null" />
+</graph>
+</graphml>
