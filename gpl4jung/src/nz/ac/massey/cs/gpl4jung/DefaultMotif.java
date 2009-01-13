@@ -10,14 +10,14 @@ public class DefaultMotif implements Motif {
 	public void setRoles(List<String> roles) {
 		this.roles = roles;
 	}
-	public List<Constraint> getConstraints() {
+	public List<LinkConstraint> getConstraints() {
 		return constraints;
 	}
-	public void setConstraints(List<Constraint> constraints) {
+	public void setConstraints(List<LinkConstraint> constraints) {
 		this.constraints = constraints;
 	}
 	private List<String> roles = new ArrayList<String>();
-	private List<Constraint> constraints = new ArrayList<Constraint>();
+	private List<LinkConstraint> constraints = new ArrayList<LinkConstraint>();
 
 
 }
