@@ -91,7 +91,7 @@ public class PathConstraint extends LinkConstraint<Path> {
 				List path = ShortestPathUtils.getPath(SPA,otherNode,target);
 				if (path!=null) {
 					PathImpl pp = new PathImpl();
-					// TODO
+					pp.setEdges(path);
 					ConnectedVertex<Path> p = new ConnectedVertex(pp,otherNode); // TODO
 					links.put(otherNode,p);
 				}
@@ -110,44 +110,51 @@ public class PathConstraint extends LinkConstraint<Path> {
 		};
 		Iterator<Vertex>  sources = IteratorUtils.filteredIterator(vItr,filter);
 		return IteratorUtils.transformedIterator(sources,transformer);
-//	
-//		/*boolean evaluate(Object obj)
-//		{
-//			Vertex x = (Vertex)x;
-//			return GraphProperties.isConnected(g);
-//		}*/
-//		return Iterator.filter(vItr, filter);
-//		
-//		//return null; // TODO
 	}
-	public Iterator<ConnectedVertex<Path>>  getPossibleTargets(Graph g,Vertex source){
-		return null; // TODO
-	}
-	public Path check(Graph g,Vertex source,Vertex target){
-		BFSDistanceLabeler bdl = new BFSDistanceLabeler();
-		bdl.labelDistances(g, source);
-		Set mPred = new HashSet();
-		
-		StringLabeller sl = StringLabeller.getLabeller(g);
-		
-		// grab a predecessor
-		Vertex v = target;
-		Set prd = bdl.getPredecessors(v);
-		mPred.add( target );
-		while( prd != null && prd.size() > 0) {
-			System.out.print("Preds of " + sl.getLabel(v) + " are: ");
-			for (Iterator iter = prd.iterator(); iter.hasNext();) {
-				Vertex x = (Vertex) iter.next();
-				System.out.print( sl.getLabel(x) +" " );
+	public Iterator<ConnectedVertex<Path>>  getPossibleTargets(final Graph g, final Vertex source){
+		final Collection<Vertex> nodes= g.getVertices();
+		final Iterator<Vertex> vItr = nodes.iterator();
+		final ShortestPath SPA = new DijkstraShortestPath(g);
+		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
+		Predicate filter = new Predicate() {
+			@Override
+			public boolean evaluate(Object e) {
+				Vertex otherNode = (Vertex)e;
+				List path = ShortestPathUtils.getPath(SPA, source,otherNode);
+				if (path!=null) {
+					PathImpl pp = new PathImpl();
+					pp.setEdges(path);
+					ConnectedVertex<Path> p = new ConnectedVertex(pp,otherNode); // TODO
+					links.put(otherNode,p);
+				}
+				return path!=null;
 			}
-			System.out.println();
-			v = (Vertex) prd.iterator().next();
-			mPred.add( v );
-			if ( v == source );
-			prd = bdl.getPredecessors(v);
-		}
-		
-		return null; // TODO
+		};
+		// vertex to path transformer
+		Transformer transformer = new Transformer() {
+			@Override
+			public Object transform(Object v) {
+				Vertex n = (Vertex)v;
+				ConnectedVertex<Path> p = links.get(n);
+				links.remove(p); // TODO - this should make it faster by keeping the size of the cache small
+				return p;
+			}
+		};
+		Iterator<Vertex>  targets = IteratorUtils.filteredIterator(vItr,filter);
+		return IteratorUtils.transformedIterator(targets,transformer);
 	}
-	
+	public Path check(final Graph g, final Vertex source, final Vertex target){
+		final Collection<Vertex> nodes= g.getVertices();
+		final ShortestPath SPA = new DijkstraShortestPath(g);
+		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
+		List path = ShortestPathUtils.getPath(SPA, source,target);
+		PathImpl pp = new PathImpl();
+		if (path!=null) {
+			pp.setEdges(path);
+			ConnectedVertex<Path> p = new ConnectedVertex(pp,source); // TODO
+			links.put(source,p);
+			};	
+		return pp;
+	}
 }
+

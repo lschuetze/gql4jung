@@ -19,10 +19,9 @@ public class PathImpl implements Path {
 	{
 		this.end=end;
 	}
-	public void setEdges(Vertex start, Vertex end)
+	public void setEdges(List edges)
 	{
-		this.start = start;
-		this.end = end;
+		this.edges = edges;
 	}
 	@Override
 	public List<Edge> getEdges() {
