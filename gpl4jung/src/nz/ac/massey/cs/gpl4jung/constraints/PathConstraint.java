@@ -10,13 +10,21 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.commons.collections.Predicate;
 
 import nz.ac.massey.cs.gpl4jung.LinkConstraint;
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
 import nz.ac.massey.cs.gpl4jung.Path;
+import edu.uci.ics.jung.algorithms.connectivity.BFSDistanceLabeler;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.graph.decorators.StringLabeller;
+import edu.uci.ics.jung.utils.GraphProperties;
 /**
  * Constraint to check the existence of paths between nodes.
  * @author jens.dietrich@gmail.com
@@ -39,12 +47,68 @@ public class PathConstraint extends LinkConstraint<Path> {
 	}
 	
 	public Iterator<ConnectedVertex<Path>> getPossibleSources(Graph g,Vertex target) {
-		return null; // TODO
+		BFSDistanceLabeler bdl = new BFSDistanceLabeler();
+		bdl.labelDistances(g, target);
+		Set mPred = new HashSet();
+		StringLabeller sl = StringLabeller.getLabeller(g);
+		// grab a predecessor
+		Vertex v = target;
+		Set prd = bdl.getPredecessors(v);
+		mPred.add( target );
+		while( prd != null && prd.size() > 0) {
+			System.out.print("Preds of " + sl.getLabel(v) + " are: ");
+			for (Iterator iter = prd.iterator(); iter.hasNext();) {
+				Vertex x = (Vertex) iter.next();
+				System.out.print( sl.getLabel(x) +" " );
+			}
+			System.out.println();
+			v = (Vertex) prd.iterator().next();
+			mPred.add( v );
+			if ( v == target ) 
+			prd = bdl.getPredecessors(v);
+		
+		}
+		return null;
+		//		final Collection<Vertex> nodes= g.getVertices();
+//		final Iterator<Vertex> vItr = nodes.iterator();
+//		Predicate filter = new PredicateDecorator();
+//	
+//		/*boolean evaluate(Object obj)
+//		{
+//			Vertex x = (Vertex)x;
+//			return GraphProperties.isConnected(g);
+//		}*/
+//		return Iterator.filter(vItr, filter);
+//		
+//		//return null; // TODO
 	}
 	public Iterator<ConnectedVertex<Path>>  getPossibleTargets(Graph g,Vertex source){
 		return null; // TODO
 	}
-	public Path  check(Graph g,Vertex source,Vertex target){
+	public Path check(Graph g,Vertex source,Vertex target){
+		BFSDistanceLabeler bdl = new BFSDistanceLabeler();
+		bdl.labelDistances(g, source);
+		Set mPred = new HashSet();
+		
+		StringLabeller sl = StringLabeller.getLabeller(g);
+		
+		// grab a predecessor
+		Vertex v = target;
+		Set prd = bdl.getPredecessors(v);
+		mPred.add( target );
+		while( prd != null && prd.size() > 0) {
+			System.out.print("Preds of " + sl.getLabel(v) + " are: ");
+			for (Iterator iter = prd.iterator(); iter.hasNext();) {
+				Vertex x = (Vertex) iter.next();
+				System.out.print( sl.getLabel(x) +" " );
+			}
+			System.out.println();
+			v = (Vertex) prd.iterator().next();
+			mPred.add( v );
+			if ( v == source );
+			prd = bdl.getPredecessors(v);
+		}
+		
 		return null; // TODO
 	}
 	
