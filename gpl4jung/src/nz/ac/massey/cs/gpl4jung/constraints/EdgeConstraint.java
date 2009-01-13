@@ -10,22 +10,21 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
-
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+import org.apache.commons.collections.Transformer;
 
 import nz.ac.massey.cs.gpl4jung.LinkConstraint;
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
-
+import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.predicates.EdgePredicate;
-import edu.uci.ics.jung.graph.predicates.SimpleEdgePredicate;
 /**
  * Constraint to check the existence of edges connecting nodes.
  * @author jens.dietrich@gmail.com
@@ -33,28 +32,69 @@ import edu.uci.ics.jung.graph.predicates.SimpleEdgePredicate;
  */
 public class EdgeConstraint extends LinkConstraint<Edge> {
 
-	public Iterator<ConnectedVertex<Edge>> getPossibleSources(Graph g,Vertex target) {
-		//final Iterator<Edge> eitr = new Iterator();
-		Collection<ConnectedVertex<Edge>> link = new ArrayList<ConnectedVertex<Edge>>();
-		//Predicate filter = new SimpleEdgePredicate();
-		for(Iterator eitr = g.getEdges().iterator(); eitr.hasNext();)
-		{
-			Edge iedge = (Edge) eitr.next();
-			if(iedge.getIncidentVertices().contains(target))
-			{
-				link = (Collection<ConnectedVertex<Edge>>) new ConnectedVertex(iedge,target);
+	public Iterator<ConnectedVertex<Edge>> getPossibleSources(final Graph g,final Vertex target) {
+		final Collection<Vertex> nodes= g.getVertices();
+		final DijkstraShortestPath DSP = new DijkstraShortestPath(g);
+		final Iterator<Vertex> vItr = nodes.iterator();
+		final Map<Vertex,ConnectedVertex<Edge>> links = new HashMap<Vertex,ConnectedVertex<Edge>>();
+		Predicate filter = new Predicate() {
+			@Override
+			public boolean evaluate(Object e) {
+				Vertex otherNode = (Vertex)e;
+				Edge edge = DSP.getIncomingEdge(otherNode, target);
+				if (edge!=null) {
+					ConnectedVertex<Edge> e1 = new ConnectedVertex(edge,otherNode); 
+					links.put(otherNode,e1);
+				}
+				return edge!=null;
 			}
-		}
-		
-		ConnectedVertex<Edge> cve = new ConnectedVertex<Edge>(null, target);
-		
-		return (Iterator<ConnectedVertex<Edge>>) cve; // TODO
+		};
+		// vertex to edge transformer
+		Transformer transformer = new Transformer() {
+			@Override
+			public Object transform(Object v) {
+				Vertex n = (Vertex)v;
+				ConnectedVertex<Edge> e1 = links.get(n);
+				links.remove(e1); // TODO - this should make it faster by keeping the size of the cache small
+				return e1;
+			}
+		};
+		Iterator<Vertex>  sources = IteratorUtils.filteredIterator(vItr,filter);
+		return IteratorUtils.transformedIterator(sources,transformer);
 	}
-	public Iterator<ConnectedVertex<Edge>>  getPossibleTargets(Graph g,Vertex source){
-		return null; // TODO
+	public Iterator<ConnectedVertex<Edge>> getPossibleTargets(final Graph g,final Vertex source){
+		final Collection<Vertex> nodes= g.getVertices();
+		final DijkstraShortestPath DSP = new DijkstraShortestPath(g);
+		final Iterator<Vertex> vItr = nodes.iterator();
+		final Map<Vertex,ConnectedVertex<Edge>> links = new HashMap<Vertex,ConnectedVertex<Edge>>();
+		Predicate filter = new Predicate() {
+			@Override
+			public boolean evaluate(Object e) {
+				Vertex otherNode = (Vertex)e;
+				Edge edge = DSP.getIncomingEdge(source, otherNode);
+				if (edge!=null) {
+					ConnectedVertex<Edge> e1 = new ConnectedVertex(edge,otherNode); 
+					links.put(otherNode,e1);
+				}
+				return edge!=null;
+			}
+		};
+		// vertex to edge transformer
+		Transformer transformer = new Transformer() {
+			@Override
+			public Object transform(Object v) {
+				Vertex n = (Vertex)v;
+				ConnectedVertex<Edge> e1 = links.get(n);
+				links.remove(e1); // TODO - this should make it faster by keeping the size of the cache small
+				return e1;
+			}
+		};
+		Iterator<Vertex> targets = IteratorUtils.filteredIterator(vItr,filter);
+		return IteratorUtils.transformedIterator(targets,transformer);
 	}
-	public Edge  check(Graph g,Vertex source,Vertex target){
-		return null; // TODO
+	public Edge check(final Graph g,final Vertex source, final Vertex target){
+		final DijkstraShortestPath DSP = new DijkstraShortestPath(g);
+		Edge edge = DSP.getIncomingEdge(source, target);
+		return edge;
 	}
-	
 }
