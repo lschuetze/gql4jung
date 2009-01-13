@@ -11,16 +11,25 @@
 package nz.ac.massey.cs.gpl4jung.constraints;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.Transformer;
 
 import nz.ac.massey.cs.gpl4jung.LinkConstraint;
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
 import nz.ac.massey.cs.gpl4jung.Path;
+import nz.ac.massey.cs.gpl4jung.impl.PathImpl;
 import edu.uci.ics.jung.algorithms.connectivity.BFSDistanceLabeler;
+import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
+import edu.uci.ics.jung.algorithms.shortestpath.ShortestPath;
+import edu.uci.ics.jung.algorithms.shortestpath.ShortestPathUtils;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.decorators.StringLabeller;
@@ -46,7 +55,8 @@ public class PathConstraint extends LinkConstraint<Path> {
 		this.minLength = minLength;
 	}
 	
-	public Iterator<ConnectedVertex<Path>> getPossibleSources(Graph g,Vertex target) {
+	public Iterator<ConnectedVertex<Path>> getPossibleSources(final Graph g,final Vertex target) {
+		/**
 		BFSDistanceLabeler bdl = new BFSDistanceLabeler();
 		bdl.labelDistances(g, target);
 		Set mPred = new HashSet();
@@ -69,9 +79,37 @@ public class PathConstraint extends LinkConstraint<Path> {
 		
 		}
 		return null;
-		//		final Collection<Vertex> nodes= g.getVertices();
-//		final Iterator<Vertex> vItr = nodes.iterator();
-//		Predicate filter = new PredicateDecorator();
+		*/
+		final Collection<Vertex> nodes= g.getVertices();
+		final Iterator<Vertex> vItr = nodes.iterator();
+		final ShortestPath SPA = new DijkstraShortestPath(g);
+		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
+		Predicate filter = new Predicate() {
+			@Override
+			public boolean evaluate(Object e) {
+				Vertex otherNode = (Vertex)e;
+				List path = ShortestPathUtils.getPath(SPA,otherNode,target);
+				if (path!=null) {
+					PathImpl pp = new PathImpl();
+					// TODO
+					ConnectedVertex<Path> p = new ConnectedVertex(pp,otherNode); // TODO
+					links.put(otherNode,p);
+				}
+				return path!=null;
+			}
+		};
+		// vertex to path transformer
+		Transformer transformer = new Transformer() {
+			@Override
+			public Object transform(Object v) {
+				Vertex n = (Vertex)v;
+				ConnectedVertex<Path> p = links.get(n);
+				links.remove(p); // TODO - this should make it faster by keeping the size of the cache small
+				return p;
+			}
+		};
+		Iterator<Vertex>  sources = IteratorUtils.filteredIterator(vItr,filter);
+		return IteratorUtils.transformedIterator(sources,transformer);
 //	
 //		/*boolean evaluate(Object obj)
 //		{
