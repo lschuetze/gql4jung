@@ -28,7 +28,8 @@ public class XMLMotifReader implements MotifReader {
 			DefaultMotif motif = new DefaultMotif();
 			List<String> v_roles = new ArrayList<String>();
 			List<LinkConstraint> constraints = new ArrayList<LinkConstraint>();
-			PathConstraint pc = new PathConstraint();
+			motif.setConstraints(constraints);
+			
 			
 			//unmarshalling xml query
 			JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gpl4jung.xml");
@@ -39,11 +40,18 @@ public class XMLMotifReader implements MotifReader {
 			//getting path constraint from query
 			for (Object o:q.getVertexOrPathOrCondition()) {
 				if (o instanceof Query.Path) {
+					PathConstraint pc = new PathConstraint();
 					Query.Path p = (Query.Path)o;
 					//System.out.println("path from " + p.getFrom() + " to " + p.getTo());
 					pc.setMinLength(p.getMinLength());
 					pc.setMaxLength(p.getMaxLength());
+					constraints.add(pc);
 				}
+				else if (o instanceof Query.Condition) {
+					Query.Condition p = (Query.Condition)o;
+					
+				}
+				// TODO: complex conditions, edge constraints ..
 			}
 			
 			
@@ -54,9 +62,7 @@ public class XMLMotifReader implements MotifReader {
 					v_roles.add(v.id);
 					}
 			}
-			
-			// TODO: set up motif 
-			
+
 			motif.setRoles(v_roles);
 			motif.setConstraints(constraints);
 			return motif;
