@@ -148,12 +148,13 @@ public class PathConstraint extends LinkConstraint<Path> {
 		final ShortestPath SPA = new DijkstraShortestPath(g);
 		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
 		List path = ShortestPathUtils.getPath(SPA, source,target);
-		PathImpl pp = new PathImpl();
+		PathImpl pp = null;
 		if (path!=null) {
+			pp = new PathImpl();
 			pp.setEdges(path);
 			ConnectedVertex<Path> p = new ConnectedVertex(pp,source); // TODO
 			links.put(source,p);
-			};	
+		};	
 		return pp;
 	}
 }

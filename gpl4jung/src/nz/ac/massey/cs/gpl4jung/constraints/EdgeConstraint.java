@@ -33,34 +33,16 @@ import edu.uci.ics.jung.graph.Vertex;
 public class EdgeConstraint extends LinkConstraint<Edge> {
 
 	public Iterator<ConnectedVertex<Edge>> getPossibleSources(final Graph g,final Vertex target) {
-		final Collection<Vertex> nodes= g.getVertices();
-		final DijkstraShortestPath DSP = new DijkstraShortestPath(g);
-		final Iterator<Vertex> vItr = nodes.iterator();
-		final Map<Vertex,ConnectedVertex<Edge>> links = new HashMap<Vertex,ConnectedVertex<Edge>>();
-		Predicate filter = new Predicate() {
-			@Override
-			public boolean evaluate(Object e) {
-				Vertex otherNode = (Vertex)e;
-				Edge edge = DSP.getIncomingEdge(otherNode, target);
-				if (edge!=null) {
-					ConnectedVertex<Edge> e1 = new ConnectedVertex(edge,otherNode); 
-					links.put(otherNode,e1);
-				}
-				return edge!=null;
-			}
-		};
-		// vertex to edge transformer
+		Iterator<Edge> incomingEdges = target.getInEdges().iterator();
+		
 		Transformer transformer = new Transformer() {
 			@Override
 			public Object transform(Object v) {
-				Vertex n = (Vertex)v;
-				ConnectedVertex<Edge> e1 = links.get(n);
-				links.remove(e1); // TODO - this should make it faster by keeping the size of the cache small
-				return e1;
+				Edge e = (Edge)v;
+				return e.getEndpoints().getFirst();
 			}
-		};
-		Iterator<Vertex>  sources = IteratorUtils.filteredIterator(vItr,filter);
-		return IteratorUtils.transformedIterator(sources,transformer);
+		};		
+		return IteratorUtils.transformedIterator(incomingEdges,transformer);
 	}
 	public Iterator<ConnectedVertex<Edge>> getPossibleTargets(final Graph g,final Vertex source){
 		final Collection<Vertex> nodes= g.getVertices();
