@@ -42,6 +42,20 @@ import edu.uci.ics.jung.utils.GraphProperties;
 public class PathConstraint extends LinkConstraint<Path> {
 	private int minLength = 1;
 	private int maxLength = -1; // this means unbound
+	private String from=null ,to =null;
+	
+	public String getFrom(){
+		return from;
+	}
+	public void setFrom(String from){
+		this.from = from;
+	}
+	public String getTo(){
+		return to;
+	}
+	public void setTo(String to){
+		this.to = to;
+	}
 	public int getMaxLength() {
 		return maxLength;
 	}

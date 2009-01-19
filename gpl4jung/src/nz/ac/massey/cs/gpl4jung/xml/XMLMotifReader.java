@@ -18,6 +18,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import nz.ac.massey.cs.gpl4jung.*;
+import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
 
 public class XMLMotifReader implements MotifReader {
@@ -28,43 +29,60 @@ public class XMLMotifReader implements MotifReader {
 			DefaultMotif motif = new DefaultMotif();
 			List<String> v_roles = new ArrayList<String>();
 			List<LinkConstraint> constraints = new ArrayList<LinkConstraint>();
+			motif.setRoles(v_roles);
 			motif.setConstraints(constraints);
-			
-			
+					
 			//unmarshalling xml query
 			JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gpl4jung.xml");
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			Query q= (Query)unmarshaller.unmarshal(source);
 			//System.out.println(q);
 			
-			//getting path constraint from query
-			for (Object o:q.getVertexOrPathOrCondition()) {
-				if (o instanceof Query.Path) {
+			
+			for (Object o:q.getVertexOrPathOrEdge()) {
+				//getting roles (vertex id) from query
+				if (o instanceof Query.Vertex) {
+					Query.Vertex v = (Query.Vertex)o;
+					v_roles.add(v.id);
+					}
+				//getting path constraint from query
+				else if (o instanceof Query.Path) {
 					PathConstraint pc = new PathConstraint();
 					Query.Path p = (Query.Path)o;
 					//System.out.println("path from " + p.getFrom() + " to " + p.getTo());
 					pc.setMinLength(p.getMinLength());
 					pc.setMaxLength(p.getMaxLength());
+					pc.setFrom(p.getFrom());
+					pc.setTo(p.getTo());
 					constraints.add(pc);
 				}
 				else if (o instanceof Query.Condition) {
 					Query.Condition p = (Query.Condition)o;
-					
+					LinkConstraint condition = null;
+					constraints.add((LinkConstraint) p.getAttribute());
+					condition.setPredicate(p.getPredicate());
+					constraints.add(condition);					
 				}
-				// TODO: complex conditions, edge constraints ..
+				else if (o instanceof Query.Edge){
+					Query.Edge p = (Query.Edge) o;
+					EdgeConstraint ec = new EdgeConstraint();
+					ec.setSource(p.getSource());
+					ec.setTarget(p.getTarget());
+					constraints.add(ec);
+				}
+				else if (o instanceof Query.ExistsNot){
+					Query.ExistsNot e = (Query.ExistsNot)o;
+					v_roles.add(e.getVertex().getId()); //gets vertex id in complex condition of Exists not
+				}
+				else if (o instanceof Query.Not){
+					Query.Not n = (Query.Not)o;
+					LinkConstraint notcond = null;
+					notcond.setPredicate(n.getCondition().getPredicate()); //gets predicate from NOT CONDITION
+					constraints.add((LinkConstraint) n.getCondition().getAttribute()); //gets list of attributes from NOT CONDITION ATTRIBUTEs
+					constraints.add(notcond);
+				}			
 			}
 			
-			
-			//getting roles (vertex id) from query
-			for (Object o:q.getVertexOrPathOrCondition()) {
-				if (o instanceof Query.Vertex) {
-					Query.Vertex v = (Query.Vertex)o;
-					v_roles.add(v.id);
-					}
-			}
-
-			motif.setRoles(v_roles);
-			motif.setConstraints(constraints);
 			return motif;
 		
 		} catch (JAXBException e) {
