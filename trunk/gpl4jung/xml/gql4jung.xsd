@@ -119,6 +119,21 @@
               <xs:attribute name="to" type="xs:string" use="required" />
             </xs:complexType>
           </xs:element>
+          <!--'edge' element definition-->
+          <xs:element name="edge" maxOccurs="unbounded" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="property">
+                  <xs:complexType>
+                    <xs:attribute name="key" type="xs:string" use="required" />
+                    <xs:attribute name="value" type="xs:string" use="required" />
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="source" type="xs:string" use="required" />
+              <xs:attribute name="target" type="xs:string" use="required" />
+            </xs:complexType>
+          </xs:element>
           <!--'condition' element definition-->
           <xs:element name="condition">
             <xs:complexType>
