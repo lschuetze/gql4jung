@@ -60,16 +60,16 @@ private String source=null ,target =null;
 		return IteratorUtils.transformedIterator(incomingEdges,transformer);
 	}
 	public Iterator<ConnectedVertex<Edge>> getPossibleTargets(final Graph g,final Vertex source){
-	Iterator<Edge> incomingEdges = source.getInEdges().iterator();
+	Iterator<Edge> outgoingEdges = source.getOutEdges().iterator();
 		
 		Transformer transformer = new Transformer() {
 			@Override
 			public Object transform(Object v) {
 				Edge e = (Edge)v;
-				return e.getEndpoints().getSecond();
+				return e.getEndpoints().getFirst();
 			}
 		};		
-		return IteratorUtils.transformedIterator(incomingEdges,transformer);
+		return IteratorUtils.transformedIterator(outgoingEdges,transformer);
 	}
 	
 	public Edge check(final Graph g,final Vertex source, final Vertex target){

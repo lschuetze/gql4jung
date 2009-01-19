@@ -19,7 +19,7 @@ public class PathImpl implements Path {
 	{
 		this.end=end;
 	}
-	public void setEdges(List edges)
+	public void setEdges(List<Edge> edges)
 	{
 		this.edges = edges;
 	}
