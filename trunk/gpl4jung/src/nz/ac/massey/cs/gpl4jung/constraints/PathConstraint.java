@@ -70,30 +70,7 @@ public class PathConstraint extends LinkConstraint<Path> {
 	}
 	
 	public Iterator<ConnectedVertex<Path>> getPossibleSources(final Graph g,final Vertex target) {
-		/**
-		BFSDistanceLabeler bdl = new BFSDistanceLabeler();
-		bdl.labelDistances(g, target);
-		Set mPred = new HashSet();
-		StringLabeller sl = StringLabeller.getLabeller(g);
-		// grab a predecessor
-		Vertex v = target;
-		Set prd = bdl.getPredecessors(v);
-		mPred.add( target );
-		while( prd != null && prd.size() > 0) {
-			System.out.print("Preds of " + sl.getLabel(v) + " are: ");
-			for (Iterator iter = prd.iterator(); iter.hasNext();) {
-				Vertex x = (Vertex) iter.next();
-				System.out.print( sl.getLabel(x) +" " );
-			}
-			System.out.println();
-			v = (Vertex) prd.iterator().next();
-			mPred.add( v );
-			if ( v == target ) 
-			prd = bdl.getPredecessors(v);
 		
-		}
-		return null;
-		*/
 		final Collection<Vertex> nodes= g.getVertices();
 		final Iterator<Vertex> vItr = nodes.iterator();
 		final ShortestPath SPA = new DijkstraShortestPath(g);

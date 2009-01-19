@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.Iterator;
 import java.util.Set;
 
+import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
 import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 
 import org.junit.Test;
@@ -92,13 +93,45 @@ public class EdgeConstraintTests {
 	}
 
 	@Test
-	public void testGetPossibleSourcesGraphVertex() {
-		fail("Not yet implemented"); // TODO
+	public void testGetPossibleSources() {
+		EdgeConstraint ec = new EdgeConstraint();
+		buildGraph();
+		Vertex testv4 = null;
+		for (Iterator iter = g.getVertices().iterator(); iter.hasNext();){
+			Vertex v = (Vertex) iter.next();
+			if(v.toString().equalsIgnoreCase("V4")){
+				testv4 = (Vertex) v;
+			}
+		}
+		Iterator ps =  ec.getPossibleSources(g, testv4);	//TODO: DISCUSS
+		Set<Edge> ps1 = null;
+		for (Iterator i=ps;i.hasNext();){
+			Edge ie = (Edge)i.next();
+			ps1.add(ie);
+		}
+		String result = "[E3(V3,V4), E2(V1,V4)]";
+		assertEquals(result, ps1.toString());
 	}
 
 	@Test
-	public void testGetPossibleTargetsGraphVertex() {
-		fail("Not yet implemented"); // TODO
+	public void testGetPossibleTargets() {
+		EdgeConstraint ec = new EdgeConstraint();
+		buildGraph();
+		Vertex testv4 = null;
+		for (Iterator iter = g.getVertices().iterator(); iter.hasNext();){
+			Vertex v = (Vertex) iter.next();
+			if(v.toString().equalsIgnoreCase("V4")){
+				testv4 = (Vertex) v;
+			}
+		}
+		Iterator pt =  ec.getPossibleTargets(g, testv4);	//TODO: DISCUSS
+		Set<Edge> ps1 = null;
+		for (Iterator i=pt;i.hasNext();){
+			Edge ie = (Edge)i.next();
+			ps1.add(ie);
+		}
+		String result = "[E4(V4,V5), E5(V4,V7)]"; //result to compare with actual
+		assertEquals(result, ps1.toString());
 	}
 
 	@Test
@@ -115,8 +148,7 @@ public class EdgeConstraintTests {
         	}	
         }
 		Edge testedge = ec.check(g, testv1, testv4);
-		String testEdgeStr = testedge.toString();
-		assertEquals("E2(V1,V4)", testEdgeStr);
+		assertEquals("E2(V1,V4)", testedge.toString());
 	
 	}
 
