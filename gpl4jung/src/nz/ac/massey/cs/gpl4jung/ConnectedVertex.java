@@ -39,4 +39,33 @@ public class ConnectedVertex<ConnectionType> {
 	public void setVertex(Vertex vertex) {
 		this.vertex = vertex;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((link == null) ? 0 : link.hashCode());
+		result = prime * result + ((vertex == null) ? 0 : vertex.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ConnectedVertex other = (ConnectedVertex) obj;
+		if (link == null) {
+			if (other.link != null)
+				return false;
+		} else if (!link.equals(other.link))
+			return false;
+		if (vertex == null) {
+			if (other.vertex != null)
+				return false;
+		} else if (!vertex.equals(other.vertex))
+			return false;
+		return true;
+	}
 }

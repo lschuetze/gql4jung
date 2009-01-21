@@ -3,16 +3,20 @@ package test.nz.ac.massey.cs.gpl4jung.gql;
 import static org.junit.Assert.*;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
 import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.junit.Test;
 
+import edu.uci.ics.jung.graph.ArchetypeEdge;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.graph.decorators.EdgeStringer;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
@@ -59,58 +63,45 @@ public class EdgeConstraintTests {
         g.addEdge(e7);
         g.addEdge(e8);
 	}
-	
-	@Test
-	public void testGetSource() {
-		EdgeConstraint ec = new EdgeConstraint();
-		String source="V0";
-		ec.setSource(source);
-		assertEquals(source, ec.getSource());
-	}
-
-	@Test
-	public void testSetSource() {
-		EdgeConstraint ec = new EdgeConstraint();
-		String source="V0";
-		ec.setSource(source);
-		assertEquals(source, ec.getSource());
-	}
-
-	@Test
-	public void testGetTarget() {
-		EdgeConstraint ec = new EdgeConstraint();
-		String target="V1";
-		ec.setTarget(target);
-		assertEquals(target, ec.getTarget());
-	}
-
-	@Test
-	public void testSetTarget() {
-		EdgeConstraint ec = new EdgeConstraint();
-		String target="V1";
-		ec.setTarget(target);
-		assertEquals(target, ec.getTarget());
-	}
 
 	@Test
 	public void testGetPossibleSources() {
 		EdgeConstraint ec = new EdgeConstraint();
 		buildGraph();
-		Vertex testv4 = null;
+		Vertex testv4 = null, connectedv1=null, connectedv3=null;
 		for (Iterator iter = g.getVertices().iterator(); iter.hasNext();){
 			Vertex v = (Vertex) iter.next();
 			if(v.toString().equalsIgnoreCase("V4")){
 				testv4 = (Vertex) v;
 			}
 		}
-		Iterator ps =  ec.getPossibleSources(g, testv4);	//TODO: DISCUSS
-		Set<Edge> ps1 = null;
-		for (Iterator i=ps;i.hasNext();){
-			Edge ie = (Edge)i.next();
-			ps1.add(ie);
+		Iterator<ConnectedVertex<Edge>> ps =  ec.getPossibleSources(g, testv4);	//TODO: DISCUSS
+		
+		List<ConnectedVertex<Edge>> list = IteratorUtils.toList(ps);
+		System.out.println(list);
+		//obtaining link,vertex for connected vertex and intializing it for v1
+		for (Iterator iter = g.getVertices().iterator(); iter.hasNext();){
+			Vertex v = (Vertex) iter.next();
+			if(v.toString().equalsIgnoreCase("V1")){
+				connectedv1 = (Vertex) v;
+			}
 		}
-		String result = "[E3(V3,V4), E2(V1,V4)]";
-		assertEquals(result, ps1.toString());
+		Edge connectedlink = connectedv1.findEdge(testv4);
+		ConnectedVertex<Edge> v1 = new ConnectedVertex<Edge>(connectedlink, connectedv1);
+		
+		//obtaining link,vertex for connected vertex and intializing it for v3
+		for (Iterator iter = g.getVertices().iterator(); iter.hasNext();){
+			Vertex v = (Vertex) iter.next();
+			if(v.toString().equalsIgnoreCase("V3")){
+				connectedv3 = (Vertex) v;
+			}
+		}
+		Edge connectedlink2 = connectedv1.findEdge(testv4);
+		ConnectedVertex<Edge> v3 = new ConnectedVertex<Edge>(connectedlink2, connectedv3);
+		
+		//assertEquals(2, list.size());
+		assertTrue(list.equals(v1));
+		assertTrue(list.contains(v3));
 	}
 
 	@Test
@@ -124,18 +115,14 @@ public class EdgeConstraintTests {
 				testv4 = (Vertex) v;
 			}
 		}
-		Iterator pt =  ec.getPossibleTargets(g, testv4);	//TODO: DISCUSS
-		Set<Edge> ps1 = null;
-		for (Iterator i=pt;i.hasNext();){
-			Edge ie = (Edge)i.next();
-			ps1.add(ie);
-		}
-		String result = "[E4(V4,V5), E5(V4,V7)]"; //result to compare with actual
-		assertEquals(result, ps1.toString());
+		Iterator<ConnectedVertex<Edge>> ps =  ec.getPossibleTargets(g, testv4);
+		List<ConnectedVertex<Edge>> list = IteratorUtils.toList(ps);
+		System.out.println(list); //should print [v5, v7]
+		assertEquals(2, list.size());
 	}
 
 	@Test
-	public void testCheckGraphVertexVertex() {
+	public void testCheck() {
 		EdgeConstraint ec = new EdgeConstraint();
 		buildGraph();
 		Vertex testv1=null, testv4=null;
@@ -148,7 +135,15 @@ public class EdgeConstraintTests {
         	}	
         }
 		Edge testedge = ec.check(g, testv1, testv4);
-		assertEquals("E2(V1,V4)", testedge.toString());
+        EdgeStringer stringer = new EdgeStringer(){
+
+			@Override
+			public String getLabel(ArchetypeEdge e) {
+				return e.toString();
+			}
+        	
+        };
+		assertEquals("E2(V1,V4)", stringer.getLabel(testedge));
 	
 	}
 

@@ -26,7 +26,6 @@ import nz.ac.massey.cs.gpl4jung.LinkConstraint;
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
 import nz.ac.massey.cs.gpl4jung.Path;
 import nz.ac.massey.cs.gpl4jung.impl.PathImpl;
-import edu.uci.ics.jung.algorithms.connectivity.BFSDistanceLabeler;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.algorithms.shortestpath.ShortestPath;
 import edu.uci.ics.jung.algorithms.shortestpath.ShortestPathUtils;
@@ -41,21 +40,8 @@ import edu.uci.ics.jung.utils.GraphProperties;
  */
 public class PathConstraint extends LinkConstraint<Path> {
 	private int minLength = 1;
-	private int maxLength = -1; // this means unbound
-	private String from=null ,to =null;
+	private int maxLength = -1; // this means unbound	
 	
-	public String getFrom(){
-		return from;
-	}
-	public void setFrom(String from){
-		this.from = from;
-	}
-	public String getTo(){
-		return to;
-	}
-	public void setTo(String to){
-		this.to = to;
-	}
 	public int getMaxLength() {
 		return maxLength;
 	}
