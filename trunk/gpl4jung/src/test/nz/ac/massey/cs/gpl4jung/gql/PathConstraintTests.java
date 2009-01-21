@@ -3,13 +3,20 @@ package test.nz.ac.massey.cs.gpl4jung.gql;
 import static org.junit.Assert.*;
 
 import java.util.Iterator;
+import java.util.List;
 
+import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
 import nz.ac.massey.cs.gpl4jung.Path;
+import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
 import nz.ac.massey.cs.gpl4jung.impl.PathImpl;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.junit.Test;
 
+import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
+import edu.uci.ics.jung.algorithms.shortestpath.ShortestPath;
+import edu.uci.ics.jung.algorithms.shortestpath.ShortestPathUtils;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -60,41 +67,6 @@ public class PathConstraintTests {
         g.addEdge(e8);
 	}
 
-	@Test
-	public void testGetFrom() {
-		PathConstraint pc = new PathConstraint();
-		String str = "V1";
-		pc.setFrom(str);
-		String actual = pc.getFrom();
-		assertEquals(str, actual);
-	}
-
-	@Test
-	public void testSetFrom() {
-		PathConstraint pc = new PathConstraint();
-		String str = "V2";
-		pc.setFrom(str);
-		String actual = pc.getFrom();
-		assertEquals(str, actual);
-	}
-
-	@Test
-	public void testGetTo() {
-		PathConstraint pc = new PathConstraint();
-		String str = "V3";
-		pc.setTo(str);
-		String actual = pc.getTo();
-		assertEquals(str, actual);
-	}
-
-	@Test
-	public void testSetTo() {
-		PathConstraint pc = new PathConstraint();
-		String str = "V4";
-		pc.setTo(str);
-		String actual = pc.getTo();
-		assertEquals(str, actual);
-	}
 
 	@Test
 	public void testGetMaxLength() {
@@ -134,7 +106,32 @@ public class PathConstraintTests {
 
 	@Test
 	public void testGetPossibleSources() {
-		fail("Not yet implemented"); // TODO
+		PathConstraint pc = new PathConstraint();
+		buildGraph();
+		Vertex testv4 = null, connectedv1=null;
+		for (Iterator iter = g.getVertices().iterator(); iter.hasNext();){
+			Vertex v = (Vertex) iter.next();
+			if(v.toString().equalsIgnoreCase("V4")){
+				testv4 = (Vertex) v;
+			}
+		}
+		Iterator<ConnectedVertex<Path>> ps =  pc.getPossibleSources(g, testv4);
+		List<ConnectedVertex<Path>> list = IteratorUtils.toList(ps);
+		//obtaining link,vertex for connected vertex and intializing it for v1
+		for (Iterator iter = g.getVertices().iterator(); iter.hasNext();){
+			Vertex v = (Vertex) iter.next();
+			if(v.toString().equalsIgnoreCase("V1")){
+				connectedv1 = (Vertex) v;
+			}
+		}
+		ShortestPath SPA = new DijkstraShortestPath(g);
+		List path = ShortestPathUtils.getPath(SPA,connectedv1,testv4);
+		PathImpl p = new PathImpl();
+		p.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v1 = new ConnectedVertex<Path>(p, connectedv1);
+		assertTrue(list.equals(v1));
+		//assertEquals(10, list.size());
+	
 	}
 
 	@Test

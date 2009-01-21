@@ -21,6 +21,7 @@ import org.apache.commons.collections.Transformer;
 
 import nz.ac.massey.cs.gpl4jung.LinkConstraint;
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
+import nz.ac.massey.cs.gpl4jung.Path;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
@@ -32,21 +33,7 @@ import edu.uci.ics.jung.graph.Vertex;
  */
 public class EdgeConstraint extends LinkConstraint<Edge> {
 	
-private String source=null ,target =null;
 	
-	public String getSource(){
-		return source;
-	}
-	public void setSource(String source){
-		this.source = source;
-	}
-	public String getTarget(){
-		return target;
-	}
-	public void setTarget(String target){
-		this.target = target;
-	}
-
 	public Iterator<ConnectedVertex<Edge>> getPossibleSources(final Graph g,final Vertex target) {
 		Iterator<Edge> incomingEdges = target.getInEdges().iterator();
 		
@@ -66,7 +53,7 @@ private String source=null ,target =null;
 			@Override
 			public Object transform(Object v) {
 				Edge e = (Edge)v;
-				return e.getEndpoints().getFirst();
+				return e.getEndpoints().getSecond();
 			}
 		};		
 		return IteratorUtils.transformedIterator(outgoingEdges,transformer);

@@ -52,8 +52,8 @@ public class XMLMotifReader implements MotifReader {
 					//System.out.println("path from " + p.getFrom() + " to " + p.getTo());
 					pc.setMinLength(p.getMinLength());
 					pc.setMaxLength(p.getMaxLength());
-					pc.setFrom(p.getFrom());
-					pc.setTo(p.getTo());
+//					pc.setFrom(p.getFrom());
+//					pc.setTo(p.getTo());
 					constraints.add(pc);
 				}
 				else if (o instanceof Query.Condition) {
@@ -66,8 +66,8 @@ public class XMLMotifReader implements MotifReader {
 				else if (o instanceof Query.Edge){
 					Query.Edge p = (Query.Edge) o;
 					EdgeConstraint ec = new EdgeConstraint();
-					ec.setSource(p.getSource());
-					ec.setTarget(p.getTarget());
+//					ec.setSource(p.getSource());
+//					ec.setTarget(p.getTarget());
 					constraints.add(ec);
 				}
 				else if (o instanceof Query.ExistsNot){
