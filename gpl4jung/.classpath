@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/commons-collections-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/colt.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Ali/Desktop/JUNG/jung-1.7.6-src.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Ali/Desktop/googlecollection/google-collect-snapshot-20080820/google-collect-snapshot-20080820.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

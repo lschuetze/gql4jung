@@ -12,14 +12,9 @@ package nz.ac.massey.cs.gpl4jung.constraints;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.collections.Transformer;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
@@ -33,8 +28,6 @@ import edu.uci.ics.jung.algorithms.shortestpath.ShortestPath;
 import edu.uci.ics.jung.algorithms.shortestpath.ShortestPathUtils;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.StringLabeller;
-import edu.uci.ics.jung.utils.GraphProperties;
 /**
  * Constraint to check the existence of paths between nodes.
  * @author jens.dietrich@gmail.com
@@ -43,19 +36,6 @@ import edu.uci.ics.jung.utils.GraphProperties;
 public class PathConstraint extends LinkConstraint<Path> {
 	private int minLength = 1;
 	private int maxLength = -1; // this means unbound	
-	
-	public int getMaxLength() {
-		return maxLength;
-	}
-	public void setMaxLength(int maxLength) {
-		this.maxLength = maxLength;
-	}
-	public int getMinLength() {
-		return minLength;
-	}
-	public void setMinLength(int minLength) {
-		this.minLength = minLength;
-	}
 	
 	public Iterator<ConnectedVertex<Path>> getPossibleSources(final Graph g,final Vertex target) {
 		
@@ -70,7 +50,7 @@ public class PathConstraint extends LinkConstraint<Path> {
 				if (path!=null) {
 					PathImpl pp = new PathImpl();
 					pp.setEdges(path);
-					ConnectedVertex<Path> p = new ConnectedVertex(pp,v); // TODO
+					ConnectedVertex<Path> p = new ConnectedVertex(pp,v); 
 					links.put(v,p);
 				}
 				return path!=null;
@@ -85,7 +65,7 @@ public class PathConstraint extends LinkConstraint<Path> {
 				return p;
 			}
 		};
-		Iterator<Vertex>  sources = Iterators.filter(vItr,filter);
+		Iterator<Vertex> sources = Iterators.filter(vItr,filter);
 		return Iterators.transform(sources,transformer);
 	}
 	public Iterator<ConnectedVertex<Path>>  getPossibleTargets(final Graph g, final Vertex source){
@@ -93,32 +73,32 @@ public class PathConstraint extends LinkConstraint<Path> {
 		final Iterator<Vertex> vItr = nodes.iterator();
 		final ShortestPath SPA = new DijkstraShortestPath(g);
 		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
-		Predicate filter = new Predicate() {
+		Predicate<Vertex> filter = new Predicate<Vertex>() {
 			@Override
-			public boolean evaluate(Object e) {
-				Vertex otherNode = (Vertex)e;
+			public boolean apply(Vertex v) {
+				Vertex otherNode = (Vertex)v;
 				List path = ShortestPathUtils.getPath(SPA, source,otherNode);
 				if (path!=null) {
 					PathImpl pp = new PathImpl();
 					pp.setEdges(path);
-					ConnectedVertex<Path> p = new ConnectedVertex(pp,otherNode); // TODO
+					ConnectedVertex<Path> p = new ConnectedVertex(pp,otherNode); 
 					links.put(otherNode,p);
 				}
 				return path!=null;
 			}
 		};
 		// vertex to path transformer
-		Transformer transformer = new Transformer() {
+		Function<Vertex,ConnectedVertex<Path>> transformer = new Function<Vertex,ConnectedVertex<Path>>() {
+
 			@Override
-			public Object transform(Object v) {
-				Vertex n = (Vertex)v;
-				ConnectedVertex<Path> p = links.get(n);
-				links.remove(p); // TODO - this should make it faster by keeping the size of the cache small
-				return p;
-			}
+			public ConnectedVertex<Path> apply(Vertex n) {
+					ConnectedVertex<Path> p = links.get(n);
+					links.remove(p); // TODO - this should make it faster by keeping the size of the cache small
+					return p;
+				}			
 		};
-		Iterator<Vertex>  targets = IteratorUtils.filteredIterator(vItr,filter);
-		return IteratorUtils.transformedIterator(targets,transformer);
+		Iterator<Vertex>  targets = Iterators.filter(vItr,filter);
+		return Iterators.transform(targets,transformer);
 	}
 	public Path check(final Graph g, final Vertex source, final Vertex target){
 		final Collection<Vertex> nodes= g.getVertices();
@@ -129,10 +109,24 @@ public class PathConstraint extends LinkConstraint<Path> {
 		if (path!=null) {
 			pp = new PathImpl();
 			pp.setEdges(path);
-			ConnectedVertex<Path> p = new ConnectedVertex(pp,source); // TODO
+			ConnectedVertex<Path> p = new ConnectedVertex(pp,source); 
 			links.put(source,p);
 		};	
 		return pp;
 	}
+
+	public int getMaxLength() {
+		return maxLength;
+	}
+	public void setMaxLength(int maxLength) {
+		this.maxLength = maxLength;
+	}
+	public int getMinLength() {
+		return minLength;
+	}
+	public void setMinLength(int minLength) {
+		this.minLength = minLength;
+	}
+
 }
 
