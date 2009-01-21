@@ -18,9 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
 
 import nz.ac.massey.cs.gpl4jung.LinkConstraint;
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
@@ -61,32 +63,30 @@ public class PathConstraint extends LinkConstraint<Path> {
 		final Iterator<Vertex> vItr = nodes.iterator();
 		final ShortestPath SPA = new DijkstraShortestPath(g);
 		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
-		Predicate filter = new Predicate() {
+		Predicate<Vertex> filter = new Predicate<Vertex>() {
 			@Override
-			public boolean evaluate(Object e) {
-				Vertex otherNode = (Vertex)e;
-				List path = ShortestPathUtils.getPath(SPA,otherNode,target);
+			public boolean apply(Vertex v) {
+				List path = ShortestPathUtils.getPath(SPA,v,target);
 				if (path!=null) {
 					PathImpl pp = new PathImpl();
 					pp.setEdges(path);
-					ConnectedVertex<Path> p = new ConnectedVertex(pp,otherNode); // TODO
-					links.put(otherNode,p);
+					ConnectedVertex<Path> p = new ConnectedVertex(pp,v); // TODO
+					links.put(v,p);
 				}
 				return path!=null;
 			}
 		};
 		// vertex to path transformer
-		Transformer transformer = new Transformer() {
+		Function<Vertex,ConnectedVertex<Path>> transformer = new Function<Vertex,ConnectedVertex<Path>>() {
 			@Override
-			public Object transform(Object v) {
-				Vertex n = (Vertex)v;
+			public ConnectedVertex<Path> apply(Vertex n) {
 				ConnectedVertex<Path> p = links.get(n);
 				links.remove(p); // TODO - this should make it faster by keeping the size of the cache small
 				return p;
 			}
 		};
-		Iterator<Vertex>  sources = IteratorUtils.filteredIterator(vItr,filter);
-		return IteratorUtils.transformedIterator(sources,transformer);
+		Iterator<Vertex>  sources = Iterators.filter(vItr,filter);
+		return Iterators.transform(sources,transformer);
 	}
 	public Iterator<ConnectedVertex<Path>>  getPossibleTargets(final Graph g, final Vertex source){
 		final Collection<Vertex> nodes= g.getVertices();
