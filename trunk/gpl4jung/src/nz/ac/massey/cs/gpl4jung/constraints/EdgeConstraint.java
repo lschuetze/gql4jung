@@ -10,22 +10,12 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-
-import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.Transformer;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 
 import nz.ac.massey.cs.gpl4jung.LinkConstraint;
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
-import nz.ac.massey.cs.gpl4jung.Path;
-import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -35,7 +25,6 @@ import edu.uci.ics.jung.graph.Vertex;
  *
  */
 public class EdgeConstraint extends LinkConstraint<Edge> {
-	
 	
 	public Iterator<ConnectedVertex<Edge>> getPossibleSources(final Graph g,final Vertex target) {
 		Iterator<Edge> incomingEdges = target.getInEdges().iterator();
@@ -51,16 +40,18 @@ public class EdgeConstraint extends LinkConstraint<Edge> {
 		return Iterators.transform(incomingEdges,transformer);
 	}
 	public Iterator<ConnectedVertex<Edge>> getPossibleTargets(final Graph g,final Vertex source){
-	Iterator<Edge> outgoingEdges = source.getOutEdges().iterator();
+		Iterator<Edge> outgoingEdges = source.getOutEdges().iterator();
 		
-		Transformer transformer = new Transformer() {
+		Function<Edge,ConnectedVertex<Edge>> transformer = new Function<Edge,ConnectedVertex<Edge>>(){
+
 			@Override
-			public Object transform(Object v) {
-				Edge e = (Edge)v;
-				return e.getEndpoints().getSecond();
+			public ConnectedVertex<Edge> apply(Edge e) {
+				Vertex v = (Vertex) e.getEndpoints().getSecond();
+				ConnectedVertex<Edge> ve = new ConnectedVertex<Edge>(e,v);
+				return ve;
 			}
 		};		
-		return IteratorUtils.transformedIterator(outgoingEdges,transformer);
+		return Iterators.transform(outgoingEdges, transformer);
 	}
 	
 	public Edge check(final Graph g,final Vertex source, final Vertex target){
