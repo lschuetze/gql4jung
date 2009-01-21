@@ -96,11 +96,11 @@ public class EdgeConstraintTests {
 				connectedv3 = (Vertex) v;
 			}
 		}
-		Edge connectedlink2 = connectedv1.findEdge(testv4);
+		Edge connectedlink2 = connectedv3.findEdge(testv4);
 		ConnectedVertex<Edge> v3 = new ConnectedVertex<Edge>(connectedlink2, connectedv3);
 		
-		//assertEquals(2, list.size());
-		assertTrue(list.equals(v1));
+		assertEquals(2, list.size());
+		assertTrue(list.contains(v1)); 
 		assertTrue(list.contains(v3));
 	}
 
