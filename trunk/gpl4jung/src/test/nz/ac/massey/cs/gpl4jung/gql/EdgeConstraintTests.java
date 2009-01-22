@@ -72,17 +72,14 @@ public class EdgeConstraintTests {
 		EdgeConstraint ec = new EdgeConstraint();
 		Vertex testV1 = getVertexFromGraph("V1"); // Source test vertex
 		Vertex testV4 = getVertexFromGraph("V4"); // Target test vertex
+		Vertex expectedV1 = getVertexFromGraph("V1"); // Expected Source vertex
+		Vertex expectedV4 = getVertexFromGraph("V4"); // Expected Target vertex
 		//method to test for an edge "check(g,source,target)"
 		Edge testedge = ec.check(g, testV1, testV4);
         //getting edge label into string
-		EdgeStringer stringer = new EdgeStringer(){
-			@Override
-			public String getLabel(ArchetypeEdge e) {
-				return e.toString();
-			}
-        };
-		assertEquals("E2(V1,V4)", stringer.getLabel(testedge));
-	
+		Edge expectedEdge = expectedV1.findEdge(expectedV4);
+		//Assert for result, change value of expectedV1 or expected V2 to see difference
+		assertEquals(expectedEdge, testedge);
 	}
 
 	private static void buildGraph(){
@@ -98,14 +95,14 @@ public class EdgeConstraintTests {
 		Vertex v8 = g.addVertex(new DirectedSparseVertex());
 		Vertex v9 = g.addVertex(new DirectedSparseVertex());
 		//creating edges for graph
-		Edge e1 = g.addEdge(new DirectedSparseEdge(v0, v1));
-        Edge e2 = g.addEdge(new DirectedSparseEdge(v2, v3));
-        Edge e3 = g.addEdge(new DirectedSparseEdge(v1, v4));
-        Edge e4 = g.addEdge(new DirectedSparseEdge(v3, v4));
-        Edge e5 = g.addEdge(new DirectedSparseEdge(v4, v5));
-        Edge e6 = g.addEdge(new DirectedSparseEdge(v4, v7));
-        Edge e7 = g.addEdge(new DirectedSparseEdge(v5, v6));
-        Edge e8 = g.addEdge(new DirectedSparseEdge(v7, v8));  
+		g.addEdge(new DirectedSparseEdge(v0, v1));
+        g.addEdge(new DirectedSparseEdge(v2, v3));
+        g.addEdge(new DirectedSparseEdge(v1, v4));
+        g.addEdge(new DirectedSparseEdge(v3, v4));
+        g.addEdge(new DirectedSparseEdge(v4, v5));
+        g.addEdge(new DirectedSparseEdge(v4, v7));
+        g.addEdge(new DirectedSparseEdge(v5, v6));
+        g.addEdge(new DirectedSparseEdge(v7, v8));  
 	}
 	private Vertex getVertexFromGraph(String vertexname){
 		Vertex testv = null;

@@ -47,13 +47,13 @@ public class PathConstraint extends LinkConstraint<Path> {
 			@Override
 			public boolean apply(Vertex v) {
 				List path = ShortestPathUtils.getPath(SPA,v,target);
-				if (path!=null) {
+				if (path.size()!=0 ) {
 					PathImpl pp = new PathImpl();
 					pp.setEdges(path);
 					ConnectedVertex<Path> p = new ConnectedVertex(pp,v); 
 					links.put(v,p);
 				}
-				return path!=null;
+				return path.size()!=0;
 			}
 		};
 		// vertex to path transformer
@@ -61,7 +61,7 @@ public class PathConstraint extends LinkConstraint<Path> {
 			@Override
 			public ConnectedVertex<Path> apply(Vertex n) {
 				ConnectedVertex<Path> p = links.get(n);
-				links.remove(p); // TODO - this should make it faster by keeping the size of the cache small
+				links.remove(p); //this should make it faster by keeping the size of the cache small
 				return p;
 			}
 		};
@@ -78,13 +78,13 @@ public class PathConstraint extends LinkConstraint<Path> {
 			public boolean apply(Vertex v) {
 				Vertex otherNode = (Vertex)v;
 				List path = ShortestPathUtils.getPath(SPA, source,otherNode);
-				if (path!=null) {
+				if (path.size()!=0) {
 					PathImpl pp = new PathImpl();
 					pp.setEdges(path);
 					ConnectedVertex<Path> p = new ConnectedVertex(pp,otherNode); 
 					links.put(otherNode,p);
 				}
-				return path!=null;
+				return path.size()!=0;
 			}
 		};
 		// vertex to path transformer
@@ -93,7 +93,7 @@ public class PathConstraint extends LinkConstraint<Path> {
 			@Override
 			public ConnectedVertex<Path> apply(Vertex n) {
 					ConnectedVertex<Path> p = links.get(n);
-					links.remove(p); // TODO - this should make it faster by keeping the size of the cache small
+					links.remove(p); // this should make it faster by keeping the size of the cache small
 					return p;
 				}			
 		};
@@ -101,16 +101,12 @@ public class PathConstraint extends LinkConstraint<Path> {
 		return Iterators.transform(targets,transformer);
 	}
 	public Path check(final Graph g, final Vertex source, final Vertex target){
-		final Collection<Vertex> nodes= g.getVertices();
 		final ShortestPath SPA = new DijkstraShortestPath(g);
-		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
 		List path = ShortestPathUtils.getPath(SPA, source,target);
 		PathImpl pp = null;
-		if (path!=null) {
+		if (path.size()!=0) {
 			pp = new PathImpl();
-			pp.setEdges(path);
-			ConnectedVertex<Path> p = new ConnectedVertex(pp,source); 
-			links.put(source,p);
+			pp.setEdges(path); 
 		};	
 		return pp;
 	}
