@@ -15,6 +15,7 @@ import nz.ac.massey.cs.gpl4jung.DefaultMotif;
 import nz.ac.massey.cs.gpl4jung.GQL;
 import nz.ac.massey.cs.gpl4jung.Motif;
 import nz.ac.massey.cs.gpl4jung.MotifInstance;
+import nz.ac.massey.cs.gpl4jung.impl.GQLImpl;
 import nz.ac.massey.cs.gpl4jung.xml.XMLMotifReader;
 import nz.ac.massey.cs.utils.odem2graphml.Odem2GraphML;
 import org.junit.After;
@@ -35,7 +36,7 @@ public class GQLTests {
 	private GQL gql = null; // TODO
 	@Before
 	public void init() {
-		// FIXME must initialize GQL here
+		gql = new GQLImpl();
 		
 	}
 	@After
@@ -73,18 +74,18 @@ public class GQLTests {
 		return readJungGraphFromGraphML(graphmlReader);
 	}
 	private Motif readMotif(String motifSource) throws Exception {
-		// TODO refer to your own MotifParser here (unmarshal)
+		// refer to your own MotifParser here (unmarshal)
 		// use XMLMotifReader
-
-		return null;
+		XMLMotifReader r = new XMLMotifReader();
+		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream (motifSource));
+		return q;
 		
 	}
 	@Test
 	//No decoupling through abstraction
 	public void test1 () throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/abstraction.graphml");
-		XMLMotifReader r = new XMLMotifReader();
-		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/query1.xml"));
+		DefaultMotif q = (DefaultMotif) readMotif("xml/query1.xml");
 		ResultCollector rc = new ResultCollector();
 		this.gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();

@@ -17,9 +17,15 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
+import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
 import nz.ac.massey.cs.gpl4jung.*;
 import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
+import nz.ac.massey.cs.gpl4jung.xml.Query.Vertex.Property;
 
 public class XMLMotifReader implements MotifReader {
 
@@ -44,17 +50,25 @@ public class XMLMotifReader implements MotifReader {
 				if (o instanceof Query.Vertex) {
 					Query.Vertex v = (Query.Vertex)o;
 					v_roles.add(v.id);
+					//setting up vertex property
+					PropertyTerm pt = new PropertyTerm();
+					Query.Vertex.Property p = (Query.Vertex.Property) o;
+					pt.setKey(p.getKey());
+					pt.setOwner(p.getValue());
+					//constraints.add(pt);
 					}
 				//getting path constraint from query
 				else if (o instanceof Query.Path) {
 					PathConstraint pc = new PathConstraint();
+					LinkConstraint linkpc = null;
 					Query.Path p = (Query.Path)o;
 					//System.out.println("path from " + p.getFrom() + " to " + p.getTo());
 					pc.setMinLength(p.getMinLength());
 					pc.setMaxLength(p.getMaxLength());
-//					pc.setFrom(p.getFrom());
-//					pc.setTo(p.getTo());
+					linkpc.setSource(p.getFrom());
+					linkpc.setTarget(p.getTo());
 					constraints.add(pc);
+					constraints.add(linkpc);
 				}
 				else if (o instanceof Query.Condition) {
 					Query.Condition p = (Query.Condition)o;
@@ -66,8 +80,9 @@ public class XMLMotifReader implements MotifReader {
 				else if (o instanceof Query.Edge){
 					Query.Edge p = (Query.Edge) o;
 					EdgeConstraint ec = new EdgeConstraint();
-//					ec.setSource(p.getSource());
-//					ec.setTarget(p.getTarget());
+					LinkConstraint linkec = null;
+					linkec.setSource(p.getSource());
+					linkec.setTarget(p.getTarget());
 					constraints.add(ec);
 				}
 				else if (o instanceof Query.ExistsNot){
@@ -80,6 +95,7 @@ public class XMLMotifReader implements MotifReader {
 					notcond.setPredicate(n.getCondition().getPredicate()); //gets predicate from NOT CONDITION
 					constraints.add((LinkConstraint) n.getCondition().getAttribute()); //gets list of attributes from NOT CONDITION ATTRIBUTEs
 					constraints.add(notcond);
+					
 				}			
 			}
 			

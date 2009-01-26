@@ -24,8 +24,8 @@ import edu.uci.ics.jung.utils.UserDataContainer;
 public class SimplePropertyConstraint<T extends UserDataContainer> implements PropertyConstraint<T> {
 
 
-	private Term[] terms = null;
-	
+	//private Term[] terms = null;
+	private PropertyTerm terms = new PropertyTerm();
 	// the default operator is 
 	private Operators operator = Operators.EQUALS;
 	
@@ -34,16 +34,21 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements Pr
 	}
 
 	public void setOperator(Operators operator) {
-		this.operator = operator;
+		this.operator = operator; 
 	}
 
 	/* (non-Javadoc)
 	 * @see nz.ac.massey.cs.gpl4jung.PropertyConstraint#check(edu.uci.ics.jung.graph.Graph, T)
 	 */
 	public boolean check(Graph g,T... edgeOrVertex) {
-		// TODO
+		for(T element:edgeOrVertex)
+		{
+		String value = (String) terms.getValue(element);
+		String key = (String)terms.getKey();
+		if(element.getUserDatum(key).equals(value)){
+			return true;
+			} 
+		} 
 		return false;
 	}
-
-
 }

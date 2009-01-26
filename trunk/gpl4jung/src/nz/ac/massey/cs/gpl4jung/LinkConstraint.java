@@ -24,9 +24,12 @@ import edu.uci.ics.jung.graph.Vertex;
 public abstract class LinkConstraint<T>{
 
 	private PropertyConstraint<Edge> edgePropertyConstraint = null;
-	private String predicate = null;
+	private String predicate = null, source=null, target=null;
 	public void setPredicate(String predicate){
 		this.predicate = predicate;
+	}
+	public String getPredicate(){
+		return predicate;
 	}
 	/**
 	 * Given the target of the link returns possible pairs consisting of a source vertex and a link.
@@ -60,5 +63,17 @@ public abstract class LinkConstraint<T>{
 	}
 	public void setEdgePropertyConstraint(PropertyConstraint<Edge> edgePropertyConstraint) {
 		this.edgePropertyConstraint = edgePropertyConstraint;
+	}
+	public String getSource() {
+		return source;
+	}
+	public void setSource(String source) {
+		this.source = source;
+	}
+	public String getTarget() {
+		return target;
+	}
+	public void setTarget(String target) {
+		this.target = target;
 	};
 }
