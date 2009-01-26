@@ -15,40 +15,44 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
 
 /**
- * Simple key value conditions. 
- * Given a vertex v, and a property "type=package", the method should check 
- * whether v.getUserDatum("type").equals("package").
- * Note that the following is not yet supported: comparison operators other than equals, data types other than strings. 
+ * Simple key value conditions. Given a vertex v, and a property "type=package",
+ * the method should check whether v.getUserDatum("type").equals("package").
+ * Note that the following is not yet supported: comparison operators other than
+ * equals, data types other than strings.
+ * 
  * @author jens.dietrich@gmail.com
  */
-public class SimplePropertyConstraint<T extends UserDataContainer> implements PropertyConstraint<T> {
+public class SimplePropertyConstraint<T extends UserDataContainer> implements
+		PropertyConstraint<T> {
 
-
-	//private Term[] terms = null;
+	// private Term[] terms = null;
 	private PropertyTerm terms = new PropertyTerm();
-	// the default operator is 
+	// the default operator is
 	private Operators operator = Operators.EQUALS;
-	
+
 	public Operators getOperator() {
 		return operator;
 	}
 
 	public void setOperator(Operators operator) {
-		this.operator = operator; 
+		this.operator = operator;
 	}
 
-	/* (non-Javadoc)
-	 * @see nz.ac.massey.cs.gpl4jung.PropertyConstraint#check(edu.uci.ics.jung.graph.Graph, T)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nz.ac.massey.cs.gpl4jung.PropertyConstraint#check(edu.uci.ics.jung.graph
+	 * .Graph, T)
 	 */
-	public boolean check(Graph g,T... edgeOrVertex) {
-		for(T element:edgeOrVertex)
-		{
-		String value = (String) terms.getValue(element);
-		String key = (String)terms.getKey();
-		if(element.getUserDatum(key).equals(value)){
-			return true;
-			} 
-		} 
-		return false;
+	public boolean check(Graph g, T... edgeOrVertex) {
+		for (T element : edgeOrVertex) {
+			String value = (String) terms.getValue(element);
+			String key = (String) terms.getKey();
+			if (!element.getUserDatum(key).equals(value)) { // instead of using equals, you need to use the operator
+				return false;
+			}
+		}
+		return true;
 	}
 }
