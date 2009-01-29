@@ -25,10 +25,10 @@ import edu.uci.ics.jung.utils.UserDataContainer;
 public class SimplePropertyConstraint<T extends UserDataContainer> implements
 		PropertyConstraint<T> {
 
-	// private Term[] terms = null;
-	private PropertyTerm terms = new PropertyTerm();
+	private Term[] terms = null;
+//	private PropertyTerm terms = new PropertyTerm();
 	// the default operator is
-	private Operators operator = Operators.EQUALS;
+	private Operators operator = Operators.getInstance("=");
 
 	public Operators getOperator() {
 		return operator;
@@ -47,9 +47,10 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 	 */
 	public boolean check(Graph g, T... edgeOrVertex) {
 		for (T element : edgeOrVertex) {
-			String value = (String) terms.getValue(element);
-			String key = (String) terms.getKey();
-			if (!element.getUserDatum(key).equals(value)) { // instead of using equals, you need to use the operator
+			String key = "type";
+			String value = "class";
+			if(!operator.check(element,key,value)){
+//			if (!element.getUserDatum(key).equals(value)) { // instead of using equals, you need to use the operator
 				return false;
 			}
 		}
