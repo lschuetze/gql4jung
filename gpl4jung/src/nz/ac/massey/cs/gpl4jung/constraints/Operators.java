@@ -10,6 +10,16 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
+import edu.uci.ics.jung.utils.UserDataContainer;
+import nz.ac.massey.cs.gpl4jung.constraints.Operator.EQ;
+import nz.ac.massey.cs.gpl4jung.constraints.Operator.GT;
+import nz.ac.massey.cs.gpl4jung.constraints.Operator.GTE;
+import nz.ac.massey.cs.gpl4jung.constraints.Operator.IN;
+import nz.ac.massey.cs.gpl4jung.constraints.Operator.LT;
+import nz.ac.massey.cs.gpl4jung.constraints.Operator.LTE;
+import nz.ac.massey.cs.gpl4jung.constraints.Operator.NEQ;
+import nz.ac.massey.cs.gpl4jung.constraints.Operator.REGEX;
+
 /**
  * Definition of operators.  
  * TODO complete
@@ -17,11 +27,33 @@ package nz.ac.massey.cs.gpl4jung.constraints;
  * must map URIs defined in http://www.w3.org/TR/xpath-functions/ to instances.
  * @author jens.dietrich@gmail.com
  */
-public enum Operators  {
-	EQUALS,
-	MATCHES,
-	LESS_THAN,
-	GREATER_THAN,
-	LESS_THAN_OR_EQUALS,
-	GREATER_THAN_OR_EQUALS
+//public enum Operators  {
+//	EQUALS,
+//	MATCHES,
+//	LESS_THAN,
+//	GREATER_THAN,
+//	LESS_THAN_OR_EQUALS,
+//	GREATER_THAN_OR_EQUALS
+//}
+
+public abstract class Operators {
+	static class EQ extends Operators { 
+		public boolean check(UserDataContainer o1, String key, String value) { 
+			return o1.getUserDatum(key).equals(value); 
+		} 
+		public String getName() {
+			return "="; 
+		}
+	};
+	public static Operators[] INSTANCES = { new EQ()};  
+	public static Operators getInstance(String name) { 
+		for (Operators o:INSTANCES) { 
+			if (o.getName().equalsIgnoreCase(name)) { 
+				return o; 
+			} 
+		} 
+		return null; 
+	}   
+	public abstract boolean check(UserDataContainer o1, String key, String value); 
+	public abstract String getName();  
 }

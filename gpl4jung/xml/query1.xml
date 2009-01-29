@@ -12,11 +12,11 @@
 	    <!--   -->
     </vertex>
     <vertex id="service" type="class">    
-        <property key="isAbstract" value="istrue"/>
+        <property key="isAbstract" value="true"/>
         <property key="type" value="class"/>
     </vertex>
     <vertex id="service_impl" type="class">
-        <property key="isAbstract" value="isfalse"/>
+        <property key="isAbstract" value="false"/>
         <property key="type" value="class"/>
     </vertex>
     <!-- minLength and maxLength are optional, defaults are 1 and  infinite-->

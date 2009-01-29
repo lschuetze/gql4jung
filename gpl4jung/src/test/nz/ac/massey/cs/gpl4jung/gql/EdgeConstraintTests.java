@@ -19,6 +19,7 @@ import edu.uci.ics.jung.graph.decorators.EdgeStringer;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
+import edu.uci.ics.jung.utils.UserData;
 
 public class EdgeConstraintTests {
 	static Graph g = null; 
@@ -33,12 +34,18 @@ public class EdgeConstraintTests {
 		Vertex testV4 = getVertexFromGraph("V4"); // Target test vertex
 		Vertex testV1 = getVertexFromGraph("V1"); // possible source vertex
 		Vertex testV3 = getVertexFromGraph("V3"); // possible source vertex
+		Vertex testV9 = getVertexFromGraph("V9"); // not a possible source vertex
+		
 		//obtaining possible link to populate ConnectedVertex<Edge> for testing
 		Edge linkV1 = testV1.findEdge(testV4);
 		ConnectedVertex<Edge> v1 = new ConnectedVertex<Edge>(linkV1, testV1); //to compare with actual result
 		//obtaining possible link to populate ConnectedVertex<Edge> for testing
 		Edge linkV3 = testV3.findEdge(testV4);
 		ConnectedVertex<Edge> v3 = new ConnectedVertex<Edge>(linkV3, testV3); //to compare with actual result
+		//test for a not connected verted V9
+		Edge linkV9 = testV9.findEdge(testV4);
+		ConnectedVertex<Edge> v9 = new ConnectedVertex<Edge>(linkV9, testV9); //to compare with actual
+		
 		//method to test getPossibleSources(graph, target_vertex)
 		Iterator<ConnectedVertex<Edge>> ps =  ec.getPossibleSources(g, testV4);	
 		List<ConnectedVertex<Edge>> list = IteratorUtils.toList(ps); //list of all possible sources
@@ -46,6 +53,7 @@ public class EdgeConstraintTests {
 		assertEquals(2, list.size());
 		assertTrue(list.contains(v1)); //v1 expected possible source 
 		assertTrue(list.contains(v3)); //v3 expected possible source
+		assertFalse(list.contains(v9)); //should not be there
 	}
 	@Test
 	public void testGetPossibleTargets() {
@@ -53,12 +61,17 @@ public class EdgeConstraintTests {
 		Vertex testV4 = getVertexFromGraph("V4"); // Source test vertex
 		Vertex testV5 = getVertexFromGraph("V5"); // Possible Target vertex
 		Vertex testV7 = getVertexFromGraph("V7"); // Possible Target vertex
+		Vertex testV9 = getVertexFromGraph("V9"); // not a possible target vertex
 		//obtaining possible link to populate ConnectedVertex<Edge> for testing
 		Edge linkV5 = testV4.findEdge(testV5);
 		ConnectedVertex<Edge> v5 = new ConnectedVertex<Edge>(linkV5, testV5); //to compare with actual result
 		//obtaining possible link to populate ConnectedVertex<Edge> for testing
 		Edge linkV7 = testV4.findEdge(testV7);
 		ConnectedVertex<Edge> v7 = new ConnectedVertex<Edge>(linkV7, testV7); //to compare with actual result
+		//test for a not connected verted V9
+		Edge linkV9 = testV9.findEdge(testV4);
+		ConnectedVertex<Edge> v9 = new ConnectedVertex<Edge>(linkV9, testV9); //to compare with actual
+		
 		//method to test getPossibleTargets(graph, source_vertex)
 		Iterator<ConnectedVertex<Edge>> ps =  ec.getPossibleTargets(g, testV4);	
 		List<ConnectedVertex<Edge>> list = IteratorUtils.toList(ps); //list of all possible targets
@@ -66,6 +79,7 @@ public class EdgeConstraintTests {
 		assertEquals(2, list.size());
 		assertTrue(list.contains(v5)); //v5 expected possible source 
 		assertTrue(list.contains(v7)); //v7 expected possible source
+		assertFalse(list.contains(v9)); //should not be there
 	}
 	@Test
 	public void testCheck() {
@@ -83,6 +97,7 @@ public class EdgeConstraintTests {
 	}
 
 	private static void buildGraph(){
+		String key = "name";
 		//creating vertices for graph
 		Vertex v0 = g.addVertex(new DirectedSparseVertex());
 		Vertex v1 = g.addVertex(new DirectedSparseVertex());
@@ -94,6 +109,18 @@ public class EdgeConstraintTests {
 		Vertex v7 = g.addVertex(new DirectedSparseVertex());
 		Vertex v8 = g.addVertex(new DirectedSparseVertex());
 		Vertex v9 = g.addVertex(new DirectedSparseVertex());
+		//setting up vertices names...
+		v0.addUserDatum(key, "V0", UserData.SHARED);
+		v1.addUserDatum(key, "V1", UserData.SHARED);
+		v2.addUserDatum(key, "V2", UserData.SHARED);
+		v3.addUserDatum(key, "V3", UserData.SHARED);
+		v4.addUserDatum(key, "V4", UserData.SHARED);
+		v5.addUserDatum(key, "V5", UserData.SHARED);
+		v6.addUserDatum(key, "V6", UserData.SHARED);
+		v7.addUserDatum(key, "V7", UserData.SHARED);
+		v8.addUserDatum(key, "V8", UserData.SHARED);
+		v9.addUserDatum(key, "V9", UserData.SHARED);
+		
 		//creating edges for graph
 		g.addEdge(new DirectedSparseEdge(v0, v1));
         g.addEdge(new DirectedSparseEdge(v2, v3));
@@ -102,13 +129,14 @@ public class EdgeConstraintTests {
         g.addEdge(new DirectedSparseEdge(v4, v5));
         g.addEdge(new DirectedSparseEdge(v4, v7));
         g.addEdge(new DirectedSparseEdge(v5, v6));
-        g.addEdge(new DirectedSparseEdge(v7, v8));  
+        g.addEdge(new DirectedSparseEdge(v7, v8));   
 	}
 	private Vertex getVertexFromGraph(String vertexname){
+		String key="name";
 		Vertex testv = null;
 		for (Iterator iter = g.getVertices().iterator(); iter.hasNext();){
 			Vertex v = (Vertex) iter.next();
-			if(v.toString().equalsIgnoreCase(vertexname)){
+			if(v.getUserDatum(key).equals(vertexname)){
 				testv = (Vertex) v;
 			}
 		}

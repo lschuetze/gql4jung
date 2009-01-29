@@ -7,7 +7,6 @@ import java.util.List;
 
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
 import nz.ac.massey.cs.gpl4jung.Path;
-import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
 import nz.ac.massey.cs.gpl4jung.impl.PathImpl;
 
@@ -24,6 +23,7 @@ import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
+import edu.uci.ics.jung.utils.UserData;
 
 public class PathConstraintTests {
 	static Graph g = null; 
@@ -37,11 +37,17 @@ public class PathConstraintTests {
 		PathConstraint pc = new PathConstraint();
 		ShortestPath SPA = new DijkstraShortestPath(g);
 		PathImpl p0= new PathImpl(), p1=new PathImpl(), p2= new PathImpl(), p3= new PathImpl();
+		PathImpl p5= new PathImpl(), p6=new PathImpl(), p7= new PathImpl(), p8= new PathImpl(), p9= new PathImpl();
 		Vertex testV4 = getVertexFromGraph("V4"); // Target test vertex
 		Vertex testV0 = getVertexFromGraph("V0"); // possible source vertex
 		Vertex testV1 = getVertexFromGraph("V1"); // possible source vertex
 		Vertex testV2 = getVertexFromGraph("V2"); // possible source vertex
 		Vertex testV3 = getVertexFromGraph("V3"); // possible source vertex
+		Vertex testV5 = getVertexFromGraph("V5"); // not a possible source vertex
+		Vertex testV6 = getVertexFromGraph("V6"); // not a possible source vertex
+		Vertex testV7 = getVertexFromGraph("V7"); // not a possible source vertex
+		Vertex testV8 = getVertexFromGraph("V8"); // not a possible source vertex
+		Vertex testV9 = getVertexFromGraph("V9"); // not a possible source vertex
 		//method to test getPossibleSources(graph, target_vertex) 
 		Iterator<ConnectedVertex<Path>> ps =  pc.getPossibleSources(g, testV4);
 		List<ConnectedVertex<Path>> list = IteratorUtils.toList(ps);
@@ -61,24 +67,56 @@ public class PathConstraintTests {
 		path = ShortestPathUtils.getPath(SPA,testV3,testV4);
 		p3.setEdges((List<Edge>) path);
 		ConnectedVertex<Path> v3 = new ConnectedVertex<Path>(p3, testV3);
+		//test for 5th not possible source for Vertex V5 to target vertex V4
+		path = ShortestPathUtils.getPath(SPA,testV5,testV4);
+		p5.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v5 = new ConnectedVertex<Path>(p5, testV5);
+		//test for 6th not possible source for Vertex V6 to target vertex V4
+		path = ShortestPathUtils.getPath(SPA,testV6,testV4);
+		p6.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v6 = new ConnectedVertex<Path>(p6, testV6);
+		//test for 7th not possible source for Vertex V7 to target vertex V4
+		path = ShortestPathUtils.getPath(SPA,testV7,testV4);
+		p7.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v7 = new ConnectedVertex<Path>(p7, testV7);
+		//test for 8th not possible source for Vertex V8 to target vertex V4
+		path = ShortestPathUtils.getPath(SPA,testV8,testV4);
+		p8.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v8 = new ConnectedVertex<Path>(p8, testV8);
+		//test for false negative: 9th vertex not connected to any one
+		path = ShortestPathUtils.getPath(SPA,testV9,testV4);
+		p9.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v9 = new ConnectedVertex<Path>(p9, testV9);
 		//Asserts
 		assertEquals(4, list.size());
 		assertTrue(list.contains(v0));
 		assertTrue(list.contains(v1));
 		assertTrue(list.contains(v2));
 		assertTrue(list.contains(v3));
+		//these vertcies should not be in possible sources so using assertFalse
+		assertFalse(list.contains(v5));
+		assertFalse(list.contains(v6));
+		assertFalse(list.contains(v7));
+		assertFalse(list.contains(v8));
+		assertFalse(list.contains(v9));
 	}
 
 	@Test
 	public void testGetPossibleTargets() {
 		PathConstraint pc = new PathConstraint();
 		ShortestPath SPA = new DijkstraShortestPath(g);
-		PathImpl p5= new PathImpl(), p6=new PathImpl(), p7= new PathImpl(), p8= new PathImpl();
+		PathImpl p0= new PathImpl(), p1=new PathImpl(), p2= new PathImpl(), p3= new PathImpl();
+		PathImpl p5= new PathImpl(), p6=new PathImpl(), p7= new PathImpl(), p8= new PathImpl(), p9= new PathImpl();
 		Vertex testV4 = getVertexFromGraph("V4"); // Source test vertex
+		Vertex testV0 = getVertexFromGraph("V0"); // not a possible target vertex
+		Vertex testV1 = getVertexFromGraph("V1"); // not a possible target vertex
+		Vertex testV2 = getVertexFromGraph("V2"); // not a possible target vertex
+		Vertex testV3 = getVertexFromGraph("V3"); // not a possible target vertex
 		Vertex testV5 = getVertexFromGraph("V5"); // possible target vertex
 		Vertex testV6 = getVertexFromGraph("V6"); // possible target vertex
 		Vertex testV7 = getVertexFromGraph("V7"); // possible target vertex
 		Vertex testV8 = getVertexFromGraph("V8"); // possible target vertex
+		Vertex testV9 = getVertexFromGraph("V9"); // not a possible target vertex
 		//method to test getPossibleTargets(graph, source_vertex) 
 		Iterator<ConnectedVertex<Path>> ps =  pc.getPossibleTargets(g, testV4);
 		List<ConnectedVertex<Path>> list = IteratorUtils.toList(ps);
@@ -98,12 +136,39 @@ public class PathConstraintTests {
 		path = ShortestPathUtils.getPath(SPA,testV4,testV8);
 		p8.setEdges((List<Edge>) path);
 		ConnectedVertex<Path> v8 = new ConnectedVertex<Path>(p8, testV8);
+		
+		//test for 1st not possible target vertex V0: to source vertex V4
+		path = ShortestPathUtils.getPath(SPA,testV4,testV0);
+		p0.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v0 = new ConnectedVertex<Path>(p0, testV0);
+		//test for 2nd not possible target vertex V1: to source vertex V4
+		path = ShortestPathUtils.getPath(SPA,testV4,testV1);
+		p1.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v1 = new ConnectedVertex<Path>(p1, testV1);
+		//test for 3rd not possible target vertex V2: to source vertex V4
+		path = ShortestPathUtils.getPath(SPA,testV4,testV2);
+		p2.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v2 = new ConnectedVertex<Path>(p2, testV2);
+		//test for 4th not possible target vertex V3: to source vertex V4
+		path = ShortestPathUtils.getPath(SPA,testV4,testV3);
+		p3.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v3 = new ConnectedVertex<Path>(p3, testV3);
+		//false-negative: test for 5th not possible target vertex V9: to source vertex V4
+		path = ShortestPathUtils.getPath(SPA,testV4,testV3);
+		p9.setEdges((List<Edge>) path);
+		ConnectedVertex<Path> v9 = new ConnectedVertex<Path>(p9, testV9);
 		//Asserts
 		assertEquals(4, list.size());
 		assertTrue(list.contains(v5));
 		assertTrue(list.contains(v6));
 		assertTrue(list.contains(v7));
 		assertTrue(list.contains(v8));
+		//following vertcies should not be in possible targets so using assertFalse
+		assertFalse(list.contains(v0));
+		assertFalse(list.contains(v1));
+		assertFalse(list.contains(v2));
+		assertFalse(list.contains(v3));
+		assertFalse(list.contains(v9));
 	}
 
 	@Test
@@ -123,6 +188,7 @@ public class PathConstraintTests {
 		assertEquals(p, testpath);
 	}
 	private static void buildGraph(){
+		String key = "name";
 		//creating vertices for graph
 		Vertex v0 = g.addVertex(new DirectedSparseVertex());
 		Vertex v1 = g.addVertex(new DirectedSparseVertex());
@@ -134,6 +200,18 @@ public class PathConstraintTests {
 		Vertex v7 = g.addVertex(new DirectedSparseVertex());
 		Vertex v8 = g.addVertex(new DirectedSparseVertex());
 		Vertex v9 = g.addVertex(new DirectedSparseVertex());
+		//setting up vertices names...
+		v0.addUserDatum(key, "V0", UserData.SHARED);
+		v1.addUserDatum(key, "V1", UserData.SHARED);
+		v2.addUserDatum(key, "V2", UserData.SHARED);
+		v3.addUserDatum(key, "V3", UserData.SHARED);
+		v4.addUserDatum(key, "V4", UserData.SHARED);
+		v5.addUserDatum(key, "V5", UserData.SHARED);
+		v6.addUserDatum(key, "V6", UserData.SHARED);
+		v7.addUserDatum(key, "V7", UserData.SHARED);
+		v8.addUserDatum(key, "V8", UserData.SHARED);
+		v9.addUserDatum(key, "V9", UserData.SHARED);
+		
 		//creating edges for graph
 		g.addEdge(new DirectedSparseEdge(v0, v1));
         g.addEdge(new DirectedSparseEdge(v2, v3));
@@ -145,10 +223,11 @@ public class PathConstraintTests {
         g.addEdge(new DirectedSparseEdge(v7, v8));   
 	}
 	private Vertex getVertexFromGraph(String vertexname){
+		String key="name";
 		Vertex testv = null;
 		for (Iterator iter = g.getVertices().iterator(); iter.hasNext();){
 			Vertex v = (Vertex) iter.next();
-			if(v.toString().equalsIgnoreCase(vertexname)){
+			if(v.getUserDatum(key).equals(vertexname)){
 				testv = (Vertex) v;
 			}
 		}
