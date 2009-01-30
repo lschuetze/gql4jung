@@ -19,13 +19,13 @@ import edu.uci.ics.jung.utils.UserDataContainer;
  */
 
 public class PropertyTerm  implements Term {
-	public String getOwner() {
-		return owner;
+	public PropertyTerm(String key) {
+		super();
+		this.key = key;
 	}
 
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
+
+	private String key = null;  // this is the property key that can be used to query the property
 
 	public String getKey() {
 		return key;
@@ -35,8 +35,6 @@ public class PropertyTerm  implements Term {
 		this.key = key;
 	}
 
-	private String owner = null; // this is the role name of the owner, such as "class1"
-	private String key = null;  // this is the property key that can be used to query the property
 	
 	public Object getValue(UserDataContainer vertexOrEdge) {
 		return vertexOrEdge.getUserDatum(key);

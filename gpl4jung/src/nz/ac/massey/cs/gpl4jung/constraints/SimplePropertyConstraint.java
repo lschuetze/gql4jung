@@ -29,6 +29,14 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 //	private PropertyTerm terms = new PropertyTerm();
 	// the default operator is
 	private Operators operator = Operators.getInstance("=");
+	
+	public void setTerms(Term... terms) {
+		this.terms = terms;
+	}
+	public Term[] getTerms() {
+		return terms;
+	}
+	
 
 	public Operators getOperator() {
 		return operator;
@@ -46,14 +54,21 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 	 * .Graph, T)
 	 */
 	public boolean check(Graph g, T... edgeOrVertex) {
-		for (T element : edgeOrVertex) {
-			String key = "type";
-			String value = "class";
-			if(!operator.check(element,key,value)){
-//			if (!element.getUserDatum(key).equals(value)) { // instead of using equals, you need to use the operator
-				return false;
+		// TODO: check whether we really need/want to check more then one artefacts
+		// idea: match them to properties 
+		T first = edgeOrVertex[0]; // hack !!
+		// instantiate
+		Object[] values = new Object[terms.length];
+		for (int i=0;i<terms.length;i++) {
+			if (terms[i] instanceof PropertyTerm) {
+				Object value = ((PropertyTerm)terms[i]).getValue(first);
+				values[i] = value;
+			}
+			else if (terms[i] instanceof ValueTerm) {
+				values[i] = ((ValueTerm)terms[i]).getValue();
 			}
 		}
-		return true;
+		return operator.check(values);
+
 	}
 }

@@ -16,6 +16,11 @@ package nz.ac.massey.cs.gpl4jung.constraints;
  */
 
 public class ValueTerm  implements Term {
+	public ValueTerm(Object value) {
+		super();
+		this.value = value;
+	}
+
 	private Object value = null;
 
 	public Object getValue() {

@@ -10,15 +10,6 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
-import edu.uci.ics.jung.utils.UserDataContainer;
-import nz.ac.massey.cs.gpl4jung.constraints.Operator.EQ;
-import nz.ac.massey.cs.gpl4jung.constraints.Operator.GT;
-import nz.ac.massey.cs.gpl4jung.constraints.Operator.GTE;
-import nz.ac.massey.cs.gpl4jung.constraints.Operator.IN;
-import nz.ac.massey.cs.gpl4jung.constraints.Operator.LT;
-import nz.ac.massey.cs.gpl4jung.constraints.Operator.LTE;
-import nz.ac.massey.cs.gpl4jung.constraints.Operator.NEQ;
-import nz.ac.massey.cs.gpl4jung.constraints.Operator.REGEX;
 
 /**
  * Definition of operators.  
@@ -38,8 +29,9 @@ import nz.ac.massey.cs.gpl4jung.constraints.Operator.REGEX;
 
 public abstract class Operators {
 	static class EQ extends Operators { 
-		public boolean check(UserDataContainer o1, String key, String value) { 
-			return o1.getUserDatum(key).equals(value); 
+		public boolean check(Object... values) { 
+			assert(values.length==2);
+			return values[0]==null?values[1]==null:values[0].equals(values[1]); 
 		} 
 		public String getName() {
 			return "="; 
@@ -54,6 +46,6 @@ public abstract class Operators {
 		} 
 		return null; 
 	}   
-	public abstract boolean check(UserDataContainer o1, String key, String value); 
+	public abstract boolean check(Object... values); 
 	public abstract String getName();  
 }
