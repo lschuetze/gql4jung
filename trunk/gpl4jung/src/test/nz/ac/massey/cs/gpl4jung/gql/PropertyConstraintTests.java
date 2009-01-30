@@ -5,8 +5,10 @@ import static org.junit.Assert.*;
 import java.util.Iterator;
 import java.util.Set;
 
+import nz.ac.massey.cs.gpl4jung.constraints.Operators;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
 import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,6 +32,10 @@ public class PropertyConstraintTests {
 	public void testCheck() {
 		SimplePropertyConstraint<Vertex> vc = new SimplePropertyConstraint<Vertex>();
 		Vertex testV1 = getVertexFromGraph("V1");
+		Operators op = Operators.getInstance("=");
+		PropertyTerm term1 = new PropertyTerm("type");
+		ValueTerm term2 = new ValueTerm("class");
+		vc.setTerms(term1,term2);
 		assertTrue(vc.check(g, testV1));
 	}
 	
