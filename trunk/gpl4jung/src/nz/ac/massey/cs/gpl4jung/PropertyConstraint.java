@@ -10,11 +10,14 @@
 
 package nz.ac.massey.cs.gpl4jung;
 
+import nz.ac.massey.cs.gpl4jung.constraints.Term;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
 
 public interface PropertyConstraint<T extends UserDataContainer> {
 
 	public abstract boolean check(Graph g, T... edgeOrVertex);
+	public abstract void setTerms(Term... terms);
+	public abstract Term[] getTerms();
 
 }
