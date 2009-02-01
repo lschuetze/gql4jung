@@ -51,10 +51,9 @@ public class XMLMotifReader implements MotifReader {
 					Query.Vertex v = (Query.Vertex)o;
 					v_roles.add(v.id);
 					//setting up vertex property
-					PropertyTerm pt = new PropertyTerm();
+					PropertyTerm pt = new PropertyTerm("type");
 					Query.Vertex.Property p = (Query.Vertex.Property) o;
 					pt.setKey(p.getKey());
-					pt.setOwner(p.getValue());
 					//constraints.add(pt);
 					}
 				//getting path constraint from query
