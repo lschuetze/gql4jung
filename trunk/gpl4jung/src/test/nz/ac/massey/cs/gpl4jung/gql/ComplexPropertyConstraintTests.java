@@ -2,7 +2,6 @@ package test.nz.ac.massey.cs.gpl4jung.gql;
 
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,6 +10,7 @@ import java.util.List;
 import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.NegatedPropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.Operator;
+import nz.ac.massey.cs.gpl4jung.constraints.PropertyConstraintConjunction;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyConstraintDisjunction;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
 import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
@@ -20,9 +20,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
-import edu.uci.ics.jung.algorithms.shortestpath.ShortestPath;
-import edu.uci.ics.jung.algorithms.shortestpath.ShortestPathUtils;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -41,11 +38,11 @@ public class ComplexPropertyConstraintTests {
 	
 	@After
 	public void tearDown() throws Exception {
-	g=null;
+		g=null;
 	}
 	@Test
 	public void testCheckNegated(){
-		//test for NOT EQUAL OPERATOR for the above test scenario '!='
+		//test for Negated propertycondition
 		SimplePropertyConstraint<Vertex> vc = new SimplePropertyConstraint<Vertex>();
 		NegatedPropertyConstraint<Vertex> npc = new NegatedPropertyConstraint<Vertex>();
 		PropertyTerm term1 = new PropertyTerm("type");
@@ -58,34 +55,57 @@ public class ComplexPropertyConstraintTests {
 		assertFalse(npc.check(g, testV1));
 	}
 	@Test
+	//test for complex property condition using OR
 	public void testPropertyConstraintDisjunction(){
-		Vertex source = getVertexFromGraph("V3");
-		Vertex target = getVertexFromGraph("V2");
-		Edge[] path = calcShortestPath(source, target);
-		List<PropertyConstraint<Edge>> pc = new ArrayList<PropertyConstraint<Edge>>();
-		SimplePropertyConstraint<Edge> spc = new SimplePropertyConstraint<Edge>();
+		Edge testEdge = getEdgeFromGraph("E2");
+		List<PropertyConstraint<Edge>> propertyParts = new ArrayList<PropertyConstraint<Edge>>();
+		SimplePropertyConstraint<Edge> part1 = new SimplePropertyConstraint<Edge>();
 		PropertyConstraintDisjunction<Edge> or = new PropertyConstraintDisjunction<Edge>();
 		//getting 1st propertyconstraint
 		PropertyTerm term1 = new PropertyTerm("type");
 		ValueTerm term2 = new ValueTerm("extends");
 		Operator op = Operator.getInstance("=");
-		spc.setTerms(term1,term2);
-		spc.setOperator(op);
-		pc.add(spc);
+		part1.setTerms(term1,term2);
+		part1.setOperator(op);
+		propertyParts.add(part1);
 		//getting 2nd propertyconstraint
-		SimplePropertyConstraint<Edge> spc1 = new SimplePropertyConstraint<Edge>();
+		SimplePropertyConstraint<Edge> part2 = new SimplePropertyConstraint<Edge>();
 		PropertyTerm term3 = new PropertyTerm("type");
 		ValueTerm term4 = new ValueTerm("uses");
 		Operator op1 = Operator.getInstance("=");
-		spc1.setTerms(term3,term4);
-		spc1.setOperator(op1);
-		pc.add(spc1);
+		part2.setTerms(term3,term4);
+		part2.setOperator(op1);
+		propertyParts.add(part2);
 		//checking complexpropertyconstraint OR
-		or.setParts(pc);
-		assertFalse(or.check(g, path));
-		
+		or.setParts(propertyParts);
+		assertTrue(or.check(g, testEdge));
 	}
-	
+	@Test
+	//test for complex property condition using AND
+	public void testPropertyConstraintConjunction(){
+		Vertex testVertex = getVertexFromGraph("V1");
+		List<PropertyConstraint<Vertex>> propertyParts = new ArrayList<PropertyConstraint<Vertex>>();
+		SimplePropertyConstraint<Vertex> part1 = new SimplePropertyConstraint<Vertex>();
+		PropertyConstraintConjunction<Vertex> and = new PropertyConstraintConjunction<Vertex>();
+		//getting 1st propertyconstraint
+		PropertyTerm term1 = new PropertyTerm("type");
+		ValueTerm term2 = new ValueTerm("package");
+		Operator op = Operator.getInstance("=");
+		part1.setTerms(term1,term2);
+		part1.setOperator(op);
+		propertyParts.add(part1);
+		//getting 2nd propertyconstraint
+		SimplePropertyConstraint<Vertex> part2 = new SimplePropertyConstraint<Vertex>();
+		PropertyTerm term3 = new PropertyTerm("isAbstract");
+		ValueTerm term4 = new ValueTerm("false");
+		Operator op1 = Operator.getInstance("=");
+		part2.setTerms(term3,term4);
+		part2.setOperator(op1);
+		propertyParts.add(part2);
+		//checking complexpropertyconstraint AND
+		and.setParts(propertyParts);
+		assertTrue(and.check(g, testVertex));
+	}
 	private static void buildGraph(){
 		//keys definition
 		String name = "name";
@@ -148,18 +168,5 @@ public class ComplexPropertyConstraintTests {
 			}
 		}
 		return testedge;
-	}
-	
-	private Edge[] calcShortestPath(Vertex source, Vertex target){
-		ShortestPath SPA = new DijkstraShortestPath(g);
-		List pathlist = ShortestPathUtils.getPath(SPA,source,target);
-		Edge path[] = new Edge[pathlist.size()];
-		for(Iterator itr=pathlist.iterator();itr.hasNext();){
-			for(int i=0;i<pathlist.size();i++){
-				Edge e = (Edge) itr.next();
-				path[i]= e;
-			}
-		}
-		return path;
 	}
 }
