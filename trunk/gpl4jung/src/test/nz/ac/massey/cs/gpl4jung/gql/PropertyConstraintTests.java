@@ -103,7 +103,7 @@ public class PropertyConstraintTests {
 	public void testCheckREGEX(){
 		SimplePropertyConstraint<Vertex> vc = new SimplePropertyConstraint<Vertex>();
 		PropertyTerm term1 = new PropertyTerm("type");
-		ValueTerm term2 = new ValueTerm("java[.]util[.]regex[.].*");
+		ValueTerm term2 = new ValueTerm("java\\.util\\.regex\\..*");
 		Operator op = Operator.getInstance("matches");
 		vc.setOperator(op);
 		vc.setTerms(term1,term2);
