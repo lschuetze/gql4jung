@@ -16,11 +16,8 @@ public class Bindings  {
 	public Bindings() {
 		super();
 	}
-	
-
 	/**
 	 * Lookup the binding for a given key.
-	 * @see nz.ac.massey.cs.wop.scanner.impl.Bindings#lookup(java.lang.Object)
 	 */
 	public Object lookup(String k) {
 		for (int i=position;i>-1;i--) {
@@ -31,7 +28,6 @@ public class Bindings  {
 	}
 	/**
 	 * Add a new entry.
-	 * @see nz.ac.massey.cs.wop.scanner.impl.Bindings#bind(java.lang.Object, java.lang.Object)
 	 */
 	public void bind(String k,Object v) {
 		assert(k!=null);
@@ -42,7 +38,6 @@ public class Bindings  {
 	}
 	/**
 	 * Indicates whether the values contain a given value.
-	 * @see nz.ac.massey.cs.wop.scanner.impl.Bindings#containsValue(java.lang.Object)
 	 */
 	public boolean containsValue(Object v) {
 		for (int i=position;i>-1;i--) {
@@ -53,7 +48,6 @@ public class Bindings  {
 	}
 	/**
 	 * Converts the bindings to a map.
-	 * @see nz.ac.massey.cs.wop.scanner.impl.Bindings#asMap()
 	 */
 	public java.util.Map<String,Object> asMap() {
 		java.util.Map<String,Object> map = new java.util.Hashtable<String,Object>();
