@@ -13,7 +13,7 @@ package nz.ac.massey.cs.gpl4jung;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
 
-public interface PropertyConstraint<T extends UserDataContainer> {
+public interface PropertyConstraint<T extends UserDataContainer> extends Constraint {
 
 	public abstract boolean check(Graph g, T... edgeOrVertex);
 

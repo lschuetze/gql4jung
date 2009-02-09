@@ -12,12 +12,14 @@ package nz.ac.massey.cs.gpl4jung.xml;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
@@ -25,6 +27,8 @@ import nz.ac.massey.cs.gpl4jung.*;
 import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
+import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
 import nz.ac.massey.cs.gpl4jung.xml.Query.Vertex.Property;
 
 public class XMLMotifReader implements MotifReader {
@@ -34,10 +38,11 @@ public class XMLMotifReader implements MotifReader {
 		try {
 			DefaultMotif motif = new DefaultMotif();
 			List<String> v_roles = new ArrayList<String>();
-			List<LinkConstraint> constraints = new ArrayList<LinkConstraint>();
+			List<Constraint> constraints = new ArrayList<Constraint>();
 			motif.setRoles(v_roles);
 			motif.setConstraints(constraints);
-					
+			PropertyTerm pt = null;
+//			ValueTerm term2 = null;
 			//unmarshalling xml query
 			JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gpl4jung.xml");
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
@@ -49,25 +54,39 @@ public class XMLMotifReader implements MotifReader {
 				//getting roles (vertex id) from query
 				if (o instanceof Query.Vertex) {
 					Query.Vertex v = (Query.Vertex)o;
-					v_roles.add(v.id);
-					//setting up vertex property
-					PropertyTerm pt = new PropertyTerm("type");
-					Query.Vertex.Property p = (Query.Vertex.Property) o;
-					pt.setKey(p.getKey());
-					//constraints.add(pt);
+					v_roles.add(v.id); 
+					//getting vertex property constraints
+					for(Iterator itr=v.getProperty().iterator(); itr.hasNext();){
+						Query.Vertex.Property p = (Query.Vertex.Property) itr.next();
+						PropertyTerm term1 = new PropertyTerm(p.getKey());
+						ValueTerm term2 = new ValueTerm(p.getValue());
+						SimplePropertyConstraint<Vertex> pc = new SimplePropertyConstraint<Vertex>();
+						pc.setTerms(term1, term2);
+						constraints.add(pc);
 					}
+				}
+
 				//getting path constraint from query
 				else if (o instanceof Query.Path) {
-					PathConstraint pc = new PathConstraint();
-					LinkConstraint linkpc = null;
+					PathConstraint pathConstraint = new PathConstraint();
 					Query.Path p = (Query.Path)o;
 					//System.out.println("path from " + p.getFrom() + " to " + p.getTo());
-					pc.setMinLength(p.getMinLength());
-					pc.setMaxLength(p.getMaxLength());
-					linkpc.setSource(p.getFrom());
-					linkpc.setTarget(p.getTo());
-					constraints.add(pc);
-					constraints.add(linkpc);
+					if(p.getMinLength()!=null && p.getMaxLength()!=null){
+						pathConstraint.setMinLength(p.getMinLength());
+						pathConstraint.setMaxLength(p.getMaxLength());
+					}
+					pathConstraint.setSource(p.getFrom());
+					pathConstraint.setTarget(p.getTo());
+					//getting path property constraint
+					Query.Path.Property pp = p.getProperty();
+					if(pp!=null){
+						PropertyTerm term1 = new PropertyTerm(pp.getKey());
+						ValueTerm term2 = new ValueTerm(pp.getValue());
+						SimplePropertyConstraint<Edge> pathPropConstraint = new SimplePropertyConstraint<Edge>();
+						pathPropConstraint.setTerms(term1, term2);
+						constraints.add(pathPropConstraint);
+					}
+					constraints.add(pathConstraint);
 				}
 				else if (o instanceof Query.Condition) {
 					Query.Condition p = (Query.Condition)o;
@@ -77,12 +96,18 @@ public class XMLMotifReader implements MotifReader {
 					constraints.add(condition);					
 				}
 				else if (o instanceof Query.Edge){
-					Query.Edge p = (Query.Edge) o;
-					EdgeConstraint ec = new EdgeConstraint();
-					LinkConstraint linkec = null;
-					linkec.setSource(p.getSource());
-					linkec.setTarget(p.getTarget());
-					constraints.add(ec);
+					EdgeConstraint edgeConstraint = new EdgeConstraint();
+					Query.Edge e = (Query.Edge) o;
+					edgeConstraint.setSource(e.getSource());
+					edgeConstraint.setTarget(e.getTarget());
+					//getting properties
+					Query.Edge.Property ee = (Query.Edge.Property)o;
+					PropertyTerm term1 = new PropertyTerm(ee.getKey());
+					ValueTerm term2 = new ValueTerm(ee.getValue());
+					SimplePropertyConstraint<Edge> edgePropConstraint = new SimplePropertyConstraint<Edge>();
+					edgePropConstraint.setTerms(term1,term2);
+					constraints.add(edgeConstraint);
+					constraints.add(edgePropConstraint);
 				}
 				else if (o instanceof Query.ExistsNot){
 					Query.ExistsNot e = (Query.ExistsNot)o;

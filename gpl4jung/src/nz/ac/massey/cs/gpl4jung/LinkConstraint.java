@@ -21,7 +21,7 @@ import edu.uci.ics.jung.graph.Vertex;
  *
  * @param <T>
  */
-public abstract class LinkConstraint<T>{
+public abstract class LinkConstraint<T> implements Constraint {
 
 	private PropertyConstraint<Edge> edgePropertyConstraint = null;
 	private String predicate = null, source=null, target=null;
