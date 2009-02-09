@@ -23,7 +23,7 @@ public interface Motif {
 	 * @throws JAXBException 
 	 */
 	List<String> getRoles();
-	List<LinkConstraint> getConstraints();
-	void setConstraints(List<LinkConstraint> constraints);
+	List<Constraint> getConstraints();
+	void setConstraints(List<Constraint> constraints);
 	
 }
