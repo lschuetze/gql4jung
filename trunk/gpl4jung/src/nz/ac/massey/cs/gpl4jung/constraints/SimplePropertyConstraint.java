@@ -26,6 +26,7 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 		PropertyConstraint<T> {
 
 	private Term[] terms = null;
+	private String owner = null;
 
 	// the default operator is
 	private Operator operator = Operator.getInstance("=");
@@ -54,9 +55,6 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 	 * .Graph, T)
 	 */
 	public boolean check(Graph g, T... edgeOrVertex) {
-		// TODO: check whether we really need/want to check more then one artefacts
-		// idea: match them to properties 
-		//T first = edgeOrVertex[0]; // hack !!
 		for(T element:edgeOrVertex){
 		// instantiate
 		Object[] values = new Object[terms.length];
@@ -74,5 +72,12 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 			return false;
 		}
 		return true;
+	}
+	@Override
+	public String getOwner() {
+		return owner;	
+	}
+	public void setOwner(String owner){
+		this.owner = owner;
 	}
 }

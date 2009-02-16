@@ -10,6 +10,7 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
+import java.rmi.server.UID;
 import java.util.Iterator;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
@@ -25,6 +26,18 @@ import edu.uci.ics.jung.graph.Vertex;
  *
  */
 public class EdgeConstraint extends LinkConstraint<Edge> {
+	
+private String id = null;
+	
+	public EdgeConstraint() {
+		super();
+		UID edgeID = new UID();
+		this.id = edgeID.toString();
+	}
+	
+	public String getEdgeID(){
+		return id;
+	}
 	
 	public Iterator<ConnectedVertex<Edge>> getPossibleSources(final Graph g,final Vertex target) {
 		Iterator<Edge> incomingEdges = target.getInEdges().iterator();

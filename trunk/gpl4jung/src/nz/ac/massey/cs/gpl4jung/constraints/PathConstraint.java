@@ -10,6 +10,7 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
+import java.rmi.server.UID;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,7 +37,17 @@ import edu.uci.ics.jung.graph.Vertex;
 public class PathConstraint extends LinkConstraint<Path> {
 	private int minLength = 1;
 	private int maxLength = -1; // this means unbound	
+	private String id = null;
 	
+	public PathConstraint() {
+		super();
+		UID pathID = new UID();
+		this.id = pathID.toString();
+	}
+	
+	public String getPathID(){
+		return id;
+	}
 	public Iterator<ConnectedVertex<Path>> getPossibleSources(final Graph g,final Vertex target) {
 		
 		final Collection<Vertex> nodes= g.getVertices();

@@ -16,6 +16,8 @@ import nz.ac.massey.cs.gpl4jung.DefaultMotif;
 import nz.ac.massey.cs.gpl4jung.GQL;
 import nz.ac.massey.cs.gpl4jung.Motif;
 import nz.ac.massey.cs.gpl4jung.MotifInstance;
+import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
+import nz.ac.massey.cs.gpl4jung.impl.Bindings;
 import nz.ac.massey.cs.gpl4jung.impl.ConstraintSchedulerImpl;
 import nz.ac.massey.cs.gpl4jung.impl.GQLImpl;
 import nz.ac.massey.cs.gpl4jung.xml.XMLMotifReader;
@@ -109,6 +111,22 @@ public class GQLTests {
 		List<Constraint> constraints = cr.getConstraints(q);
 		List<Constraint> sortedConstraints = cr.prepare(g, constraints);
 		System.out.println(sortedConstraints);
+		
+	}
+	@Test
+	public void test3()throws Exception{
+		Graph g = this.readJungGraphFromGraphML("test_examples/abstraction.graphml");
+		DefaultMotif q = (DefaultMotif) readMotif("xml/query1.xml");
+		ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
+		List<Constraint> constraints = cs.getConstraints(q);
+		List<Constraint> sortedConstraints = cs.prepare(g, constraints);
+		Bindings binding = new Bindings();
+		binding.bind("type", "uses");
+		Constraint c = cs.selectNext(g, sortedConstraints, binding);
+		if(c instanceof PropertyConstraint)
+			assertTrue(true);
+		else
+			assertFalse(true);
 		
 	}
 	// Testcase 1.1: Execute the above test case for both interfaces and abstract classes. 
