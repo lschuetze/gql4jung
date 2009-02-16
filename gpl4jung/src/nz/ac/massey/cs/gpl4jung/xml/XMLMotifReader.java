@@ -61,6 +61,7 @@ public class XMLMotifReader implements MotifReader {
 						PropertyTerm term1 = new PropertyTerm(p.getKey());
 						ValueTerm term2 = new ValueTerm(p.getValue());
 						SimplePropertyConstraint<Vertex> pc = new SimplePropertyConstraint<Vertex>();
+						pc.setOwner(v.id);
 						pc.setTerms(term1, term2);
 						constraints.add(pc);
 					}
@@ -83,6 +84,7 @@ public class XMLMotifReader implements MotifReader {
 						PropertyTerm term1 = new PropertyTerm(pp.getKey());
 						ValueTerm term2 = new ValueTerm(pp.getValue());
 						SimplePropertyConstraint<Edge> pathPropConstraint = new SimplePropertyConstraint<Edge>();
+						pathPropConstraint.setOwner(pathConstraint.getPathID());
 						pathPropConstraint.setTerms(term1, term2);
 						constraints.add(pathPropConstraint);
 					}
@@ -100,12 +102,13 @@ public class XMLMotifReader implements MotifReader {
 					Query.Edge e = (Query.Edge) o;
 					edgeConstraint.setSource(e.getSource());
 					edgeConstraint.setTarget(e.getTarget());
-					//getting properties
+					//getting edge properties
 					Query.Edge.Property ee = (Query.Edge.Property)o;
 					PropertyTerm term1 = new PropertyTerm(ee.getKey());
 					ValueTerm term2 = new ValueTerm(ee.getValue());
 					SimplePropertyConstraint<Edge> edgePropConstraint = new SimplePropertyConstraint<Edge>();
 					edgePropConstraint.setTerms(term1,term2);
+					edgePropConstraint.setOwner(edgeConstraint.getEdgeID());
 					constraints.add(edgeConstraint);
 					constraints.add(edgePropConstraint);
 				}

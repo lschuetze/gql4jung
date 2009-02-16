@@ -16,6 +16,9 @@ import edu.uci.ics.jung.utils.UserDataContainer;
 
 public class NegatedPropertyConstraint<T extends UserDataContainer> implements PropertyConstraint<T> {
 	private PropertyConstraint<T> part = null;
+	private Term[] terms = null;
+	private String owner = null;
+	
 	public boolean check(Graph g, T... edgeOrVertex) {
 		return !part.check(g,edgeOrVertex);
 	}
@@ -24,6 +27,22 @@ public class NegatedPropertyConstraint<T extends UserDataContainer> implements P
 	}
 	public void setPart(PropertyConstraint<T> part) {
 		this.part = part;
+	}
+	
+	@Override
+	public String getOwner() {
+		return owner;
+	}
+	public void setOwner(String owner){
+		this.owner = owner;
+	}
+
+	@Override
+	public Term[] getTerms() {
+		return terms;
+	}
+	public void setTerms(Term... terms) {
+		this.terms = terms;
 	}
 
 }

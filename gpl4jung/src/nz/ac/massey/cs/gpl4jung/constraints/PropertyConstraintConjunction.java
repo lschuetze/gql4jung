@@ -21,6 +21,9 @@ import edu.uci.ics.jung.utils.UserDataContainer;
  */
 public class PropertyConstraintConjunction<T  extends UserDataContainer> extends ComplexPropertyConstraint<T> {
 	
+	private Term[] terms = null;
+	private String owner = null;
+	
 	public boolean check(Graph g, T... edgeOrVertex) {
 		for (PropertyConstraint part:parts) {
 			if (!part.check(g,edgeOrVertex)) {
@@ -28,5 +31,21 @@ public class PropertyConstraintConjunction<T  extends UserDataContainer> extends
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public String getOwner() {
+		return owner;
+	}
+	public void setOwner(String owner){
+		this.owner = owner;
+	}
+
+	@Override
+	public Term[] getTerms() {
+		return terms;
+	}
+	public void setTerms(Term... terms) {
+		this.terms = terms;
 	}
 }
