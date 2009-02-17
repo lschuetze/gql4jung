@@ -10,10 +10,10 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-
 import nz.ac.massey.cs.gpl4jung.Constraint;
 import nz.ac.massey.cs.gpl4jung.DefaultMotif;
 import nz.ac.massey.cs.gpl4jung.GQL;
+import nz.ac.massey.cs.gpl4jung.LinkConstraint;
 import nz.ac.massey.cs.gpl4jung.Motif;
 import nz.ac.massey.cs.gpl4jung.MotifInstance;
 import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
@@ -22,10 +22,14 @@ import nz.ac.massey.cs.gpl4jung.impl.ConstraintSchedulerImpl;
 import nz.ac.massey.cs.gpl4jung.impl.GQLImpl;
 import nz.ac.massey.cs.gpl4jung.xml.XMLMotifReader;
 import nz.ac.massey.cs.utils.odem2graphml.Odem2GraphML;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.io.GraphMLFile;
 
 public class GQLTests {
@@ -116,17 +120,25 @@ public class GQLTests {
 	@Test
 	public void test3()throws Exception{
 		Graph g = this.readJungGraphFromGraphML("test_examples/abstraction.graphml");
+		Vertex v2 = null;
+		for (Object v:g.getVertices()) {
+			if (((Vertex)v).getUserDatum("id").equals("2")) v2=(Vertex)v;
+		}
+		
 		DefaultMotif q = (DefaultMotif) readMotif("xml/query1.xml");
 		ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
 		List<Constraint> constraints = cs.getConstraints(q);
 		List<Constraint> sortedConstraints = cs.prepare(g, constraints);
 		Bindings binding = new Bindings();
-		binding.bind("type", "uses");
+		binding.bind("client",v2);
 		Constraint c = cs.selectNext(g, sortedConstraints, binding);
 		if(c instanceof PropertyConstraint)
 			assertTrue(true);
 		else
 			assertFalse(true);
+		
+		PropertyConstraint pc = (PropertyConstraint)c;
+		assertEquals(pc.getOwner(),"client");
 		
 	}
 	// Testcase 1.1: Execute the above test case for both interfaces and abstract classes. 
@@ -180,5 +192,48 @@ public class GQLTests {
 	// Testcase 4.1: Test for no clusters in one package
 	
 		
+	
+	@Test
+	public void test4() throws Exception {
+		Graph g = this.readJungGraphFromGraphML("test_examples/abstraction.graphml");
+		Motif q = (DefaultMotif) readMotif("xml/query1.xml");
+		GQL gql = new GQLImpl();
+		ResultCollector listener = new ResultCollector();
+		gql.query(g,q, listener);
+		
+		// analyse results
+		assertEquals(listener.getInstances().size(),1);
+		for (MotifInstance result:listener.getInstances()) {
+			assertEquals(result.getVertex("client"),this.getVertexById(g,"2"));
+			assertEquals(result.getVertex("service"),this.getVertexById(g,"0"));
+			assertEquals(result.getVertex("service_impl"),this.getVertexById(g,"1"));
+			Edge e1 = (Edge)result.getLink(getConstraint(q,"client","service"));
+			assertEquals(e1,this.getEdgeById(g,"edge-4"));
+		}
+	
+	}
+	
+	private Vertex getVertexById(Graph g,String id) {
+		for (Object v:g.getVertices()) {
+			if (((Vertex)v).getUserDatum("id").equals(id)){
+				return (Vertex)v;
+			}
+		}
+		return null;
+	}
+	private Edge getEdgeById(Graph g,String id) {
+		for (Object v:g.getEdges()) {
+			if (((Edge)v).getUserDatum("id").equals(id)){
+				return (Edge)v;
+			}
+		}
+		return null;
+	}
+	
+	private LinkConstraint getConstraint(Motif q,String source,String target) {
+		// TODO
+		return null;
+	}
+	
 }
 

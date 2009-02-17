@@ -90,7 +90,7 @@ public class PropertyConstraintTests {
 	public void testCheckIN() {
 		SimplePropertyConstraint<Vertex> vc = new SimplePropertyConstraint<Vertex>();
 		PropertyTerm term1 = new PropertyTerm("type");
-		ValueTerm term2 = new ValueTerm(" my class ");
+		ValueTerm term2 = new ValueTerm("my class,package");
 		Operator op = Operator.getInstance("IN");
 		vc.setOperator(op);
 		vc.setTerms(term1,term2);
