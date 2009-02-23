@@ -25,15 +25,16 @@ import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
 
 
 public class ConstraintSchedulerImpl implements ConstraintScheduler {
-
+	List <String> roles = null;
 	@Override
 	public List<Constraint> getConstraints(Motif motif) {
+		this.roles = motif.getRoles();
 		List<Constraint> constraints = new ArrayList<Constraint>();
 		for(Iterator itr = motif.getConstraints().iterator();itr.hasNext();){
 			Constraint nextConstraint = (Constraint) itr.next();
 			constraints.add(nextConstraint);
 		}
-		return constraints;
+		return constraints; 
 	}
 
 	@Override
@@ -65,24 +66,22 @@ public class ConstraintSchedulerImpl implements ConstraintScheduler {
 			Object c = (Object) itr.next();
 			if(c instanceof PropertyConstraint){
 				PropertyConstraint constraint = (PropertyConstraint) c;
-				Term[] terms = constraint.getTerms();
-				PropertyTerm key = (PropertyTerm) terms[0];
-				ValueTerm value = (ValueTerm) terms[1];
-				Object instance = bindings.lookup(key.getKey());
-				if (instance!=null){
-					if (instance.toString().equals(value.getValue().toString())) 
-						return constraint;
+				Object instance = bindings.lookup(constraint.getOwner());
+				if (instance!=null){ 
+					return constraint;
 				}
 			}
 			else if (c instanceof PathConstraint){
 				PathConstraint pathConstraint = (PathConstraint) c;
-				// what kind of bindings to look for 
-				return pathConstraint;
+				Object instance = bindings.lookup(pathConstraint.getPathID());
+				if(instance!=null)
+					return pathConstraint;
 			}
 			else if (c instanceof EdgeConstraint){
 				EdgeConstraint edgeConstraint = (EdgeConstraint) c;
-				// what kind of bindings to look for 
-				return edgeConstraint;
+				Object instance = bindings.lookup(edgeConstraint.getEdgeID());
+				if(instance!=null) 
+					return edgeConstraint;
 			}
 		}
 		return null;

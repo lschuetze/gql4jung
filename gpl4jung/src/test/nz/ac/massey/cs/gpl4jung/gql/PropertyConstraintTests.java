@@ -53,6 +53,8 @@ public class PropertyConstraintTests {
 		//test for NOT EQUAL OPERATOR for the above test scenario '!='
 		op = Operator.getInstance("!=");
 		vc.setOperator(op);
+		Object x = term1.getValue(testV1);
+		System.out.println(x);
 		assertFalse(vc.check(g,testV0, testV1, testV3));
 		
 	}

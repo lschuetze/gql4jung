@@ -122,14 +122,16 @@ public class EdgeConstraintTests {
 		v9.addUserDatum(key, "V9", UserData.SHARED);
 		
 		//creating edges for graph
-		g.addEdge(new DirectedSparseEdge(v0, v1));
+		Edge e1=g.addEdge(new DirectedSparseEdge(v0, v1));
         g.addEdge(new DirectedSparseEdge(v2, v3));
         g.addEdge(new DirectedSparseEdge(v1, v4));
         g.addEdge(new DirectedSparseEdge(v3, v4));
         g.addEdge(new DirectedSparseEdge(v4, v5));
         g.addEdge(new DirectedSparseEdge(v4, v7));
         g.addEdge(new DirectedSparseEdge(v5, v6));
-        g.addEdge(new DirectedSparseEdge(v7, v8));   
+        g.addEdge(new DirectedSparseEdge(v7, v8));  
+        //setting up edges properties
+        e1.setUserDatum("type", "uses", UserData.SHARED);
 	}
 	private Vertex getVertexFromGraph(String vertexname){
 		String key="name";
