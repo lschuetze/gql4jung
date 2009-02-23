@@ -26,6 +26,7 @@ import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
 import nz.ac.massey.cs.gpl4jung.*;
 import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.PropertyConstraintDisjunction;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
 import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
@@ -78,7 +79,7 @@ public class XMLMotifReader implements MotifReader {
 					}
 					pathConstraint.setSource(p.getFrom());
 					pathConstraint.setTarget(p.getTo());
-					//getting path property constraint
+					//getting simple path property constraint
 					Query.Path.Property pp = p.getProperty();
 					if(pp!=null){
 						PropertyTerm term1 = new PropertyTerm(pp.getKey());
@@ -86,7 +87,24 @@ public class XMLMotifReader implements MotifReader {
 						SimplePropertyConstraint<Edge> pathPropConstraint = new SimplePropertyConstraint<Edge>();
 						pathPropConstraint.setOwner(pathConstraint.getPathID());
 						pathPropConstraint.setTerms(term1, term2);
-						constraints.add(pathPropConstraint);
+						pathConstraint.setEdgePropertyConstraint(pathPropConstraint);
+					}
+					//getting complex path property constraints (using OR operator)
+					Query.Path.Or orProp = p.getOr();
+					List<PropertyConstraint> propCon = new ArrayList<PropertyConstraint>();
+					PropertyConstraintDisjunction ComplexPropConstraint = new PropertyConstraintDisjunction();
+					if(orProp!=null){
+						for(Iterator itr = orProp.getProperty().iterator();itr.hasNext();){
+							Query.Path.Or.Property prp = (Query.Path.Or.Property) itr.next();
+							PropertyTerm term1 = new PropertyTerm(prp.getKey());
+							ValueTerm term2 = new ValueTerm(prp.getValue());
+							SimplePropertyConstraint<Vertex> pc = new SimplePropertyConstraint<Vertex>();
+							pc.setOwner(pathConstraint.getPathID());
+							pc.setTerms(term1, term2);
+							propCon.add(pc);
+						}
+						ComplexPropConstraint.setParts(propCon);
+						pathConstraint.setEdgePropertyConstraint(ComplexPropConstraint);
 					}
 					constraints.add(pathConstraint);
 				}
@@ -109,9 +127,10 @@ public class XMLMotifReader implements MotifReader {
 					SimplePropertyConstraint<Edge> edgePropConstraint = new SimplePropertyConstraint<Edge>();
 					edgePropConstraint.setTerms(term1,term2);
 					edgePropConstraint.setOwner(edgeConstraint.getEdgeID());
+					edgeConstraint.setEdgePropertyConstraint(edgePropConstraint);
 					constraints.add(edgeConstraint);
-					constraints.add(edgePropConstraint);
 				}
+				//to be completed
 				else if (o instanceof Query.ExistsNot){
 					Query.ExistsNot e = (Query.ExistsNot)o;
 					v_roles.add(e.getVertex().getId()); //gets vertex id in complex condition of Exists not

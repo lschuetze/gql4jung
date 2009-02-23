@@ -10,6 +10,7 @@
 
 package nz.ac.massey.cs.gpl4jung;
 
+import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 
 public interface MotifInstance {
@@ -30,5 +31,5 @@ public interface MotifInstance {
 	 * @param constraint
 	 * @return
 	 */
-	Object getLink(LinkConstraint constraint); 
+	Object getLink(LinkConstraint constraint, Graph g); 
 }

@@ -117,7 +117,9 @@ public class PathConstraint extends LinkConstraint<Path> {
 		PathImpl pp = null;
 		if (path.size()!=0) {
 			pp = new PathImpl();
-			pp.setEdges(path); 
+			pp.setEdges(path);
+			pp.setStart(source);
+			pp.setEnd(target);
 		};	
 		return pp;
 	}
