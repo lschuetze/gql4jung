@@ -182,7 +182,7 @@ public class GQLTests {
 		ResultCollector listener = new ResultCollector();
 		gql.query(g, q, listener);
 		// analyse results
-		//assertEquals(listener.getInstances().size(),1);
+		assertEquals(listener.getInstances().size(),1);
 		for (MotifInstance result:listener.getInstances()) {
 			assertEquals(result.getVertex("client"),this.getVertexById(g,"2"));
 			assertEquals(result.getVertex("service"),this.getVertexById(g,"0"));
