@@ -31,5 +31,5 @@ public interface MotifInstance {
 	 * @param constraint
 	 * @return
 	 */
-	Object getLink(LinkConstraint constraint, Graph g); 
+	Object getLink(LinkConstraint constraint); 
 }
