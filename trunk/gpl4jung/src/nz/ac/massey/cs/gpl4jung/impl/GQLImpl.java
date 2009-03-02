@@ -142,7 +142,7 @@ public class GQLImpl implements GQL {
 		    					Path p = (Path) instance;
 		    					List<Edge> list = p.getEdges(); 
 		    					Edge[] path = getEdgesFromPath(list);
-		    					if(pc.check(g, path)){
+		    					if(pc!=null && pc.check(g, path)){
 			    					List<Constraint> newConstraints = copy(constraints);
 					    			newConstraints.remove(lc);
 					    			//reset counter
