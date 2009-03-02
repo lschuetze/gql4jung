@@ -37,17 +37,14 @@ import edu.uci.ics.jung.graph.Vertex;
 public class PathConstraint extends LinkConstraint<Path> {
 	private int minLength = 1;
 	private int maxLength = -1; // this means unbound	
-	private String id = null;
+	//private String id = null;
 	
 	public PathConstraint() {
 		super();
 		UID pathID = new UID();
-		this.id = pathID.toString();
+		super.id = pathID.toString();
 	}
 	
-	public String getPathID(){
-		return id;
-	}
 	public Iterator<ConnectedVertex<Path>> getPossibleSources(final Graph g,final Vertex target) {
 		
 		final Collection<Vertex> nodes= g.getVertices();

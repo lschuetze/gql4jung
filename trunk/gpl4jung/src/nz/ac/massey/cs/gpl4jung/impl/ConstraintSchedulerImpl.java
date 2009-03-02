@@ -73,13 +73,13 @@ public class ConstraintSchedulerImpl implements ConstraintScheduler {
 			}
 			else if (c instanceof PathConstraint){
 				PathConstraint pathConstraint = (PathConstraint) c;
-				Object instance = bindings.lookup(pathConstraint.getPathID());
+				Object instance = bindings.lookup(pathConstraint.getID());
 				if(instance!=null)
 					return pathConstraint;
 			}
 			else if (c instanceof EdgeConstraint){
 				EdgeConstraint edgeConstraint = (EdgeConstraint) c;
-				Object instance = bindings.lookup(edgeConstraint.getEdgeID());
+				Object instance = bindings.lookup(edgeConstraint.getID());
 				if(instance!=null) 
 					return edgeConstraint;
 			}

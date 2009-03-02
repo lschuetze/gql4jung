@@ -27,16 +27,12 @@ import edu.uci.ics.jung.graph.Vertex;
  */
 public class EdgeConstraint extends LinkConstraint<Edge> {
 	
-private String id = null;
+//private String id = null;
 	
 	public EdgeConstraint() {
 		super();
 		UID edgeID = new UID();
-		this.id = edgeID.toString();
-	}
-	
-	public String getEdgeID(){
-		return id;
+		super.id = edgeID.toString();
 	}
 	
 	public Iterator<ConnectedVertex<Edge>> getPossibleSources(final Graph g,final Vertex target) {

@@ -184,14 +184,14 @@ public class GQLTests {
 		// analyse results
 		assertEquals(listener.getInstances().size(),1);
 		for (MotifInstance result:listener.getInstances()) {
-			assertEquals(result.getVertex("client"),this.getVertexById(g,"2"));
-			assertEquals(result.getVertex("service"),this.getVertexById(g,"0"));
-			assertEquals(result.getVertex("service_impl"),this.getVertexById(g,"1"));
-			Path p1 = (Path)result.getLink(getConstraint(q,"client","service"),g);
+			assertEquals(result.getVertex("client"),this.getVertexById(g,"MyApplication"));
+			assertEquals(result.getVertex("service"),this.getVertexById(g,"Animal"));
+			assertEquals(result.getVertex("service_impl"),this.getVertexById(g,"Horse"));
+			Path p1 = (Path)result.getLink(getConstraint(q,"client","service"));
 			assertTrue(p1.getEdges().contains(this.getEdgeById(g,"edge-4")));
-			Path p2 = (Path)result.getLink(getConstraint(q,"client","service_impl"),g);
+			Path p2 = (Path)result.getLink(getConstraint(q,"client","service_impl"));
 			assertTrue(p2.getEdges().contains(this.getEdgeById(g,"edge-5")));
-			Path p3 = (Path)result.getLink(getConstraint(q,"service_impl","service"), g);
+			Path p3 = (Path)result.getLink(getConstraint(q,"service_impl","service"));
 			assertTrue(p3.getEdges().contains(this.getEdgeById(g,"edge-1")));
 		}
 	}
@@ -204,7 +204,6 @@ public class GQLTests {
 		ResultCollector rc = new ResultCollector();
 		this.gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
-		
 		assertEquals(1,results.size());
 		MotifInstance instance1 = results.get(0);
 		assertEquals("Class1",instance1.getVertex("Class1").getUserDatum("name"));
@@ -230,7 +229,7 @@ public class GQLTests {
 	
 	private Vertex getVertexById(Graph g,String id) {
 		for (Object v:g.getVertices()) {
-			if (((Vertex)v).getUserDatum("class.id").equals(id)){
+			if (((Vertex)v).getUserDatum("name").equals(id)){
 				return (Vertex)v;
 			}
 		}

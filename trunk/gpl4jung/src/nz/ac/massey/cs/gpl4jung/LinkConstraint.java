@@ -25,11 +25,15 @@ public abstract class LinkConstraint<T> implements Constraint {
 
 	private PropertyConstraint<Edge> edgePropertyConstraint = null;
 	private String predicate = null, source=null, target=null;
+	protected String id = null;
 	public void setPredicate(String predicate){
 		this.predicate = predicate;
 	}
 	public String getPredicate(){
 		return predicate;
+	}
+	public String getID(){
+		return id;
 	}
 	/**
 	 * Given the target of the link returns possible pairs consisting of a source vertex and a link.
