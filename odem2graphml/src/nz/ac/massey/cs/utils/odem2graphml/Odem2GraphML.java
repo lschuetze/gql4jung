@@ -104,7 +104,7 @@ public class Odem2GraphML {
 								out.write(String.valueOf(nodeId));
 //								out.write("\" class.id=\"");
 //								out.write(String.valueOf(nodeId));
-								out.write("\" jar=\"");
+								out.write("\" container=\"");
 								out.write(containerStr.substring(containerStr
 										.lastIndexOf('/') + 1));
 								out.write("\" namespace=\"");
