@@ -78,19 +78,19 @@ public class Odem2GraphML {
 		NodeList containerList = doc.getElementsByTagName("container");
 		for (int i = 0; i < containerList.getLength(); i++) {
 			Node container = containerList.item(i);
-			NamedNodeMap containerAttr = container.getAttributes();
+			NamedNodeMap containerAttr = container.getAttributes(); 
 			if (container.getNodeType() == Node.ELEMENT_NODE) {
 				Element containerElement = (Element) container;
 				NodeList namespaces = containerElement.getElementsByTagName("namespace");
 				for (int j = 0; j < namespaces.getLength(); j++) {
-					Node namespace = namespaces.item(j);
+					Node namespace = namespaces.item(j); 
 					NamedNodeMap namespaceAttr = namespace.getAttributes();
 					if (namespace.getNodeType() == Node.ELEMENT_NODE) {
-						Element namespaceElement = (Element) namespace;
+						Element namespaceElement = (Element) namespace; 
 						NodeList types = namespaceElement
 								.getElementsByTagName("type");
 						for (int k = 0; k < types.getLength(); k++) {
-							Node type = types.item(k);
+							Node type = types.item(k); 
 							NamedNodeMap typeAttr = type.getAttributes();
 							String containerStr = containerAttr.getNamedItem(
 									"name").getNodeValue();
@@ -98,42 +98,50 @@ public class Odem2GraphML {
 									"name").getNodeValue();
 							String typeStr = typeAttr.getNamedItem("name")
 									.getNodeValue();
+							String typeStr1 = typeAttr.getNamedItem("classification").getNodeValue();
 							try {
 								out.write("<node id=\"");
 								out.write(String.valueOf(nodeId));
-								out.write("\" class.id=\"");
-								out.write(String.valueOf(nodeId));
-								out.write("\" class.jar=\"");
+//								out.write("\" class.id=\"");
+//								out.write(String.valueOf(nodeId));
+								out.write("\" jar=\"");
 								out.write(containerStr.substring(containerStr
 										.lastIndexOf('/') + 1));
-								out.write("\" class.packageName=\"");
+								out.write("\" namespace=\"");
 								out.write(namespaceStr);
-								out.write("\" class.name=\"");
+								out.write("\" name=\"");
 								out.write(typeStr.substring(typeStr
 										.lastIndexOf('.') + 1));
-								out
-										.write("\" class.cluster=\"null\" class.isInterface=\"");
-
-								if (typeAttr.getNamedItem("classification") != null)
-									out.write(String
-											.valueOf(typeAttr.getNamedItem(
-													"classification")
-													.getNodeValue().equals(
-															"interface")));
+								out.write("\" cluster=\"null\" isInterface=\"");
+								if(typeAttr.getNamedItem("classification")!=null 
+										&& typeAttr.getNamedItem("classification").getNodeValue()
+										.equals("interface")){
+									out.write("true");
+								}
 								else
-									out.write("null");
+									out.write("false");
+								out.write("\" type=\"");
+								out.write(typeStr1);
+//								if (typeAttr.getNamedItem("classification") != null)
+//									out.write(String
+//											.valueOf(typeAttr.getNamedItem(
+//													"classification")
+//													.getNodeValue().equals(
+//															"interface")));
+//								else
+//									out.write("null");
 
-								out.write("\" class.isAbstract=\"");
+								out.write("\" isAbstract=\"");
 								if (typeAttr.getNamedItem("isAbstract") != null
 										&& typeAttr.getNamedItem("isAbstract")
 												.getNodeValue().equals("yes"))
 									out.write("true");
 								else
 									out.write("false");
-								out.write("\" class.isException=\"");
+								out.write("\" isException=\"");
 								out.write(String.valueOf(typeStr
 										.endsWith("Exception")));
-								out.write("\" class.access=\"");
+								out.write("\" access=\"");
 
 								if (typeAttr.getNamedItem("visibility") != null)
 									out.write(typeAttr.getNamedItem(
@@ -141,7 +149,7 @@ public class Odem2GraphML {
 								else
 									out.write("null");
 
-								out.write("\" node.isSelected=\"false\" ");
+								out.write("\" isSelected=\"false\" ");
 
 								if (typeStr.contains(namespaceStr))
 									nodes.add(nodeId, typeStr);
@@ -184,7 +192,7 @@ public class Odem2GraphML {
 									out.write(buffer.toString());
 									out.write("\" ");
 								}
-								out.write("classification=\"null\" ");
+//								out.write("classification=\"null\" ");
 								out.write("/>");
 								out.write('\n');
 								nodeId++;
@@ -216,12 +224,11 @@ public class Odem2GraphML {
 					buffer.append(te.getSource());
 					buffer.append("\" targetId=\"");
 					buffer.append(j);
-					buffer.append("\" relationship.type=\"");
+					buffer.append("\" type=\"");
 					buffer.append(te.getType());
-					buffer
-							.append("\" edge.isSelected=\"false\" relationship.state=\"null");
-					buffer.append("\" relationship.betweenness=\"null");
-					buffer.append("\" relationship.separation=\"null\" />");
+					buffer.append("\" isSelected=\"false\" state=\"null");
+					buffer.append("\" betweenness=\"null");
+					buffer.append("\" separation=\"null\" />");
 					edges.add(buffer.toString());
 					break;
 				}
