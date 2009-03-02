@@ -1,5 +1,6 @@
 package nz.ac.massey.cs.gpl4jung.impl;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -8,34 +9,38 @@ import org.apache.commons.collections.IteratorUtils;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.graph.impl.AbstractSparseEdge;
+import edu.uci.ics.jung.graph.impl.AbstractSparseVertex;
+import edu.uci.ics.jung.utils.UserDataContainer;
 
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
 import nz.ac.massey.cs.gpl4jung.Constraint;
 import nz.ac.massey.cs.gpl4jung.GQL;
 import nz.ac.massey.cs.gpl4jung.LinkConstraint;
 import nz.ac.massey.cs.gpl4jung.Motif;
+import nz.ac.massey.cs.gpl4jung.Path;
 
 import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.QueryOptimizer;
 import nz.ac.massey.cs.gpl4jung.ResultListener;
+import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 
 
 public class GQLImpl implements GQL {
 	
 	private boolean cancelled = false;
-    	
+    
 	@Override
 	public void query(Graph graph, Motif motif, ResultListener listener) {
-		List<Constraint> constraints = motif.getConstraints();
+		
     	//gettting initial binding 
     	String role = motif.getRoles().get(0);
     	for(Object o:graph.getVertices()){
     		Vertex v = (Vertex) o;
+    		List<Constraint> constraints = motif.getConstraints();
     		Bindings binding = new Bindings();
     		binding.bind(role, v);
-    		//motifInstance.setVertex(v, role);
-    		//source = v;
-    		resolve(graph, constraints, binding, listener);
+    		resolve(graph, constraints, binding, listener,0);
     	}
 	}
 
@@ -46,89 +51,188 @@ public class GQLImpl implements GQL {
 
 	}
 	
-public void resolve(Graph g, List<Constraint> constraints, Bindings replacement, ResultListener listener) {
+	public void resolve(Graph g, List<Constraint> constraints, Bindings replacement, ResultListener listener, int constraintCounter) {
 		
 		if(cancelled){
 			return;
 		}
-		MotifInstanceImpl motifInstance = new MotifInstanceImpl();
+		
 		//check for termination
     	if (constraints.isEmpty()){
-    		//TODO: instantiate motifInstance
+    		MotifInstanceImpl motifInstance = new MotifInstanceImpl();
+    		motifInstance.addAll(replacement.asMap());
     		listener.found(motifInstance);
     		return;
     	}
-		ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
-		Constraint c = cs.selectNext(g,constraints,replacement);
+		//ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
+		Constraint c = constraints.get(constraintCounter);
 		if(c instanceof PropertyConstraint){
 			PropertyConstraint pc = (PropertyConstraint) c;
-			if (pc!=null){
-				Vertex v = (Vertex) replacement.lookup(pc.getOwner());
-				if(pc.check(g, v)){
-					List<Constraint> newConstraints = constraints;
-					newConstraints.remove(pc);
-					resolve(g,newConstraints,replacement,listener);
+			String owner = pc.getOwner();
+			Object instance = replacement.lookup(owner);
+			if(instance!=null){
+				if(instance instanceof UserDataContainer){
+					UserDataContainer edgeOrVertex = (UserDataContainer) instance;
+					if(pc.check(g, edgeOrVertex)){
+						List<Constraint> newConstraints = copy(constraints);
+						newConstraints.remove(pc);
+						resolve(g,newConstraints,replacement,listener, constraintCounter);
+						releaseBindingMap(replacement);
+					}
+					else
+						return; //backtrack
 				}
-				else
-					return; //backtrack
+				else if(instance instanceof Path){
+					Path p  = (Path)instance;
+					List<Edge> list = p.getEdges(); 
+					Edge[] path = getEdgesFromPath(list);
+					if(pc.check(g, path)){
+						List<Constraint> newConstraints = copy(constraints);
+						newConstraints.remove(pc);
+						resolve(g,newConstraints,replacement,listener, constraintCounter);
+						releaseBindingMap(replacement);
+					}
+					else
+						return; //backtrack
+				}	
 			}
+			else if (instance == null){
+				resolve(g, constraints, replacement, listener,constraintCounter+1);
+			}	
 		}
 		//resolving constraints for binary constrainst
 		else if (c instanceof LinkConstraint){
 			LinkConstraint lc = (LinkConstraint) c;
-			if(lc!=null){
-				String source = lc.getSource();
-				String target = lc.getTarget();
-				Object instance1 = replacement.lookup(source);
-				Object instance2 = replacement.lookup(target);
-				if (instance1 == null && instance2 != null){
-					//we have got target so look for possible sources
-					Vertex targetVertex = (Vertex) replacement.lookup(target);
-					Iterator<ConnectedVertex<Edge>> ps = lc.getPossibleSources(g, targetVertex);
-	    			List<ConnectedVertex<Edge>> sources = IteratorUtils.toList(ps);
-	    			for(Iterator itr = sources.iterator();itr.hasNext();){
-	    				Object nextInstance = itr.next();
-	    				if(!mustNotBinding(replacement, nextInstance)){
+			String source = lc.getSource();
+			String target = lc.getTarget();
+			Object instance1 = replacement.lookup(source);
+			Object instance2 = replacement.lookup(target);
+			if(instance1 == null && instance2 == null){
+				resolve(g,constraints,replacement,listener,constraintCounter+1);
+			}
+			else if (instance1 == null && instance2 != null){
+				//we have got target so look for possible sources
+				Vertex targetVertex = (Vertex) replacement.lookup(target);
+				Iterator<ConnectedVertex<Edge>> ps = lc.getPossibleSources(g, targetVertex);
+    			List<ConnectedVertex<Edge>> sources = IteratorUtils.toList(ps);
+    			if(sources.size()!=0){
+    				for(Iterator itr = sources.iterator();itr.hasNext();){
+	    				ConnectedVertex nextInstance = (ConnectedVertex) itr.next();
+	    				if(!mustNotBinding(replacement, nextInstance.getVertex())){
 	    					//add new replacement
 	    					Bindings nextReplacement = createBindingMap(replacement);
-			    			nextReplacement.bind(source, nextInstance);
-			    			List<Constraint> newConstraints = constraints;
-			    			newConstraints.remove(lc);
-			    			resolve(g,newConstraints,nextReplacement,listener);
-	    				}
-	    				 				
-	    			}
-	    			
-				}
-				else if (instance1 != null && instance2 == null){
-					//we have source, so look for possible targets
-					Vertex sourceVertex = (Vertex) replacement.lookup(source);
-					Iterator<ConnectedVertex<Edge>> pt = lc.getPossibleTargets(g, sourceVertex);
-	    			List<ConnectedVertex<Edge>> targets = IteratorUtils.toList(pt);
-	    			for(Iterator itr = targets.iterator();itr.hasNext();){
-	    				Object nextInstance = itr.next();
-	    				if(!mustNotBinding(replacement, nextInstance)){
-	    					//add new replacement
-	    					Bindings nextReplacement = createBindingMap(replacement);
-			    			nextReplacement.bind(target, nextInstance);
-			    			List<Constraint> newConstraints = constraints;
-			    			newConstraints.remove(lc);
-			    			resolve(g,newConstraints,nextReplacement,listener);
+			    			nextReplacement.bind(source, nextInstance.getVertex());
+			    			nextReplacement = createBindingMap(nextReplacement);
+			    			String link = lc.getID();
+			    			nextReplacement.bind(link, nextInstance.getLink());
+			    			PropertyConstraint pc = lc.getEdgePropertyConstraint();
+			    			Object instance =  nextInstance.getLink();
+			    			if(instance instanceof AbstractSparseEdge){
+			    				Edge e = (Edge) instance;
+			    				if(pc.check(g,e)){
+			    					List<Constraint> newConstraints = copy(constraints);
+					    			newConstraints.remove(lc);
+					    			//reset counter
+					    			constraintCounter = 0;
+					    			resolve(g,newConstraints,nextReplacement,listener, constraintCounter);
+					    			releaseBindingMap(nextReplacement);//to b tested
+			    				}				
+			    			}
+		    				else if (instance instanceof Path){
+		    					Path p = (Path) instance;
+		    					List<Edge> list = p.getEdges(); 
+		    					Edge[] path = getEdgesFromPath(list);
+		    					if(pc.check(g, path)){
+			    					List<Constraint> newConstraints = copy(constraints);
+					    			newConstraints.remove(lc);
+					    			//reset counter
+					    			constraintCounter = 0;
+					    			resolve(g,newConstraints,nextReplacement,listener, constraintCounter);			    						
+					    			releaseBindingMap(nextReplacement);//to b tested
+		    					}		   
+		    				}
 	    				} 				
 	    			}
+    			}
+			}
+			else if (instance1 != null && instance2 == null){
+				//we have source, so look for possible targets
+				Vertex sourceVertex = (Vertex) replacement.lookup(source);
+				Iterator<ConnectedVertex<Edge>> pt = lc.getPossibleTargets(g, sourceVertex);
+    			List<ConnectedVertex<Edge>> targets = IteratorUtils.toList(pt);
+    			if(targets.size()!=0){
+    				for(Iterator itr = targets.iterator();itr.hasNext();){
+    					ConnectedVertex nextInstance = (ConnectedVertex) itr.next();
+    					if(!mustNotBinding(replacement, nextInstance.getVertex())){
+    						//add new replacement
+	    					Bindings nextReplacement = createBindingMap(replacement);
+			    			nextReplacement.bind(target, nextInstance.getVertex());
+			    			nextReplacement = createBindingMap(nextReplacement);
+			    			String link = lc.getID();
+			    			nextReplacement.bind(link, nextInstance.getLink());
+			    			PropertyConstraint pc = lc.getEdgePropertyConstraint();
+			    			Object instance =  nextInstance.getLink();
+			    			if(instance instanceof AbstractSparseEdge){
+			    				Edge e = (Edge) instance;
+			    				if(pc.check(g,e)){
+			    					List<Constraint> newConstraints = copy(constraints);
+					    			newConstraints.remove(lc);
+					    			//reset counter
+					    			constraintCounter = 0;
+					    			resolve(g,newConstraints,nextReplacement,listener, constraintCounter);
+					    			releaseBindingMap(nextReplacement);//to b tested
+			    				}				
+			    			}
+		    				else if (instance instanceof Path){
+		    					Path p = (Path) instance;
+		    					List<Edge> list = p.getEdges(); 
+		    					Edge[] path = getEdgesFromPath(list);
+		    					if(pc.check(g, path)){
+			    					List<Constraint> newConstraints = copy(constraints);
+					    			newConstraints.remove(lc);
+					    			//reset counter
+					    			constraintCounter = 0;
+					    			resolve(g,newConstraints,nextReplacement,listener, constraintCounter);			    						
+					    			//releaseBindingMap(nextReplacement);//to b tested
+		    					}		   
+		    				}
+    					}	
+		    		}
+    			}	
+			}
+			else if (instance1 != null && instance2 != null){
+				Object link = lc.check(g, (Vertex) instance1, (Vertex)instance2);
+				if(link!=null){
+					String id = lc.getID();
+					Bindings nextReplacement = createBindingMap(replacement);
+					nextReplacement.bind(id, link);
+					List<Constraint> newConstraints = copy(constraints);
+					newConstraints.remove(lc);
+					constraintCounter = 0;
+					resolve(g,newConstraints,replacement,listener, constraintCounter);
 				}
-				else if (instance1 != null && instance2 != null){
-					if(lc.check(g, (Vertex) instance1, (Vertex)instance2)!=null){
-						List<Constraint> newConstraints = constraints;
-						newConstraints.remove(lc);
-						resolve(g,newConstraints,replacement,listener);
-					}
-				}
+				else
+					return;
 			}
 		}
 	}
 
-	
+	/**
+	 * Retrieves edges from the list
+	 * @param list
+	 * @return an array of edges included in the path
+	 */
+	private Edge[] getEdgesFromPath(List<Edge> list) {
+		Edge path[] = new Edge[list.size()];
+		for(Iterator itr=list.iterator();itr.hasNext();){
+			for(int i=0;i<list.size();i++){
+				Edge e = (Edge) itr.next();
+				path[i]= e;
+			}
+		}
+		return path;
+	}
+
 	/**
      * Create the next map containing bindings.
      * @param map a map containing binding
@@ -146,16 +250,6 @@ public void resolve(Graph g, List<Constraint> constraints, Bindings replacement,
     private void releaseBindingMap(Bindings bindings) {
     	bindings.gotoParentLevel();
     }
-
-    /**
-     * Check whether a binding map contains an object. 
-     * @param map a binding map
-     * @param obj an object
-     * @return a boolean
-     */
-    private boolean containsValue(Bindings map, Object value) {
-        return map.containsValue(value);
-    }
     
     /**
      * Check whether an instance can be added to the bindings.
@@ -163,9 +257,18 @@ public void resolve(Graph g, List<Constraint> constraints, Bindings replacement,
      * @param object an object
      */
     private boolean mustNotBinding(Bindings bindings, Object object) {
-    	return this.containsValue(bindings, object);
+    	return bindings.containsValue(object);
     }
-    
+    /**
+     * Copy a list. 
+     * @param list a list
+     * @return a list
+     */
+    private List<Constraint> copy(List<Constraint> list) {
+        List<Constraint> newList = new ArrayList<Constraint>();
+        newList.addAll(list);
+        return newList;
+    }
 	
 	
 	
