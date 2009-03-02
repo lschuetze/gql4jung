@@ -21,8 +21,7 @@ import javax.xml.bind.Unmarshaller;
 
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
-import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
+
 import nz.ac.massey.cs.gpl4jung.*;
 import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
@@ -30,7 +29,6 @@ import nz.ac.massey.cs.gpl4jung.constraints.PropertyConstraintDisjunction;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
 import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
-import nz.ac.massey.cs.gpl4jung.xml.Query.Vertex.Property;
 
 public class XMLMotifReader implements MotifReader {
 
@@ -42,15 +40,12 @@ public class XMLMotifReader implements MotifReader {
 			List<Constraint> constraints = new ArrayList<Constraint>();
 			motif.setRoles(v_roles);
 			motif.setConstraints(constraints);
-			PropertyTerm pt = null;
-//			ValueTerm term2 = null;
+			
 			//unmarshalling xml query
 			JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gpl4jung.xml");
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			Query q= (Query)unmarshaller.unmarshal(source);
-			//System.out.println(q);
-			
-			
+						
 			for (Object o:q.getVertexOrPathOrEdge()) {
 				//getting roles (vertex id) from query
 				if (o instanceof Query.Vertex) {
@@ -77,6 +72,7 @@ public class XMLMotifReader implements MotifReader {
 						pathConstraint.setMinLength(p.getMinLength());
 						pathConstraint.setMaxLength(p.getMaxLength());
 					}
+					
 					pathConstraint.setSource(p.getFrom());
 					pathConstraint.setTarget(p.getTo());
 					//getting simple path property constraint
@@ -87,6 +83,7 @@ public class XMLMotifReader implements MotifReader {
 						SimplePropertyConstraint<Edge> pathPropConstraint = new SimplePropertyConstraint<Edge>();
 						pathPropConstraint.setOwner(pathConstraint.getID());
 						pathPropConstraint.setTerms(term1, term2);
+						pathConstraint.setPredicate("");
 						pathConstraint.setEdgePropertyConstraint(pathPropConstraint);
 					}
 					//getting complex path property constraints (using OR operator)
@@ -108,13 +105,6 @@ public class XMLMotifReader implements MotifReader {
 					}
 					constraints.add(pathConstraint);
 				}
-				else if (o instanceof Query.Condition) {
-					Query.Condition p = (Query.Condition)o;
-					LinkConstraint condition = null;
-					constraints.add((LinkConstraint) p.getAttribute());
-					condition.setPredicate(p.getPredicate());
-					constraints.add(condition);					
-				}
 				else if (o instanceof Query.Edge){
 					EdgeConstraint edgeConstraint = new EdgeConstraint();
 					Query.Edge e = (Query.Edge) o;
@@ -132,17 +122,14 @@ public class XMLMotifReader implements MotifReader {
 				}
 				//to be completed
 				else if (o instanceof Query.ExistsNot){
-					Query.ExistsNot e = (Query.ExistsNot)o;
-					v_roles.add(e.getVertex().getId()); //gets vertex id in complex condition of Exists not
+					
 				}
 				else if (o instanceof Query.Not){
-					Query.Not n = (Query.Not)o;
-					LinkConstraint notcond = null;
-					notcond.setPredicate(n.getCondition().getPredicate()); //gets predicate from NOT CONDITION
-					constraints.add((LinkConstraint) n.getCondition().getAttribute()); //gets list of attributes from NOT CONDITION ATTRIBUTEs
-					constraints.add(notcond);
-					
-				}			
+										
+				}	
+				else if (o instanceof Query.Condition) {
+									
+				}
 			}
 			
 			return motif;

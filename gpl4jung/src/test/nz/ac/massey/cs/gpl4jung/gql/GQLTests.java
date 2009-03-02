@@ -216,15 +216,15 @@ public class GQLTests {
 	public void test4() throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/separation.graphml");
 		XMLMotifReader r = new XMLMotifReader();
-		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/query3.xml"));
+		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/testdata/query3.xml"));
 		ResultCollector rc = new ResultCollector();
 		this.gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
 		
 		assertEquals(1,results.size());
 		MotifInstance instance1 = results.get(0);
-		assertEquals("MyClass",instance1.getVertex("ui").getUserDatum("name"));
-		assertEquals("MyClass",instance1.getVertex("db").getUserDatum("name"));
+		assertEquals("MyClass",instance1.getVertex("uiclass").getUserDatum("name"));
+		assertEquals("MyClass",instance1.getVertex("dbclass").getUserDatum("name"));
 	}
 	
 	private Vertex getVertexById(Graph g,String id) {
