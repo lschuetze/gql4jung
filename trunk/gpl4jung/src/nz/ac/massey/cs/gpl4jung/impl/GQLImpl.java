@@ -10,7 +10,6 @@ import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.AbstractSparseEdge;
-import edu.uci.ics.jung.graph.impl.AbstractSparseVertex;
 import edu.uci.ics.jung.utils.UserDataContainer;
 
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
@@ -23,7 +22,6 @@ import nz.ac.massey.cs.gpl4jung.Path;
 import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.QueryOptimizer;
 import nz.ac.massey.cs.gpl4jung.ResultListener;
-import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 
 
 public class GQLImpl implements GQL {
@@ -40,7 +38,7 @@ public class GQLImpl implements GQL {
     		List<Constraint> constraints = motif.getConstraints();
     		Bindings binding = new Bindings();
     		binding.bind(role, v);
-    		resolve(graph, constraints, binding, listener,0);
+    		resolve(graph, constraints, binding, listener);
     	}
 	}
 
@@ -51,7 +49,7 @@ public class GQLImpl implements GQL {
 
 	}
 	
-	public void resolve(Graph g, List<Constraint> constraints, Bindings replacement, ResultListener listener, int constraintCounter) {
+	public void resolve(Graph g, List<Constraint> constraints, Bindings replacement, ResultListener listener) {
 		
 		if(cancelled){
 			return;
@@ -64,8 +62,8 @@ public class GQLImpl implements GQL {
     		listener.found(motifInstance);
     		return;
     	}
-		//ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
-		Constraint c = constraints.get(constraintCounter);
+		ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
+		Constraint c = cs.selectNext(g, constraints, replacement);
 		if(c instanceof PropertyConstraint){
 			PropertyConstraint pc = (PropertyConstraint) c;
 			String owner = pc.getOwner();
@@ -76,7 +74,7 @@ public class GQLImpl implements GQL {
 					if(pc.check(g, edgeOrVertex)){
 						List<Constraint> newConstraints = copy(constraints);
 						newConstraints.remove(pc);
-						resolve(g,newConstraints,replacement,listener, constraintCounter);
+						resolve(g,newConstraints,replacement,listener);
 						releaseBindingMap(replacement);
 					}
 					else
@@ -89,7 +87,7 @@ public class GQLImpl implements GQL {
 					if(pc.check(g, path)){
 						List<Constraint> newConstraints = copy(constraints);
 						newConstraints.remove(pc);
-						resolve(g,newConstraints,replacement,listener, constraintCounter);
+						resolve(g,newConstraints,replacement,listener);
 						releaseBindingMap(replacement);
 					}
 					else
@@ -97,7 +95,7 @@ public class GQLImpl implements GQL {
 				}	
 			}
 			else if (instance == null){
-				resolve(g, constraints, replacement, listener,constraintCounter+1);
+				resolve(g, constraints, replacement, listener);
 			}	
 		}
 		//resolving constraints for binary constrainst
@@ -108,7 +106,7 @@ public class GQLImpl implements GQL {
 			Object instance1 = replacement.lookup(source);
 			Object instance2 = replacement.lookup(target);
 			if(instance1 == null && instance2 == null){
-				resolve(g,constraints,replacement,listener,constraintCounter+1);
+				resolve(g,constraints,replacement,listener);
 			}
 			else if (instance1 == null && instance2 != null){
 				//we have got target so look for possible sources
@@ -132,10 +130,8 @@ public class GQLImpl implements GQL {
 			    				if(pc.check(g,e)){
 			    					List<Constraint> newConstraints = copy(constraints);
 					    			newConstraints.remove(lc);
-					    			//reset counter
-					    			constraintCounter = 0;
-					    			resolve(g,newConstraints,nextReplacement,listener, constraintCounter);
-					    			releaseBindingMap(nextReplacement);//to b tested
+					    			resolve(g,newConstraints,nextReplacement,listener);
+					    			releaseBindingMap(nextReplacement);
 			    				}				
 			    			}
 		    				else if (instance instanceof Path){
@@ -145,10 +141,8 @@ public class GQLImpl implements GQL {
 		    					if(pc!=null && pc.check(g, path)){
 			    					List<Constraint> newConstraints = copy(constraints);
 					    			newConstraints.remove(lc);
-					    			//reset counter
-					    			constraintCounter = 0;
-					    			resolve(g,newConstraints,nextReplacement,listener, constraintCounter);			    						
-					    			releaseBindingMap(nextReplacement);//to b tested
+					    			resolve(g,newConstraints,nextReplacement,listener);			    						
+					    			releaseBindingMap(nextReplacement);
 		    					}		   
 		    				}
 	    				} 				
@@ -177,10 +171,8 @@ public class GQLImpl implements GQL {
 			    				if(pc.check(g,e)){
 			    					List<Constraint> newConstraints = copy(constraints);
 					    			newConstraints.remove(lc);
-					    			//reset counter
-					    			constraintCounter = 0;
-					    			resolve(g,newConstraints,nextReplacement,listener, constraintCounter);
-					    			releaseBindingMap(nextReplacement);//to b tested
+					    			resolve(g,newConstraints,nextReplacement,listener);
+					    			releaseBindingMap(nextReplacement);
 			    				}				
 			    			}
 		    				else if (instance instanceof Path){
@@ -190,10 +182,8 @@ public class GQLImpl implements GQL {
 		    					if(pc.check(g, path)){
 			    					List<Constraint> newConstraints = copy(constraints);
 					    			newConstraints.remove(lc);
-					    			//reset counter
-					    			constraintCounter = 0;
-					    			resolve(g,newConstraints,nextReplacement,listener, constraintCounter);			    						
-					    			//releaseBindingMap(nextReplacement);//to b tested
+					    			resolve(g,newConstraints,nextReplacement,listener);			    						
+					    			
 		    					}		   
 		    				}
     					}	
@@ -208,8 +198,7 @@ public class GQLImpl implements GQL {
 					nextReplacement.bind(id, link);
 					List<Constraint> newConstraints = copy(constraints);
 					newConstraints.remove(lc);
-					constraintCounter = 0;
-					resolve(g,newConstraints,replacement,listener, constraintCounter);
+					resolve(g,newConstraints,replacement,listener);
 				}
 				else
 					return;
