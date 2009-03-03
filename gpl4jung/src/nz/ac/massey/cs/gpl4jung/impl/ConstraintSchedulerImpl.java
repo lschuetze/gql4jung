@@ -5,21 +5,15 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.collections.IteratorUtils;
-
-import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 
-import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
 import nz.ac.massey.cs.gpl4jung.Constraint;
 import nz.ac.massey.cs.gpl4jung.Motif;
-import nz.ac.massey.cs.gpl4jung.Path;
 import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
-import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.Term;
 import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
 
@@ -73,14 +67,12 @@ public class ConstraintSchedulerImpl implements ConstraintScheduler {
 			}
 			else if (c instanceof PathConstraint){
 				PathConstraint pathConstraint = (PathConstraint) c;
-				Object instance = bindings.lookup(pathConstraint.getID());
-				if(instance!=null)
+				if(bindings.lookup(pathConstraint.getSource())!=null || bindings.lookup(pathConstraint.getTarget())!=null)
 					return pathConstraint;
 			}
 			else if (c instanceof EdgeConstraint){
 				EdgeConstraint edgeConstraint = (EdgeConstraint) c;
-				Object instance = bindings.lookup(edgeConstraint.getID());
-				if(instance!=null) 
+				if(bindings.lookup(edgeConstraint.getSource())!=null || bindings.lookup(edgeConstraint.getTarget())!=null)
 					return edgeConstraint;
 			}
 		}
