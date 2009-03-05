@@ -25,7 +25,7 @@ import nz.ac.massey.cs.gpl4jung.ResultListener;
 
 
 public class GQLImpl implements GQL {
-	
+	ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
 	private boolean cancelled = false;
     
 	@Override
@@ -51,6 +51,7 @@ public class GQLImpl implements GQL {
 	
 	public void resolve(Graph g, List<Constraint> constraints, Bindings replacement, ResultListener listener) {
 		
+		
 		if(cancelled){
 			return;
 		}
@@ -62,40 +63,21 @@ public class GQLImpl implements GQL {
     		listener.found(motifInstance);
     		return;
     	}
-		ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
+		
 		Constraint c = cs.selectNext(g, constraints, replacement);
 		if(c instanceof PropertyConstraint){
 			PropertyConstraint pc = (PropertyConstraint) c;
 			String owner = pc.getOwner();
 			Object instance = replacement.lookup(owner);
-			if(instance!=null){
-				if(instance instanceof UserDataContainer){
-					UserDataContainer edgeOrVertex = (UserDataContainer) instance;
-					if(pc.check(g, edgeOrVertex)){
-						List<Constraint> newConstraints = copy(constraints);
-						newConstraints.remove(pc);
-						resolve(g,newConstraints,replacement,listener);
-						releaseBindingMap(replacement);
-					}
-					else
-						return; //backtrack
+			if(instance instanceof UserDataContainer){
+				UserDataContainer edgeOrVertex = (UserDataContainer) instance;
+				if(pc.check(g, edgeOrVertex)){
+					List<Constraint> newConstraints = copy(constraints);
+					newConstraints.remove(pc);
+					resolve(g,newConstraints,replacement,listener);
 				}
-				else if(instance instanceof Path){
-					Path p  = (Path)instance;
-					List<Edge> list = p.getEdges(); 
-					Edge[] path = getEdgesFromPath(list);
-					if(pc.check(g, path)){
-						List<Constraint> newConstraints = copy(constraints);
-						newConstraints.remove(pc);
-						resolve(g,newConstraints,replacement,listener);
-						releaseBindingMap(replacement);
-					}
-					else
-						return; //backtrack
-				}	
-			}
-			else if (instance == null){
-				resolve(g, constraints, replacement, listener);
+				else
+					return; //backtrack
 			}	
 		}
 		//resolving constraints for binary constrainst
@@ -106,45 +88,57 @@ public class GQLImpl implements GQL {
 			Object instance1 = replacement.lookup(source);
 			Object instance2 = replacement.lookup(target);
 			if(instance1 == null && instance2 == null){
-				resolve(g,constraints,replacement,listener);
+				throw new NullPointerException(); 
 			}
 			else if (instance1 == null && instance2 != null){
-				//we have got target so look for possible sources
+				//we have got target, so look for possible sources
 				Vertex targetVertex = (Vertex) replacement.lookup(target);
 				Iterator<ConnectedVertex<Edge>> ps = lc.getPossibleSources(g, targetVertex);
     			List<ConnectedVertex<Edge>> sources = IteratorUtils.toList(ps);
     			if(sources.size()!=0){
     				for(Iterator itr = sources.iterator();itr.hasNext();){
 	    				ConnectedVertex nextInstance = (ConnectedVertex) itr.next();
-	    				if(!mustNotBinding(replacement, nextInstance.getVertex())){
-	    					//add new replacement
-	    					Bindings nextReplacement = createBindingMap(replacement);
-			    			nextReplacement.bind(source, nextInstance.getVertex());
-			    			nextReplacement = createBindingMap(nextReplacement);
-			    			String link = lc.getID();
-			    			nextReplacement.bind(link, nextInstance.getLink());
-			    			PropertyConstraint pc = lc.getEdgePropertyConstraint();
-			    			Object instance =  nextInstance.getLink();
-			    			if(instance instanceof AbstractSparseEdge){
-			    				Edge e = (Edge) instance;
-			    				if(pc.check(g,e)){
-			    					List<Constraint> newConstraints = copy(constraints);
+	    				PropertyConstraint edgePropConstraint = lc.getEdgePropertyConstraint();
+		    			Object instance =  nextInstance.getLink();
+		    			if(instance instanceof AbstractSparseEdge){
+		    				Edge e = (Edge) instance;
+		    				if(edgePropConstraint!=null && edgePropConstraint.check(g,e)){
+		    					if(!mustNotBinding(replacement, nextInstance.getVertex())){
+			    					//add new replacements (link and vertex)
+			    					Bindings nextReplacement = createBindingMap(replacement);
+					    			nextReplacement.bind(source, nextInstance.getVertex());
+					    			nextReplacement = createBindingMap(nextReplacement);
+					    			String link = lc.getID();
+					    			nextReplacement.bind(link, nextInstance.getLink());
+					    			List<Constraint> newConstraints = copy(constraints);
 					    			newConstraints.remove(lc);
 					    			resolve(g,newConstraints,nextReplacement,listener);
+					    			//release bindings (link and vertex)
 					    			releaseBindingMap(nextReplacement);
-			    				}				
-			    			}
-		    				else if (instance instanceof Path){
-		    					Path p = (Path) instance;
-		    					List<Edge> list = p.getEdges(); 
-		    					Edge[] path = getEdgesFromPath(list);
-		    					if(pc!=null && pc.check(g, path)){
-			    					List<Constraint> newConstraints = copy(constraints);
+					    			releaseBindingMap(nextReplacement);
+			    				}
+		    				}				
+		    			}
+	    				else if (instance instanceof Path){
+	    					Path p = (Path) instance;
+	    					List<Edge> list = p.getEdges(); 
+	    					Edge[] path = getEdgesFromPath(list);
+	    					if(edgePropConstraint!=null && edgePropConstraint.check(g, path)){
+	    						if(!mustNotBinding(replacement, nextInstance.getVertex())){
+			    					//add new replacement
+			    					Bindings nextReplacement = createBindingMap(replacement);
+					    			nextReplacement.bind(source, nextInstance.getVertex());
+					    			nextReplacement = createBindingMap(nextReplacement);
+					    			String link = lc.getID();
+					    			nextReplacement.bind(link, nextInstance.getLink());
+					    			List<Constraint> newConstraints = copy(constraints);
 					    			newConstraints.remove(lc);
-					    			resolve(g,newConstraints,nextReplacement,listener);			    						
+					    			resolve(g,newConstraints,nextReplacement,listener);
+					    			//release bindings (link and vertex)
 					    			releaseBindingMap(nextReplacement);
-		    					}		   
-		    				}
+					    			releaseBindingMap(nextReplacement);
+			    				}
+	    					}		   
 	    				} 				
 	    			}
     			}
@@ -157,41 +151,55 @@ public class GQLImpl implements GQL {
     			if(targets.size()!=0){
     				for(Iterator itr = targets.iterator();itr.hasNext();){
     					ConnectedVertex nextInstance = (ConnectedVertex) itr.next();
-    					if(!mustNotBinding(replacement, nextInstance.getVertex())){
-    						//add new replacement
-	    					Bindings nextReplacement = createBindingMap(replacement);
-			    			nextReplacement.bind(target, nextInstance.getVertex());
-			    			nextReplacement = createBindingMap(nextReplacement);
-			    			String link = lc.getID();
-			    			nextReplacement.bind(link, nextInstance.getLink());
-			    			PropertyConstraint pc = lc.getEdgePropertyConstraint();
-			    			Object instance =  nextInstance.getLink();
-			    			if(instance instanceof AbstractSparseEdge){
-			    				Edge e = (Edge) instance;
-			    				if(pc.check(g,e)){
-			    					List<Constraint> newConstraints = copy(constraints);
+    					PropertyConstraint edgePropConstraint = lc.getEdgePropertyConstraint();
+		    			Object instance =  nextInstance.getLink();
+		    			if(instance instanceof AbstractSparseEdge){
+		    				Edge e = (Edge) instance;
+		    				if(edgePropConstraint!=null && edgePropConstraint.check(g,e)){
+		    					if(!mustNotBinding(replacement, nextInstance.getVertex())){
+		    						//add new replacement
+			    					Bindings nextReplacement = createBindingMap(replacement);
+					    			nextReplacement.bind(target, nextInstance.getVertex());
+					    			nextReplacement = createBindingMap(nextReplacement);
+					    			String link = lc.getID();
+					    			nextReplacement.bind(link, nextInstance.getLink());
+					    			List<Constraint> newConstraints = copy(constraints);
 					    			newConstraints.remove(lc);
 					    			resolve(g,newConstraints,nextReplacement,listener);
+					    			//release bindings (link and vertex)
 					    			releaseBindingMap(nextReplacement);
-			    				}				
-			    			}
-		    				else if (instance instanceof Path){
-		    					Path p = (Path) instance;
-		    					List<Edge> list = p.getEdges(); 
-		    					Edge[] path = getEdgesFromPath(list);
-		    					if(pc.check(g, path)){
-			    					List<Constraint> newConstraints = copy(constraints);
+					    			releaseBindingMap(nextReplacement);
+		    					}	
+		    				}				
+		    			}
+	    				else if (instance instanceof Path){
+	    					Path p = (Path) instance;
+	    					List<Edge> list = p.getEdges(); 
+	    					Edge[] path = getEdgesFromPath(list);
+	    					if(edgePropConstraint!=null && edgePropConstraint.check(g, path)){
+	    						if(!mustNotBinding(replacement, nextInstance.getVertex())){
+		    						//add new replacement
+			    					Bindings nextReplacement = createBindingMap(replacement);
+					    			nextReplacement.bind(target, nextInstance.getVertex());
+					    			nextReplacement = createBindingMap(nextReplacement);
+					    			String link = lc.getID();
+					    			nextReplacement.bind(link, nextInstance.getLink());
+					    			List<Constraint> newConstraints = copy(constraints);
 					    			newConstraints.remove(lc);
-					    			resolve(g,newConstraints,nextReplacement,listener);			    						
-					    			
-		    					}		   
-		    				}
-    					}	
+					    			resolve(g,newConstraints,nextReplacement,listener);
+					    			//release bindings (link and vertex)
+					    			releaseBindingMap(nextReplacement);
+					    			releaseBindingMap(nextReplacement);
+		    					}
+	    					}		   
+	    				}	
 		    		}
     			}	
 			}
 			else if (instance1 != null && instance2 != null){
-				Object link = lc.check(g, (Vertex) instance1, (Vertex)instance2);
+				Vertex sourceVertex = (Vertex) instance1;
+				Vertex targetVertex = (Vertex) instance2;
+				Object link = lc.check(g, sourceVertex, targetVertex);
 				if(link!=null){
 					String id = lc.getID();
 					Bindings nextReplacement = createBindingMap(replacement);
@@ -199,6 +207,8 @@ public class GQLImpl implements GQL {
 					List<Constraint> newConstraints = copy(constraints);
 					newConstraints.remove(lc);
 					resolve(g,newConstraints,replacement,listener);
+					//release binding (link only)
+					releaseBindingMap(nextReplacement);
 				}
 				else
 					return;
@@ -258,7 +268,4 @@ public class GQLImpl implements GQL {
         newList.addAll(list);
         return newList;
     }
-	
-	
-	
 }

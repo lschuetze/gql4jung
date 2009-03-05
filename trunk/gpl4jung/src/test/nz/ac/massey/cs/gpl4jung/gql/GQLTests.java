@@ -8,10 +8,8 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import nz.ac.massey.cs.gpl4jung.Constraint;
 import nz.ac.massey.cs.gpl4jung.DefaultMotif;
@@ -35,6 +33,7 @@ import org.junit.Test;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.io.GraphMLFile;
 
 public class GQLTests {
@@ -45,24 +44,21 @@ public class GQLTests {
 		System.getProperties().put( "proxyPort", "8080" );
 	}
 	
-	
-	private GQL gql = null; // TODO
+
 	@Before
 	public void init() {
-		gql = new GQLImpl();
 		
 	}
 	@After
-	public void release() {
-		this.gql=null;
+	public void release() throws Exception {
 		
 	}
 	// see also http://jung.sourceforge.net/doc/api/edu/uci/ics/jung/io/GraphMLFile.html
-	private Graph readJungGraphFromGraphML(String graphSource) throws Exception {
+	private Graph readJungGraphFromGraphML(String graphSource) throws Exception {	
 		GraphMLFile input = new GraphMLFile();
 		Reader reader = new FileReader(graphSource);
-		Graph g = input.load(reader);
-		
+		Graph g = new DirectedSparseGraph();
+		g =	input.load(reader);
 		reader.close();
 		return g;
 	}
@@ -94,45 +90,21 @@ public class GQLTests {
 		return q;
 		
 	}
-//	@Test
-//	//No decoupling through abstraction
-//	public void test1 () throws Exception {
-//		Graph g = this.readJungGraphFromGraphML("test_examples/abstraction.graphml");
-//		DefaultMotif q = (DefaultMotif) readMotif("xml/query1.xml");
-//		ResultCollector rc = new ResultCollector();
-//		this.gql.query(g,q,rc);
-//		List<MotifInstance> results = rc.getInstances();
-//		
-//		// when client "MyApplication" accesses both "Animal" abstract class & "Horse" Impl of animal
-//		assertEquals(1,results.size());
-//		MotifInstance instance1 = results.get(0);
-//		assertEquals("Animal",instance1.getVertex("service").getUserDatum("name"));
-//		assertEquals("MyApplication",instance1.getVertex("client").getUserDatum("name"));
-//		assertEquals("Horse",instance1.getVertex("service_impl").getUserDatum("name"));
-//		//assertEquals(expected, actual)
-//	}
-	
+
+	//to check bindings and selectNext method in Constraint scheduler
 	@Test
 	public void test1()throws Exception{
-		Graph g = this.readJungGraphFromGraphML("test_examples/abstraction.graphml");
+		Graph g = readJungGraphFromGraphML("test_examples/abstraction.graphml");
 		Vertex v2 = null, v0=null, v1=null;
-		Edge e1 = null;
-	
+		
 		for (Object v:g.getVertices()) {
-			if (((Vertex)v).getUserDatum("class.id").equals("2")) 
-			v2=(Vertex)v;
-			else if (((Vertex)v).getUserDatum("class.id").equals("0")) 
+			if (((Vertex)v).getUserDatum("name").equals("MyApplication")) 
+				v2=(Vertex)v;
+			else if (((Vertex)v).getUserDatum("name").equals("Animal")) 
 				v0=(Vertex)v;
-			else if (((Vertex)v).getUserDatum("class.id").equals("1")) 
+			else if (((Vertex)v).getUserDatum("name").equals("Horse")) 
 				v1=(Vertex)v;
-				
-			//System.out.println(v2.getUserDatum("id"));
 		}
-//		for (Object e:g.getEdges()){
-//			if(((Edge)e).getUserDatum("id").equals("edge-1"))
-//				e1 = (Edge) e;
-//			//System.out.println(e1.getUserDatum("id"));
-//		}
 		DefaultMotif q = (DefaultMotif) readMotif("xml/query1.xml");
 		ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
 		List<Constraint> constraints = cs.getConstraints(q);
@@ -146,8 +118,7 @@ public class GQLTests {
 		Constraint c = cs.selectNext(g, constraints, binding);
 		if(c instanceof PropertyConstraint){
 				PropertyConstraint pc = (PropertyConstraint)c;
-				assertEquals(pc.getOwner(),"client");
-				
+				assertEquals(pc.getOwner(),"client");		
 		}
 		else
 			fail("Sorry");
@@ -173,12 +144,12 @@ public class GQLTests {
 	// Testcase 4.1: Test for no clusters in one package
 	
 		
-	
+	//No decoupling through abstraction
 	@Test
 	public void test2() throws Exception {
-		Graph g = this.readJungGraphFromGraphML("test_examples/abstraction.graphml");
+		Graph g = readJungGraphFromGraphML("test_examples/abstraction.graphml");
 		Motif q = (DefaultMotif) readMotif("xml/query1.xml");
-		GQLImpl gql = new GQLImpl();
+		GQL gql = new GQLImpl();
 		ResultCollector listener = new ResultCollector();
 		gql.query(g, q, listener);
 		// analyse results
@@ -195,14 +166,115 @@ public class GQLTests {
 			assertTrue(p3.getEdges().contains(this.getEdgeById(g,"edge-1")));
 		}
 	}
+	//A variation in test2 to detect 2 patterns in the graph
 	@Test
+	public void test2_1() throws Exception {
+		Graph g = readJungGraphFromGraphML("test_examples/abstraction1.graphml");
+		Motif q = (DefaultMotif) readMotif("xml/query1.xml");
+		GQL gql = new GQLImpl();
+		ResultCollector listener = new ResultCollector();
+		gql.query(g, q, listener);
+		List<MotifInstance> result = listener.getInstances();
+		// analyse 1st results
+		assertEquals(listener.getInstances().size(),2);
+		MotifInstance instance1 = result.get(0);
+		assertEquals(instance1.getVertex("client"),this.getVertexById(g,"MyApplication"));
+		assertEquals(instance1.getVertex("service"),this.getVertexById(g,"Animal"));
+		assertEquals(instance1.getVertex("service_impl"),this.getVertexById(g,"Cow"));
+		Path p1 = (Path)instance1.getLink(getConstraint(q,"client","service"));
+		assertTrue(p1.getEdges().contains(this.getEdgeById(g,"edge-5")));
+		Path p2 = (Path)instance1.getLink(getConstraint(q,"client","service_impl"));
+		assertTrue(p2.getEdges().contains(this.getEdgeById(g,"edge-7")));
+		Path p3 = (Path)instance1.getLink(getConstraint(q,"service_impl","service"));
+		assertTrue(p3.getEdges().contains(this.getEdgeById(g,"edge-1")));
+		//analyse 2nd result
+		MotifInstance instance2 = result.get(1);
+		assertEquals(instance2.getVertex("client"),this.getVertexById(g,"MyApplication"));
+		assertEquals(instance2.getVertex("service"),this.getVertexById(g,"Animal"));
+		assertEquals(instance2.getVertex("service_impl"),this.getVertexById(g,"Horse"));
+		Path p4 = (Path)instance2.getLink(getConstraint(q,"client","service"));
+		assertTrue(p4.getEdges().contains(this.getEdgeById(g,"edge-5")));
+		Path p5 = (Path)instance2.getLink(getConstraint(q,"client","service_impl"));
+		assertTrue(p5.getEdges().contains(this.getEdgeById(g,"edge-6")));
+		Path p6 = (Path)instance2.getLink(getConstraint(q,"service_impl","service"));
+		assertTrue(p6.getEdges().contains(this.getEdgeById(g,"edge-2")));
+	}
+	//A variation in test2 to detect 2 patterns in the graph by having multiple edges (Path)
+	@Test
+	public void test2_2() throws Exception {
+		Graph g = readJungGraphFromGraphML("test_examples/abstraction2.graphml");
+		Motif q = (DefaultMotif) readMotif("xml/query1.xml");
+		GQL gql = new GQLImpl();
+		ResultCollector listener = new ResultCollector();
+		gql.query(g, q, listener);
+		List<MotifInstance> result = listener.getInstances();
+		// analyse 1st results
+		assertEquals(listener.getInstances().size(),2);
+		MotifInstance instance1 = result.get(1);
+		assertEquals(instance1.getVertex("client"),this.getVertexById(g,"MyApplication"));
+		assertEquals(instance1.getVertex("service"),this.getVertexById(g,"Animal"));
+		assertEquals(instance1.getVertex("service_impl"),this.getVertexById(g,"Pony"));
+		Path p1 = (Path)instance1.getLink(getConstraint(q,"client","service"));
+		assertTrue(p1.getEdges().contains(this.getEdgeById(g,"edge-7")));
+		Path p2 = (Path)instance1.getLink(getConstraint(q,"client","service_impl"));
+		assertTrue(p2.getEdges().contains(this.getEdgeById(g,"edge-9")));
+		Path p3 = (Path)instance1.getLink(getConstraint(q,"service_impl","service"));
+		assertTrue(p3.getEdges().contains(this.getEdgeById(g,"edge-1")));
+		//analyse 2nd result
+		MotifInstance instance2 = result.get(0);
+		assertEquals(instance2.getVertex("client"),this.getVertexById(g,"MyApplication"));
+		assertEquals(instance2.getVertex("service"),this.getVertexById(g,"Animal"));
+		assertEquals(instance2.getVertex("service_impl"),this.getVertexById(g,"Horse"));
+		Path p4 = (Path)instance2.getLink(getConstraint(q,"client","service"));
+		assertTrue(p4.getEdges().contains(this.getEdgeById(g,"edge-7")));
+		Path p5 = (Path)instance2.getLink(getConstraint(q,"client","service_impl"));
+		assertTrue(p5.getEdges().contains(this.getEdgeById(g,"edge-8")));
+		Path p6 = (Path)instance2.getLink(getConstraint(q,"service_impl","service"));
+		assertTrue(p6.getEdges().contains(this.getEdgeById(g,"edge-2")));
+	}
+	
+	//A variation in test2 to analyse false positives. 
+	@Test
+	public void test2_3() throws Exception {
+		Graph g = readJungGraphFromGraphML("test_examples/abstraction3.graphml");
+		Motif q = (DefaultMotif) readMotif("xml/query1.xml");
+		GQL gql = new GQLImpl();
+		ResultCollector listener = new ResultCollector();
+		gql.query(g, q, listener);
+		List<MotifInstance> result = listener.getInstances();
+		// analyse 1st results
+		assertEquals(listener.getInstances().size(),2);
+		MotifInstance instance1 = result.get(1);
+		assertEquals(instance1.getVertex("client"),this.getVertexById(g,"MyApplication"));
+		assertEquals(instance1.getVertex("service"),this.getVertexById(g,"Animal"));
+		assertEquals(instance1.getVertex("service_impl"),this.getVertexById(g,"Pony"));
+		Path p1 = (Path)instance1.getLink(getConstraint(q,"client","service"));
+		assertTrue(p1.getEdges().contains(this.getEdgeById(g,"edge-7")));
+		Path p2 = (Path)instance1.getLink(getConstraint(q,"client","service_impl"));
+		assertTrue(p2.getEdges().contains(this.getEdgeById(g,"edge-10")));
+		Path p3 = (Path)instance1.getLink(getConstraint(q,"service_impl","service"));
+		assertTrue(p3.getEdges().contains(this.getEdgeById(g,"edge-1")));
+		//analyse 2nd result
+		MotifInstance instance2 = result.get(0);
+		assertEquals(instance2.getVertex("client"),this.getVertexById(g,"MyApplication"));
+		assertEquals(instance2.getVertex("service"),this.getVertexById(g,"Animal"));
+		assertEquals(instance2.getVertex("service_impl"),this.getVertexById(g,"Horse"));
+		Path p4 = (Path)instance2.getLink(getConstraint(q,"client","service"));
+		assertTrue(p4.getEdges().contains(this.getEdgeById(g,"edge-7")));
+		Path p5 = (Path)instance2.getLink(getConstraint(q,"client","service_impl"));
+		assertTrue(p5.getEdges().contains(this.getEdgeById(g,"edge-8")));
+		Path p6 = (Path)instance2.getLink(getConstraint(q,"service_impl","service"));
+		assertTrue(p6.getEdges().contains(this.getEdgeById(g,"edge-2")));
+	}
+@Test
 //	Testcase : circular dependency between classes and packages. 
 	public void test3() throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/dependency.graphml");
 		XMLMotifReader r = new XMLMotifReader();
 		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/query2.xml"));
+		GQL gql = new GQLImpl();
 		ResultCollector rc = new ResultCollector();
-		this.gql.query(g,q,rc);
+		gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
 		assertEquals(1,results.size());
 		MotifInstance instance1 = results.get(0);
@@ -218,7 +290,8 @@ public class GQLTests {
 		XMLMotifReader r = new XMLMotifReader();
 		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/testdata/query3.xml"));
 		ResultCollector rc = new ResultCollector();
-		this.gql.query(g,q,rc);
+		GQL gql = new GQLImpl();
+		gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
 		
 		assertEquals(1,results.size());

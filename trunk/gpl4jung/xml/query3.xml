@@ -14,5 +14,5 @@
     		<property predicate="http://www.w3.org/2005/02/xpath-functions:matches" key="namespace" value="org\.hibernate(.)*"/>
     	</or>
    	</vertex>
-    <path from="dbclass" to="ui"></path>
+    <path from="dbclass" to="uiclass"></path>
 </query>
