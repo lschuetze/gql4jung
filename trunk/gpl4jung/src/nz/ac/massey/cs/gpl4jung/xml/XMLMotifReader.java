@@ -23,12 +23,18 @@ import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Vertex;
 
 import nz.ac.massey.cs.gpl4jung.*;
+import nz.ac.massey.cs.gpl4jung.constraints.ComplexPropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.NegatedPropertyConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.Operator;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.PropertyConstraintConjunction;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyConstraintDisjunction;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
 import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
+import nz.ac.massey.cs.gpl4jung.xml.Query.Not;
+import nz.ac.massey.cs.gpl4jung.xml.Query.Condition.Attribute;
 
 public class XMLMotifReader implements MotifReader {
 
@@ -51,7 +57,7 @@ public class XMLMotifReader implements MotifReader {
 				if (o instanceof Query.Vertex) {
 					Query.Vertex v = (Query.Vertex)o;
 					v_roles.add(v.id); 
-					//getting vertex property constraints
+					//getting simple vertex property constraints
 					for(Iterator itr=v.getProperty().iterator(); itr.hasNext();){
 						Query.Vertex.Property p = (Query.Vertex.Property) itr.next();
 						PropertyTerm term1 = new PropertyTerm(p.getKey());
@@ -60,6 +66,28 @@ public class XMLMotifReader implements MotifReader {
 						pc.setOwner(v.id);
 						pc.setTerms(term1, term2);
 						constraints.add(pc);
+					}
+					//getting complex vertex property constraints (using or)
+					
+					Query.Vertex.Or orProp = v.getOr();
+					List<PropertyConstraint> propCon = new ArrayList<PropertyConstraint>();
+					PropertyConstraintDisjunction ComplexPropConstraint = new PropertyConstraintDisjunction();
+					if(orProp!=null){
+						for(Iterator itr = orProp.getProperty().iterator();itr.hasNext();){
+							Query.Vertex.Or.Property prp = (Query.Vertex.Or.Property) itr.next();
+							PropertyTerm term1 = new PropertyTerm(prp.getKey());
+							ValueTerm term2 = new ValueTerm(prp.getValue());
+							SimplePropertyConstraint<Vertex> spc = new SimplePropertyConstraint<Vertex>();
+							spc.setOwner(v.getId());
+							spc.setTerms(term1, term2);
+							Operator op = Operator.getInstance("matches");
+							spc.setOperator(op);
+							propCon.add(spc);
+						}
+						ComplexPropConstraint.setParts(propCon);
+						ComplexPropConstraint.setOwner(v.getId());
+						constraints.add(ComplexPropConstraint);
+						
 					}
 				}
 
@@ -83,7 +111,7 @@ public class XMLMotifReader implements MotifReader {
 						SimplePropertyConstraint<Edge> pathPropConstraint = new SimplePropertyConstraint<Edge>();
 						pathPropConstraint.setOwner(pathConstraint.getID());
 						pathPropConstraint.setTerms(term1, term2);
-						pathConstraint.setPredicate("");
+						//pathConstraint.setPredicate("");
 						pathConstraint.setEdgePropertyConstraint(pathPropConstraint);
 					}
 					//getting complex path property constraints (using OR operator)
@@ -120,16 +148,72 @@ public class XMLMotifReader implements MotifReader {
 					edgeConstraint.setEdgePropertyConstraint(edgePropConstraint);
 					constraints.add(edgeConstraint);
 				}
-				//to be completed
+				//TODO: to be comepleted
+				else if (o instanceof Query.Condition) {
+					Query.Condition c = (Query.Condition)o;
+					SimplePropertyConstraint part1 = new SimplePropertyConstraint();
+					SimplePropertyConstraint part2 = new SimplePropertyConstraint();
+					List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
+					Operator op = Operator.getInstance("=");
+					PropertyConstraintConjunction complexProp = new PropertyConstraintConjunction();
+					//getting condition attributes and mapping to property terms
+					Query.Condition.Attribute a = c.getAttribute().get(0);
+					part1.setOperator(op);
+					PropertyTerm term = new PropertyTerm("namespace");
+					PropertyTerm term1 = new PropertyTerm("namespace");
+					part1.setOwner(a.getVertex());
+					part1.setTerms(term,term1);
+					parts.add(part1);
+					//getting 2nd part
+					Query.Condition.Attribute a1 = c.getAttribute().get(1);
+					part2.setOperator(op);
+					PropertyTerm term2 = new PropertyTerm("namespace");
+					PropertyTerm term3 = new PropertyTerm("namespace");
+					part2.setOwner(a1.getVertex());
+					part2.setTerms(term2,term3);
+					parts.add(part2);
+					complexProp.setParts(parts);
+					complexProp.setOwner(a.getVertex());
+					constraints.add(complexProp);
+					
+				}
+				//TODO: to be completed
+				else if (o instanceof Query.Not){
+					Query.Not n = (Not) o;
+					Query.Not.Condition c = n.getCondition();
+					SimplePropertyConstraint part1 = new SimplePropertyConstraint();
+					SimplePropertyConstraint part2 = new SimplePropertyConstraint();
+					List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
+					Operator op = Operator.getInstance("=");
+					PropertyConstraintConjunction complexProp = new PropertyConstraintConjunction();
+					//getting condition attributes and mapping to property terms
+					Query.Not.Condition.Attribute a = c.getAttribute().get(0);
+					part1.setOperator(op);
+					PropertyTerm term = new PropertyTerm("namespace");
+					PropertyTerm term1 = new PropertyTerm("namespace");
+					part1.setOwner(a.getVertex());
+					part1.setTerms(term,term1);
+					parts.add(part1);
+					//getting 2nd part
+					Query.Not.Condition.Attribute a1 = c.getAttribute().get(1);
+					part2.setOperator(op);
+					PropertyTerm term2 = new PropertyTerm("namespace");
+					PropertyTerm term3 = new PropertyTerm("namespace");
+					part2.setOwner(a1.getVertex());
+					part2.setTerms(term2,term3);
+					parts.add(part2);
+					complexProp.setParts(parts);
+					complexProp.setOwner(a.getVertex());
+					NegatedPropertyConstraint negPropConstraint = new NegatedPropertyConstraint();
+					negPropConstraint.setPart(complexProp);
+					negPropConstraint.setOwner(a.getVertex());
+					constraints.add(negPropConstraint);
+				}
 				else if (o instanceof Query.ExistsNot){
 					
 				}
-				else if (o instanceof Query.Not){
-										
-				}	
-				else if (o instanceof Query.Condition) {
-									
-				}
+					
+				
 			}
 			
 			return motif;
