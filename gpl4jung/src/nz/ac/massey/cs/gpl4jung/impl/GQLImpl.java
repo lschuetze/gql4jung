@@ -36,6 +36,7 @@ public class GQLImpl implements GQL {
     	for(Object o:graph.getVertices()){
     		Vertex v = (Vertex) o;
     		List<Constraint> constraints = motif.getConstraints();
+    		//cs.prepare(graph, constraints);
     		Bindings binding = new Bindings();
     		binding.bind(role, v);
     		resolve(graph, constraints, binding, listener);
@@ -117,7 +118,24 @@ public class GQLImpl implements GQL {
 					    			releaseBindingMap(nextReplacement);
 					    			releaseBindingMap(nextReplacement);
 			    				}
-		    				}				
+		    				}
+		    				//just added
+	    					else if (edgePropConstraint==null){
+	    						if(!mustNotBinding(replacement, nextInstance.getVertex())){
+			    					//add new replacement
+			    					Bindings nextReplacement = createBindingMap(replacement);
+					    			nextReplacement.bind(source, nextInstance.getVertex());
+					    			nextReplacement = createBindingMap(nextReplacement);
+					    			String link = lc.getID();
+					    			nextReplacement.bind(link, nextInstance.getLink());
+					    			List<Constraint> newConstraints = copy(constraints);
+					    			newConstraints.remove(lc);
+					    			resolve(g,newConstraints,nextReplacement,listener);
+					    			//release bindings (link and vertex)
+					    			releaseBindingMap(nextReplacement);
+					    			releaseBindingMap(nextReplacement);
+	    						}
+	    					}
 		    			}
 	    				else if (instance instanceof Path){
 	    					Path p = (Path) instance;
@@ -138,7 +156,24 @@ public class GQLImpl implements GQL {
 					    			releaseBindingMap(nextReplacement);
 					    			releaseBindingMap(nextReplacement);
 			    				}
-	    					}		   
+	    					}
+	    					//just added
+	    					else if (edgePropConstraint==null){
+	    						if(!mustNotBinding(replacement, nextInstance.getVertex())){
+			    					//add new replacement
+			    					Bindings nextReplacement = createBindingMap(replacement);
+					    			nextReplacement.bind(source, nextInstance.getVertex());
+					    			nextReplacement = createBindingMap(nextReplacement);
+					    			String link = lc.getID();
+					    			nextReplacement.bind(link, nextInstance.getLink());
+					    			List<Constraint> newConstraints = copy(constraints);
+					    			newConstraints.remove(lc);
+					    			resolve(g,newConstraints,nextReplacement,listener);
+					    			//release bindings (link and vertex)
+					    			releaseBindingMap(nextReplacement);
+					    			releaseBindingMap(nextReplacement);
+	    						}
+	    					}
 	    				} 				
 	    			}
     			}
@@ -170,7 +205,24 @@ public class GQLImpl implements GQL {
 					    			releaseBindingMap(nextReplacement);
 					    			releaseBindingMap(nextReplacement);
 		    					}	
-		    				}				
+		    				}
+		    				//added
+		    				else if (edgePropConstraint==null){
+		    					if(!mustNotBinding(replacement, nextInstance.getVertex())){
+		    						//add new replacement
+			    					Bindings nextReplacement = createBindingMap(replacement);
+					    			nextReplacement.bind(target, nextInstance.getVertex());
+					    			nextReplacement = createBindingMap(nextReplacement);
+					    			String link = lc.getID();
+					    			nextReplacement.bind(link, nextInstance.getLink());
+					    			List<Constraint> newConstraints = copy(constraints);
+					    			newConstraints.remove(lc);
+					    			resolve(g,newConstraints,nextReplacement,listener);
+					    			//release bindings (link and vertex)
+					    			releaseBindingMap(nextReplacement);
+					    			releaseBindingMap(nextReplacement);
+		    					}	
+		    				}
 		    			}
 	    				else if (instance instanceof Path){
 	    					Path p = (Path) instance;
@@ -191,7 +243,24 @@ public class GQLImpl implements GQL {
 					    			releaseBindingMap(nextReplacement);
 					    			releaseBindingMap(nextReplacement);
 		    					}
-	    					}		   
+	    					}
+	    					//added
+		    				else if (edgePropConstraint==null){
+		    					if(!mustNotBinding(replacement, nextInstance.getVertex())){
+		    						//add new replacement
+			    					Bindings nextReplacement = createBindingMap(replacement);
+					    			nextReplacement.bind(target, nextInstance.getVertex());
+					    			nextReplacement = createBindingMap(nextReplacement);
+					    			String link = lc.getID();
+					    			nextReplacement.bind(link, nextInstance.getLink());
+					    			List<Constraint> newConstraints = copy(constraints);
+					    			newConstraints.remove(lc);
+					    			resolve(g,newConstraints,nextReplacement,listener);
+					    			//release bindings (link and vertex)
+					    			releaseBindingMap(nextReplacement);
+					    			releaseBindingMap(nextReplacement);
+		    					}	
+		    				}
 	    				}	
 		    		}
     			}	

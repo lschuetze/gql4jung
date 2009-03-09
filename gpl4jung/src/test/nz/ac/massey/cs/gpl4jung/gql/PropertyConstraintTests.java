@@ -105,7 +105,7 @@ public class PropertyConstraintTests {
 	public void testCheckREGEX(){
 		SimplePropertyConstraint<Vertex> vc = new SimplePropertyConstraint<Vertex>();
 		PropertyTerm term1 = new PropertyTerm("type");
-		ValueTerm term2 = new ValueTerm("java\\.util\\.regex\\..*");
+		ValueTerm term2 = new ValueTerm(".*javax\\.swing.*");
 		Operator op = Operator.getInstance("matches");
 		vc.setOperator(op);
 		vc.setTerms(term1,term2);
@@ -176,7 +176,7 @@ public class PropertyConstraintTests {
 		v2.addUserDatum(type, "class", UserData.SHARED);
 		v2.addUserDatum(isAbstract, "true", UserData.SHARED);
 		v3.addUserDatum(name, "V3", UserData.SHARED);
-		v3.addUserDatum(type, "java.util.regex.Pattern", UserData.SHARED);
+		v3.addUserDatum(type, "java.lang.Object|javax.swing.JOption|javax.swing.JPanel", UserData.SHARED);
 		v3.addUserDatum(isAbstract, "false", UserData.SHARED);
 		v3.addUserDatum(count, "42", UserData.SHARED);
 		//creating edges for graph

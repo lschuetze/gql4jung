@@ -1,0 +1,18 @@
+<!-- no class should depend on UI and DB classes (and therefore the respective layers) at the same time -->
+<query>
+    <vertex id="uiclass">
+    	<property key="type" value="class"/>
+    	<or>
+    		<property predicate="matches" key="reference" value=".*javax\.swing\..*"/>
+    		<property predicate="matches" key="reference" value=".*java\.awt\..*"/>
+    	</or>
+   	</vertex>
+    <vertex id="dbclass">
+    	<property key="type" value="class"/>    	
+    	<or>
+    		<property predicate="matches" key="reference" value=".*java\.sql\..*"/>
+    		<property predicate="matches" key="reference" value=".*org\.hibernate\..*"/>
+    	</or>
+   	</vertex>
+    <path from="dbclass" to="uiclass"></path>
+</query>

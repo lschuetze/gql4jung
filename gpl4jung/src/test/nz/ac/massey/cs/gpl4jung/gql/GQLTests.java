@@ -296,8 +296,8 @@ public class GQLTests {
 		
 		assertEquals(1,results.size());
 		MotifInstance instance1 = results.get(0);
-		assertEquals("MyClass",instance1.getVertex("uiclass").getUserDatum("name"));
-		assertEquals("MyClass",instance1.getVertex("dbclass").getUserDatum("name"));
+		assertEquals("CounterPanel",instance1.getVertex("uiclass").getUserDatum("name"));
+		assertEquals("RunDB",instance1.getVertex("dbclass").getUserDatum("name"));
 	}
 	
 	private Vertex getVertexById(Graph g,String id) {
