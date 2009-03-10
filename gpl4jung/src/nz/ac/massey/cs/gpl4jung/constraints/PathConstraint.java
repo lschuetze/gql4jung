@@ -35,7 +35,6 @@ import edu.uci.ics.jung.graph.Vertex;
  *
  */
 public class PathConstraint extends LinkConstraint<Path> {
-	private int minLength = 1;
 	private int maxLength = -1; // this means unbound	
 	//private String id = null;
 	
@@ -55,7 +54,7 @@ public class PathConstraint extends LinkConstraint<Path> {
 			@Override
 			public boolean apply(Vertex v) {
 				List path = ShortestPathUtils.getPath(SPA,v,target);
-				if (path.size()!=0 ) {
+				if (checkPath(path)) {
 					PathImpl pp = new PathImpl();
 					pp.setEdges(path);
 					ConnectedVertex<Path> p = new ConnectedVertex(pp,v); 
@@ -86,7 +85,7 @@ public class PathConstraint extends LinkConstraint<Path> {
 			public boolean apply(Vertex v) {
 				Vertex otherNode = (Vertex)v;
 				List path = ShortestPathUtils.getPath(SPA, source,otherNode);
-				if (path.size()!=0) {
+				if (checkPath(path)) {
 					PathImpl pp = new PathImpl();
 					pp.setEdges(path);
 					ConnectedVertex<Path> p = new ConnectedVertex(pp,otherNode); 
@@ -108,11 +107,14 @@ public class PathConstraint extends LinkConstraint<Path> {
 		Iterator<Vertex>  targets = Iterators.filter(vItr,filter);
 		return Iterators.transform(targets,transformer);
 	}
+	private boolean checkPath(List path) {
+		return path.size()!=0 && (maxLength==-1 || path.size()<maxLength);
+	}
 	public Path check(final Graph g, final Vertex source, final Vertex target){
 		final ShortestPath SPA = new DijkstraShortestPath(g);
 		List path = ShortestPathUtils.getPath(SPA, source,target);
 		PathImpl pp = null;
-		if (path.size()!=0) {
+		if (checkPath(path)) {
 			pp = new PathImpl();
 			pp.setEdges(path);
 			pp.setStart(source);
@@ -127,12 +129,7 @@ public class PathConstraint extends LinkConstraint<Path> {
 	public void setMaxLength(int maxLength) {
 		this.maxLength = maxLength;
 	}
-	public int getMinLength() {
-		return minLength;
-	}
-	public void setMinLength(int minLength) {
-		this.minLength = minLength;
-	}
+
 
 }
 
