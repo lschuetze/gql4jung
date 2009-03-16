@@ -80,8 +80,8 @@ public class XMLMotifReader implements MotifReader {
 							SimplePropertyConstraint<Vertex> spc = new SimplePropertyConstraint<Vertex>();
 							spc.setOwner(v.getId());
 							spc.setTerms(term1, term2);
-							Operator op = Operator.getInstance("matches");
-							spc.setOperator(op);
+							//Operator op = Operator.getInstance("matches");
+							//spc.setOperator(op);
 							propCon.add(spc);
 						}
 						ComplexPropConstraint.setParts(propCon);
@@ -96,8 +96,7 @@ public class XMLMotifReader implements MotifReader {
 					PathConstraint pathConstraint = new PathConstraint();
 					Query.Path p = (Query.Path)o;
 					//System.out.println("path from " + p.getFrom() + " to " + p.getTo());
-					if(p.getMinLength()!=null && p.getMaxLength()!=null){
-						pathConstraint.setMinLength(p.getMinLength());
+					if(p.getMaxLength()!=null){
 						pathConstraint.setMaxLength(p.getMaxLength());
 					}
 					
@@ -151,6 +150,7 @@ public class XMLMotifReader implements MotifReader {
 				//TODO: to be comepleted
 				else if (o instanceof Query.Condition) {
 					Query.Condition c = (Query.Condition)o;
+					ComplexPropertyConstraint p1 = new PropertyConstraintConjunction();
 					SimplePropertyConstraint part1 = new SimplePropertyConstraint();
 					SimplePropertyConstraint part2 = new SimplePropertyConstraint();
 					List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
@@ -159,18 +159,16 @@ public class XMLMotifReader implements MotifReader {
 					//getting condition attributes and mapping to property terms
 					Query.Condition.Attribute a = c.getAttribute().get(0);
 					part1.setOperator(op);
-					PropertyTerm term = new PropertyTerm("namespace");
-					PropertyTerm term1 = new PropertyTerm("namespace");
+					PropertyTerm term = new PropertyTerm(a.getKey());
 					part1.setOwner(a.getVertex());
-					part1.setTerms(term,term1);
+					part1.setTerms(term);
 					parts.add(part1);
 					//getting 2nd part
 					Query.Condition.Attribute a1 = c.getAttribute().get(1);
 					part2.setOperator(op);
 					PropertyTerm term2 = new PropertyTerm("namespace");
-					PropertyTerm term3 = new PropertyTerm("namespace");
 					part2.setOwner(a1.getVertex());
-					part2.setTerms(term2,term3);
+					part2.setTerms(term2);
 					parts.add(part2);
 					complexProp.setParts(parts);
 					complexProp.setOwner(a.getVertex());
@@ -187,26 +185,24 @@ public class XMLMotifReader implements MotifReader {
 					Operator op = Operator.getInstance("=");
 					PropertyConstraintConjunction complexProp = new PropertyConstraintConjunction();
 					//getting condition attributes and mapping to property terms
-					Query.Not.Condition.Attribute a = c.getAttribute().get(0);
+					Query.Not.Condition.Attribute attr = c.getAttribute().get(0);
 					part1.setOperator(op);
 					PropertyTerm term = new PropertyTerm("namespace");
-					PropertyTerm term1 = new PropertyTerm("namespace");
-					part1.setOwner(a.getVertex());
-					part1.setTerms(term,term1);
+					part1.setOwner(attr.getVertex());
+					part1.setTerms(term);
 					parts.add(part1);
 					//getting 2nd part
 					Query.Not.Condition.Attribute a1 = c.getAttribute().get(1);
 					part2.setOperator(op);
 					PropertyTerm term2 = new PropertyTerm("namespace");
-					PropertyTerm term3 = new PropertyTerm("namespace");
 					part2.setOwner(a1.getVertex());
-					part2.setTerms(term2,term3);
+					part2.setTerms(term2);
 					parts.add(part2);
 					complexProp.setParts(parts);
-					complexProp.setOwner(a.getVertex());
+					complexProp.setOwner(attr.getVertex());
 					NegatedPropertyConstraint negPropConstraint = new NegatedPropertyConstraint();
 					negPropConstraint.setPart(complexProp);
-					negPropConstraint.setOwner(a.getVertex());
+					negPropConstraint.setOwner("class1");
 					constraints.add(negPropConstraint);
 				}
 				else if (o instanceof Query.ExistsNot){

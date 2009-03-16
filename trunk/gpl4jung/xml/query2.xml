@@ -10,13 +10,13 @@
     <!--  could also use <and> here -->
     <condition predicate="equals">
     	<!--  attributes map to property terms -->
-    	<attribute vertex="class1" key="package"/> 
-    	<attribute vertex="class3" key="package"/> 
+    	<attribute vertex="class1" key="namespace"/> 
+    	<attribute vertex="class3" key="namespace"/> 
     </condition>
     <not>
 	    <condition predicate="equals">
-	    	<attribute owner="class1" key="package"/> 
-	    	<attribute owner="class2" key="package"/> 
+	    	<attribute owner="class1" key="namespace"/> 
+	    	<attribute owner="class2" key="namespace"/> 
 	    </condition>
     </not>
 </query>
