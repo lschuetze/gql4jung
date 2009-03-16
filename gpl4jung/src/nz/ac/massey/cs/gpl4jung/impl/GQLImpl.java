@@ -22,6 +22,12 @@ import nz.ac.massey.cs.gpl4jung.Path;
 import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.QueryOptimizer;
 import nz.ac.massey.cs.gpl4jung.ResultListener;
+import nz.ac.massey.cs.gpl4jung.constraints.ComplexPropertyConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.Operator;
+import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
+import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.Term;
+import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
 
 
 public class GQLImpl implements GQL {
@@ -66,13 +72,13 @@ public class GQLImpl implements GQL {
     	}
 		
 		Constraint c = cs.selectNext(g, constraints, replacement);
-		if(c instanceof PropertyConstraint){
+		if(c instanceof SimplePropertyConstraint){
 			PropertyConstraint pc = (PropertyConstraint) c;
 			String owner = pc.getOwner();
 			Object instance = replacement.lookup(owner);
 			if(instance instanceof UserDataContainer){
 				UserDataContainer edgeOrVertex = (UserDataContainer) instance;
-				if(pc.check(g, edgeOrVertex)){
+				if(pc instanceof SimplePropertyConstraint && pc.check(g, edgeOrVertex)){
 					List<Constraint> newConstraints = copy(constraints);
 					newConstraints.remove(pc);
 					resolve(g,newConstraints,replacement,listener);
@@ -80,6 +86,58 @@ public class GQLImpl implements GQL {
 				else
 					return; //backtrack
 			}	
+		}
+		//complex property constraints
+		else if (c instanceof ComplexPropertyConstraint){
+			ComplexPropertyConstraint cpc = (ComplexPropertyConstraint) c;
+			List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
+			List<PropertyConstraint> list = cpc.getParts();
+			
+			SimplePropertyConstraint spc = (SimplePropertyConstraint) list.get(0);
+			String owner = spc.getOwner();
+			Object instance1 = replacement.lookup(owner);
+			UserDataContainer edgeOrVertex1 = null;
+			String val1=null,val2=null;
+			if(instance1 instanceof UserDataContainer){
+				edgeOrVertex1 = (UserDataContainer) instance1;
+				PropertyTerm term1 = (PropertyTerm) spc.getTerms()[0];
+				ValueTerm term2 = (ValueTerm) spc.getTerms()[1];
+				//ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex1));
+				val1= (String) term1.getValue(edgeOrVertex1);
+				spc.setTerms(term1,term2);
+				parts.add(spc);
+			}
+			SimplePropertyConstraint spc2 = (SimplePropertyConstraint) list.get(1);
+			String owner2 = spc2.getOwner();
+			Object instance2 = replacement.lookup(owner2);
+			UserDataContainer edgeOrVertex2 = null;
+			if(instance1 instanceof UserDataContainer){
+				edgeOrVertex2 = (UserDataContainer) instance2;
+				
+				PropertyTerm term1 = (PropertyTerm) spc2.getTerms()[0];
+				ValueTerm term2 = (ValueTerm) spc2.getTerms()[1];
+				//ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex2));
+				val2= (String) term1.getValue(edgeOrVertex2);
+				
+				spc2.setTerms(term1,term2);
+				parts.add(spc2);
+			}
+			cpc.setParts(parts);
+			Operator op = Operator.getInstance("=");
+//			if(op.compare(val1, val2)){
+//				List<Constraint> newConstraints = copy(constraints);
+//				newConstraints.remove(cpc);
+//				resolve(g,newConstraints,replacement,listener);
+//			}
+			
+			if(cpc.check(g, edgeOrVertex1, edgeOrVertex2)){
+				List<Constraint> newConstraints = copy(constraints);
+				newConstraints.remove(cpc);
+				resolve(g,newConstraints,replacement,listener);
+			}
+			else
+				return; //backtrack
+			
 		}
 		//resolving constraints for binary constrainst
 		else if (c instanceof LinkConstraint){
@@ -119,7 +177,7 @@ public class GQLImpl implements GQL {
 					    			releaseBindingMap(nextReplacement);
 			    				}
 		    				}
-		    				//just added
+		    				
 	    					else if (edgePropConstraint==null){
 	    						if(!mustNotBinding(replacement, nextInstance.getVertex())){
 			    					//add new replacement

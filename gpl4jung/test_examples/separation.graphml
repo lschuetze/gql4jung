@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
 <graph edgedefault="directed" file="">
-<node id="0" container="separation.jar" namespace="db" name="RunDB" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isSelected="false" reference="java.lang.Object|java.sql.Connection|java.sql.Statement|ui.CounterPanel|sun.jdbc.odbc.JdbcOdbcDriver|java.sql.ResultSet|java.sql.ResultSetMetaData|java.lang.String|java.lang.ClassNotFoundException|java.lang.Class|java.sql.SQLException|java.sql.DriverManager|java.lang.StringBuilder|java.lang.System|java.io.PrintStream|" />
-<node id="1" container="separation.jar" namespace="ui" name="CounterPanel" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isSelected="false" reference="javax.swing.JPanel|javax.swing.JButton|javax.swing.JLabel|java.lang.String|java.lang.StringBuilder|java.awt.Component|java.awt.Color|java.awt.Dimension|" />
-<edge id="edge-3" source="0" target="1" sourceId="0" targetId="1" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<node id="0" container="separation.jar" namespace="db" name="RunDB" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="true" />
+<node id="1" container="separation.jar" namespace="java.lang" name="Object" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
+<node id="2" container="separation.jar" namespace="java.sql" name="Connection" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
+<node id="3" container="separation.jar" namespace="ui" name="CounterPanel" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
+<node id="4" container="separation.jar" namespace="java.sql" name="SQLException" cluster="null" isInterface="false" type="class" isAbstract="false" isException="true" access="null" isBoundry="false" />
+<node id="5" container="separation.jar" namespace="java.sql" name="DriverManager" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
+<node id="6" container="separation.jar" namespace="java.lang" name="String" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
+<node id="7" container="separation.jar" namespace="javax.swing" name="JPanel" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
+<node id="8" container="separation.jar" namespace="javax.swing" name="JButton" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
+<edge id="edge-0" source="0" target="1" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-1" source="0" target="2" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-2" source="0" target="3" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-3" source="0" target="4" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-4" source="0" target="5" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-5" source="0" target="6" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-6" source="3" target="7" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-7" source="3" target="8" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-8" source="3" target="6" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
 </graph>
 </graphml>
