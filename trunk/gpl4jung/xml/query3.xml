@@ -7,6 +7,12 @@
     		<property key="namespace" value="java.awt"/>
     	</or>
    	</vertex>
+   	<vertex id="uilayerclass">
+    	<property key="type" value="class"/>
+   	</vertex>
+   	<vertex id="dblayerclass">
+    	<property key="type" value="class"/>
+   	</vertex>
     <vertex id="dbclass">
     	<property key="type" value="class"/>    	
     	<or>
@@ -14,5 +20,7 @@
     		<property predicate="http://www.w3.org/2005/02/xpath-functions:matches" key="namespace" value="org\.hibernate(.)*"/>
     	</or>
    	</vertex>
-    <path from="dbclass" to="uiclass"></path>
+    <path from="dblayerclass" to="uilayerclass"></path>
+    <link from="dblayerclass" to="dbclass"></link>
+    <link from="uilayerclass" to="uiclass"></link>
 </query>
