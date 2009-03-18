@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
 <graph edgedefault="directed" file="">
-<node id="0" container="abstraction3.jar" namespace="animal" name="Animal" cluster="null" isInterface="false" type="class" isAbstract="true" isException="false" access="public" isBoundry="true" />
-<node id="1" container="abstraction3.jar" namespace="java.lang" name="Object" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
-<node id="2" container="abstraction3.jar" namespace="animal" name="Pony" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="true" />
-<node id="3" container="abstraction3.jar" namespace="animal" name="Horse" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
-<node id="4" container="abstraction3.jar" namespace="client" name="Instructor" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="true" />
-<node id="5" container="abstraction3.jar" namespace="client" name="MyApplication" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="true" />
-<node id="6" container="abstraction3.jar" namespace="java.lang" name="String" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
-<node id="7" container="abstraction3.jar" namespace="client" name="Plough" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
-<node id="8" container="abstraction3.jar" namespace="java.lang" name="System" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
-<node id="9" container="abstraction3.jar" namespace="java.io" name="PrintStream" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
-<node id="10" container="abstraction3.jar" namespace="java.lang" name="StringBuilder" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false" />
+<node id="0" container="abstraction3.jar" namespace="animal" name="Animal" cluster="null" isInterface="false" type="class" isAbstract="true" isException="false" access="public" isBoundry="false"/>
+<node id="1" container="abstraction3.jar" namespace="java.lang" name="Object" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="2" container="abstraction3.jar" namespace="animal" name="Pony" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="false"/>
+<node id="3" container="abstraction3.jar" namespace="animal" name="Horse" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false"/>
+<node id="4" container="abstraction3.jar" namespace="client" name="Instructor" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="false"/>
+<node id="5" container="abstraction3.jar" namespace="client" name="MyApplication" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="false"/>
+<node id="6" container="abstraction3.jar" namespace="java.lang" name="String" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="7" container="abstraction3.jar" namespace="client" name="Plough" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false"/>
+<node id="8" container="abstraction3.jar" namespace="java.lang" name="System" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="9" container="abstraction3.jar" namespace="java.io" name="PrintStream" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="10" container="abstraction3.jar" namespace="java.lang" name="StringBuilder" cluster="null" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
 <edge id="edge-0" source="0" target="1" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
 <edge id="edge-1" source="2" target="3" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
 <edge id="edge-2" source="3" target="0" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
