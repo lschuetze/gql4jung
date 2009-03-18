@@ -5,9 +5,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -86,6 +88,12 @@ public class Odem2GraphML {
 			if (container.getNodeType() == Node.ELEMENT_NODE) {
 				Element containerElement = (Element) container;
 				NodeList namespaces = containerElement.getElementsByTagName("namespace");
+				Set<String> allNameSpaceNames = new HashSet<String>();
+				for(int counter=0;counter<namespaces.getLength();counter++){
+					Node ns = namespaces.item(counter);
+					NamedNodeMap attr=ns.getAttributes();
+					allNameSpaceNames.add(attr.getNamedItem("name").getNodeValue());
+				}
 				for (int j = 0; j < namespaces.getLength(); j++) {
 					Node namespace = namespaces.item(j); 
 					NamedNodeMap namespaceAttr = namespace.getAttributes();
@@ -154,8 +162,12 @@ public class Odem2GraphML {
 									else
 										out.write("null");
 
-									out.write("\" isBoundry=\"true\" ");
-								
+									out.write("\" isBoundry=\"");
+									String s = typeStr.substring(0,typeStr.indexOf('.'));
+									if(allNameSpaceNames.contains(s))
+										out.write("false\"");
+									else
+										out.write("true\"");
 									//out.write("\" isSelected=\"false\" ");
 //										nodes.add(nodeId, typeStr);
 									if (typeStr.contains(namespaceStr))
@@ -244,8 +256,12 @@ public class Odem2GraphML {
 											else
 												out.write("null");
 
-											out.write("\" isBoundry=\"false\" ");
-											
+											out.write("\" isBoundry=\"");
+											String s = relationshipStr.substring(0,relationshipStr.indexOf('.'));
+											if(allNameSpaceNames.contains(s))
+												out.write("false\"");
+											else
+												out.write("true\"");
 											//out.write("\" isSelected=\"false\" ");
 
 											nodes.put(nodeId1, relationshipStr);
