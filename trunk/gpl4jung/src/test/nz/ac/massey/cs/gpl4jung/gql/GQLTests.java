@@ -293,8 +293,7 @@ public class GQLTests {
 		GQL gql = new GQLImpl();
 		gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
-		
-		assertEquals(0,results.size());
+		assertEquals(6,results.size());
 //		MotifInstance instance1 = results.get(0);
 //		assertEquals("CounterPanel",instance1.getVertex("uiclass").getUserDatum("name"));
 //		assertEquals("RunDB",instance1.getVertex("dbclass").getUserDatum("name"));

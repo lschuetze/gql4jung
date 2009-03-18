@@ -593,8 +593,28 @@ public class Query {
         protected String source;
         @XmlAttribute(required = true)
         protected String target;
+        @XmlAttribute(required = true)
+        protected String from;
+        @XmlAttribute(required = true)
+        protected String to;
 
-        /**
+        public String getFrom() {
+			return from;
+		}
+
+		public void setFrom(String from) {
+			this.from = from;
+		}
+
+		public String getTo() {
+			return to;
+		}
+
+		public void setTo(String to) {
+			this.to = to;
+		}
+
+		/**
          * Gets the value of the property property.
          * 
          * @return

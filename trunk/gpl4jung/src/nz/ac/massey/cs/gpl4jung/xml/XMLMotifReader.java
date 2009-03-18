@@ -135,16 +135,18 @@ public class XMLMotifReader implements MotifReader {
 				else if (o instanceof Query.Edge){
 					EdgeConstraint edgeConstraint = new EdgeConstraint();
 					Query.Edge e = (Query.Edge) o;
-					edgeConstraint.setSource(e.getSource());
-					edgeConstraint.setTarget(e.getTarget());
+					edgeConstraint.setSource(e.getFrom());
+					edgeConstraint.setTarget(e.getTo());
 					//getting edge properties
-					Query.Edge.Property ee = (Query.Edge.Property)o;
-					PropertyTerm term1 = new PropertyTerm(ee.getKey());
-					ValueTerm term2 = new ValueTerm(ee.getValue());
-					SimplePropertyConstraint<Edge> edgePropConstraint = new SimplePropertyConstraint<Edge>();
-					edgePropConstraint.setTerms(term1,term2);
-					edgePropConstraint.setOwner(edgeConstraint.getID());
-					edgeConstraint.setEdgePropertyConstraint(edgePropConstraint);
+					Query.Edge.Property ee = e.getProperty();
+					if(ee!=null){
+						PropertyTerm term1 = new PropertyTerm(ee.getKey());
+						ValueTerm term2 = new ValueTerm(ee.getValue());
+						SimplePropertyConstraint<Edge> edgePropConstraint = new SimplePropertyConstraint<Edge>();
+						edgePropConstraint.setTerms(term1,term2);
+						edgePropConstraint.setOwner(edgeConstraint.getID());
+						edgeConstraint.setEdgePropertyConstraint(edgePropConstraint);
+					}
 					constraints.add(edgeConstraint);
 				}
 				//TODO: to be comepleted

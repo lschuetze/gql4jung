@@ -130,8 +130,10 @@
                   </xs:complexType>
                 </xs:element>
               </xs:sequence>
-              <xs:attribute name="source" type="xs:string" use="required" />
-              <xs:attribute name="target" type="xs:string" use="required" />
+              <xs:attribute name="source" type="xs:string" use="optional" />
+              <xs:attribute name="target" type="xs:string" use="optional" />
+			  <xs:attribute name="from" type="xs:string" use="required" />
+			  <xs:attribute name="to" type="xs:string" use="required" />
             </xs:complexType>
           </xs:element>
           <!--'condition' element definition-->
