@@ -266,7 +266,7 @@ public class GQLTests {
 		Path p6 = (Path)instance2.getLink(getConstraint(q,"service_impl","service"));
 		assertTrue(p6.getEdges().contains(this.getEdgeById(g,"edge-2")));
 	}
-/*@Test
+@Test
 //	Testcase : circular dependency between classes and packages. 
 	public void test3() throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/dependency.graphml");
@@ -281,7 +281,7 @@ public class GQLTests {
 		assertEquals("Class1",instance1.getVertex("Class1").getUserDatum("name"));
 		assertEquals("Class3",instance1.getVertex("Class3").getUserDatum("name"));
 		assertEquals("Class2",instance1.getVertex("Class2").getUserDatum("name"));
-	}*/
+	}
 	@Test
 	// Testcase : Test for a class depending on both UI layer and DB layer
 	

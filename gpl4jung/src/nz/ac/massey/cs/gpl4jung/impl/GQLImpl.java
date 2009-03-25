@@ -28,6 +28,8 @@ import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
 import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.Term;
 import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
+import nz.ac.massey.cs.processors.ClusterProcessor;
+import nz.ac.massey.cs.processors.Processor;
 
 
 public class GQLImpl implements GQL {
@@ -36,7 +38,11 @@ public class GQLImpl implements GQL {
     
 	@Override
 	public void query(Graph graph, Motif motif, ResultListener listener) {
-		
+		if(motif.getRoles().contains("graphprocessor")){
+			Processor clusterProcessor = new ClusterProcessor();
+			graph = clusterProcessor.process(graph);
+			motif.getRoles().remove("graphprocessor");
+		}
     	//gettting initial binding 
     	String role = motif.getRoles().get(0);
     	for(Object o:graph.getVertices()){
@@ -70,7 +76,6 @@ public class GQLImpl implements GQL {
     		listener.found(motifInstance);
     		return;
     	}
-		
 		Constraint c = cs.selectNext(g, constraints, replacement);
 		if(c instanceof SimplePropertyConstraint){
 			PropertyConstraint pc = (PropertyConstraint) c;
@@ -91,36 +96,46 @@ public class GQLImpl implements GQL {
 		else if (c instanceof ComplexPropertyConstraint){
 			ComplexPropertyConstraint cpc = (ComplexPropertyConstraint) c;
 			List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
-			List<PropertyConstraint> list = cpc.getParts();
-			
-			SimplePropertyConstraint spc = (SimplePropertyConstraint) list.get(0);
-			String owner = spc.getOwner();
+			List list = cpc.getParts();
+			List<Constraint> list1= copy(list);
+			SimplePropertyConstraint spc = (SimplePropertyConstraint) list1.get(0);
+			String owner = spc.getOwner(); 
 			Object instance1 = replacement.lookup(owner);
 			UserDataContainer edgeOrVertex1 = null;
-			String val1=null,val2=null;
+			
 			if(instance1 instanceof UserDataContainer){
 				edgeOrVertex1 = (UserDataContainer) instance1;
 				PropertyTerm term1 = (PropertyTerm) spc.getTerms()[0];
-				ValueTerm term2 = (ValueTerm) spc.getTerms()[1];
-				//ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex1));
-				val1= (String) term1.getValue(edgeOrVertex1);
-				spc.setTerms(term1,term2);
-				parts.add(spc);
+				if(spc.getTerms()[1]!=null){
+					ValueTerm term2 = (ValueTerm) spc.getTerms()[1];
+					spc.setTerms(term1,term2);
+					parts.add(spc);
+				}
+				else {
+					ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex1));
+					spc.setTerms(term1,term2);
+					parts.add(spc);
+					
+				}
 			}
-			SimplePropertyConstraint spc2 = (SimplePropertyConstraint) list.get(1);
+			SimplePropertyConstraint spc2 = (SimplePropertyConstraint) list1.get(1);
 			String owner2 = spc2.getOwner();
 			Object instance2 = replacement.lookup(owner2);
 			UserDataContainer edgeOrVertex2 = null;
-			if(instance1 instanceof UserDataContainer){
+			if(instance2 instanceof UserDataContainer){
 				edgeOrVertex2 = (UserDataContainer) instance2;
-				
 				PropertyTerm term1 = (PropertyTerm) spc2.getTerms()[0];
-				ValueTerm term2 = (ValueTerm) spc2.getTerms()[1];
-				//ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex2));
-				val2= (String) term1.getValue(edgeOrVertex2);
-				
-				spc2.setTerms(term1,term2);
-				parts.add(spc2);
+				if(spc2.getTerms()[1]!=null){
+					ValueTerm term2 = (ValueTerm) spc2.getTerms()[1];
+					spc2.setTerms(term1,term2);
+					parts.add(spc2);
+				}
+				else{
+					ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex2));
+					spc2.setTerms(term1,term2);
+					parts.add(spc2);
+					
+				}
 			}
 			cpc.setParts(parts);
 			Operator op = Operator.getInstance("=");
@@ -136,6 +151,7 @@ public class GQLImpl implements GQL {
 				resolve(g,newConstraints,replacement,listener);
 			}
 			else
+				
 				return; //backtrack
 			
 		}
@@ -392,7 +408,15 @@ public class GQLImpl implements GQL {
      */
     private List<Constraint> copy(List<Constraint> list) {
         List<Constraint> newList = new ArrayList<Constraint>();
-        newList.addAll(list);
-        return newList;
+        Object[] newArray = list.toArray();
+        Object[] clonedArray = newArray.clone();
+        for(int i = 0; i<newArray.length;i++){
+        	clonedArray[i]= newArray.clone()[i];
+        }
+        for(int i = 0;i<clonedArray.length;i++){
+        	Constraint c = (Constraint) clonedArray[i];
+        	newList.add(i, c);
+        }
+       return newList;
     }
 }
