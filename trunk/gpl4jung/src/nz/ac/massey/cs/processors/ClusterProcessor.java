@@ -23,7 +23,7 @@ public class ClusterProcessor implements Processor {
 			Set cluster = cset.getCluster(i);
 			for(Object o: cluster){
 				Vertex v =  (Vertex) o;
-				v.addUserDatum("closter", "cluster-"+i, UserData.SHARED);
+				v.addUserDatum("cluster", "cluster-"+i, UserData.SHARED);
 			}
 		}
 		return g;
