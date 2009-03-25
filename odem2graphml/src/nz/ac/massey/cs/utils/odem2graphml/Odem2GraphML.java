@@ -125,7 +125,7 @@ public class Odem2GraphML {
 									out.write(namespaceStr);
 									out.write("\" name=\"");
 									out.write(typeStr.substring(typeStr.lastIndexOf('.') + 1));
-									out.write("\" cluster=\"null\" isInterface=\"");
+									out.write("\" isInterface=\"");
 									if(typeAttr.getNamedItem("classification")!=null 
 											&& typeAttr.getNamedItem("classification").getNodeValue()
 											.equals("interface")){
@@ -219,7 +219,7 @@ public class Odem2GraphML {
 											out.write("\" name=\"");
 											out.write(relationshipStr.substring(relationshipStr
 													.lastIndexOf('.') + 1));
-											out.write("\" cluster=\"null\" isInterface=\"");
+											out.write("\" isInterface=\"");
 											if(relationshipAttr.getNamedItem("classification")!=null 
 													&& relationshipAttr.getNamedItem("classification").getNodeValue()
 													.equals("interface")){
