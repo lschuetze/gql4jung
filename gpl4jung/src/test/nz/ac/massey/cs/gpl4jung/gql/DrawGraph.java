@@ -54,9 +54,9 @@ public class DrawGraph {
 			Set cluster = set.getCluster(i);
 			for(Object o: cluster){
 				Vertex v =  (Vertex) o;
-				v.addUserDatum("closter", "cluster-"+i, UserData.SHARED);
+				v.addUserDatum("cluster", "cluster-"+i, UserData.SHARED);
 				System.out.print(v.getUserDatum("name")+" ");
-				System.out.println(v.getUserDatum("closter"));
+				System.out.println(v.getUserDatum("cluster"));
 			}
 		}
 		PluggableRenderer pr = new PluggableRenderer();
