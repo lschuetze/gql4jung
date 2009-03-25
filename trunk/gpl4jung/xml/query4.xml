@@ -1,7 +1,7 @@
 <!-- packages with multiple clusters within the package -->
 <query>
     <!--  Cluster implements interface Processor with method process(Graph) -->
-	<graphprocessor class="nz.ac.massey.cs.processors.Cluster"/>
+	<graphprocessor class="nz.ac.massey.cs.processors.ClusterProcessor"/>
     <vertex id="class1"><property key="type" value="class"/></vertex>
     <vertex id="class2"><property key="type" value="class"/></vertex>
     <!-- here we use negations: no such class should exist -->

@@ -191,7 +191,13 @@
               </xs:sequence>
             </xs:complexType>
           </xs:element>
-        </xs:choice>
+		  <!--'graphprocessor element definition-->
+		  <xs:element name="graphprocessor">
+			<xs:complexType>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+		    </xs:complexType>		
+		  </xs:element>	 
+		</xs:choice>
       </xs:sequence>
     </xs:complexType>
   </xs:element>

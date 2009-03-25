@@ -3,10 +3,12 @@ package test.nz.ac.massey.cs.gpl4jung.gql;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Set;
 
 
 import javax.swing.JFrame;
 
+import edu.uci.ics.jung.algorithms.cluster.*;
 import edu.uci.ics.jung.graph.ArchetypeEdge;
 import edu.uci.ics.jung.graph.ArchetypeVertex;
 import edu.uci.ics.jung.graph.Edge;
@@ -46,7 +48,17 @@ public class DrawGraph {
 		
 		JFrame jf = new JFrame();
 		Graph g = readJungGraphFromGraphML("test_examples/separation.graphml");
-
+		EdgeBetweennessClusterer clusterer = new EdgeBetweennessClusterer(0);
+		ClusterSet set = clusterer.extract(g); 
+		for(int i=0; i<set.size();i++){
+			Set cluster = set.getCluster(i);
+			for(Object o: cluster){
+				Vertex v =  (Vertex) o;
+				v.addUserDatum("closter", "cluster-"+i, UserData.SHARED);
+				System.out.print(v.getUserDatum("name")+" ");
+				System.out.println(v.getUserDatum("closter"));
+			}
+		}
 		PluggableRenderer pr = new PluggableRenderer();
 		VisualizationViewer vv = new VisualizationViewer(new FRLayout(g), pr);
         jf.getContentPane().add(vv);

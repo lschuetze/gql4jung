@@ -49,8 +49,9 @@ public class ConstraintSchedulerImpl implements ConstraintScheduler {
 				interimConstraints.add(c);
 			}
 		}
-		List<Constraint> sortedConstraints = sort(interimConstraints);
-		return sortedConstraints;
+		//List<Constraint> sortedConstraints = sort(interimConstraints);
+		//return sortedConstraints;
+		return interimConstraints;
 	}
 
 	@Override
