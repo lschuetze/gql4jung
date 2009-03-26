@@ -25,5 +25,6 @@ public interface Motif {
 	List<String> getRoles();
 	List<Constraint> getConstraints();
 	void setConstraints(List<Constraint> constraints);
+	boolean isCore(String role);
 	
 }
