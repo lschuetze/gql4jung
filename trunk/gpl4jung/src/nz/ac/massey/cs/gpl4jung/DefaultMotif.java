@@ -18,6 +18,9 @@ public class DefaultMotif implements Motif {
 	}
 	private List<String> roles = new ArrayList<String>();
 	private List<Constraint> constraints = new ArrayList<Constraint>();
-
+	// TODO replace dummy
+	public boolean isCore(String role) {
+		return true;
+	}
 
 }
