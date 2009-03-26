@@ -20,10 +20,11 @@ public class ClusterProcessor implements Processor {
 		EdgeBetweennessClusterer clusterer = new EdgeBetweennessClusterer(0);
 		ClusterSet cset = clusterer.extract(g); 
 		for(int i=0; i<cset.size();i++){
+			String l = "cluster-"+i;
 			Set cluster = cset.getCluster(i);
 			for(Object o: cluster){
 				Vertex v =  (Vertex) o;
-				v.addUserDatum("cluster", "cluster-"+i, UserData.SHARED);
+				v.addUserDatum("cluster",l, UserData.SHARED);
 			}
 		}
 		return g;
