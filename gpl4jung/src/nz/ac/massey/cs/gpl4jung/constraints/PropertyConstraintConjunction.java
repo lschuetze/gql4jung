@@ -10,6 +10,10 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
@@ -21,6 +25,14 @@ import edu.uci.ics.jung.utils.UserDataContainer;
  */
 public class PropertyConstraintConjunction<T  extends UserDataContainer> extends ComplexPropertyConstraint<T> {
 	
+	public PropertyConstraintConjunction() {
+		super();
+	}
+	public PropertyConstraintConjunction(List<PropertyConstraint<T>> parts) {
+		super(parts);
+		//this.parts=parts;
+	}
+
 	private Term[] terms = null;
 	private String owner = null;
 	
@@ -48,4 +60,18 @@ public class PropertyConstraintConjunction<T  extends UserDataContainer> extends
 	public void setTerms(Term... terms) {
 		this.terms = terms;
 	}
+	
+	public PropertyConstraintConjunction clone(){
+		PropertyConstraintConjunction clone = new PropertyConstraintConjunction();
+		List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
+		for(Iterator itr=this.parts.iterator();itr.hasNext();){
+			SimplePropertyConstraint p = (SimplePropertyConstraint) itr.next();
+			parts.add(p.clone());
+		}
+		clone.setParts(parts);	
+		clone.setOwner(getOwner());
+		clone.setTerms(getTerms());
+		return clone;
+	}
+	
 }

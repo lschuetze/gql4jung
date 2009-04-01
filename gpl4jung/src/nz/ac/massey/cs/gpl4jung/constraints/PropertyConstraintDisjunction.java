@@ -10,6 +10,10 @@
 
 package nz.ac.massey.cs.gpl4jung.constraints;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
@@ -47,5 +51,17 @@ public class PropertyConstraintDisjunction<T  extends UserDataContainer> extends
 	}
 	public void setTerms(Term... terms) {
 		this.terms = terms;
+	}
+	public PropertyConstraintDisjunction clone(){
+		PropertyConstraintDisjunction clone = new PropertyConstraintDisjunction();
+		List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
+		for(Iterator itr=this.parts.iterator();itr.hasNext();){
+			SimplePropertyConstraint p = (SimplePropertyConstraint) itr.next();
+			parts.add(p.clone());
+		}
+		clone.setParts(parts);	
+		clone.setOwner(getOwner());
+		clone.setTerms(getTerms());
+		return clone;
 	}
 }

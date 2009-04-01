@@ -266,22 +266,22 @@ public class GQLTests {
 		Path p6 = (Path)instance2.getLink(getConstraint(q,"service_impl","service"));
 		assertTrue(p6.getEdges().contains(this.getEdgeById(g,"edge-2")));
 	}
-/*@Test
+@Test
 //	Testcase : circular dependency between classes and packages. 
 	public void test3() throws Exception {
-		Graph g = this.readJungGraphFromGraphML("test_examples/dependency.graphml");
+		Graph g = this.readJungGraphFromGraphML("test_examples/packageB/dependency.graphml");
 		XMLMotifReader r = new XMLMotifReader();
 		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/query2.xml"));
 		GQL gql = new GQLImpl();
 		ResultCollector rc = new ResultCollector();
 		gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
-		assertEquals(1,results.size());
+		assertEquals(2,results.size());
 		MotifInstance instance1 = results.get(0);
-		assertEquals("Class1",instance1.getVertex("Class1").getUserDatum("name"));
-		assertEquals("Class3",instance1.getVertex("Class3").getUserDatum("name"));
-		assertEquals("Class2",instance1.getVertex("Class2").getUserDatum("name"));
-	}*/
+		assertEquals("Class1",instance1.getVertex("class1").getUserDatum("name"));
+		assertEquals("Class3",instance1.getVertex("class3").getUserDatum("name"));
+		assertEquals("Class2",instance1.getVertex("class2").getUserDatum("name"));
+	}
 	@Test
 	// Testcase : Test for a class depending on both UI layer and DB layer
 	

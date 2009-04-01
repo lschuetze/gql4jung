@@ -80,4 +80,11 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 	public void setOwner(String owner){
 		this.owner = owner;
 	}
+	public SimplePropertyConstraint clone(){
+		SimplePropertyConstraint clone = new SimplePropertyConstraint();
+		clone.setTerms(getTerms().clone());
+		clone.setOwner(getOwner());
+		clone.setOperator(getOperator());
+		return clone;
+	}
 }
