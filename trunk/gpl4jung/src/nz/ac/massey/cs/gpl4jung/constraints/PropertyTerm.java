@@ -39,4 +39,7 @@ public class PropertyTerm  implements Term {
 	public Object getValue(UserDataContainer vertexOrEdge) {
 		return vertexOrEdge.getUserDatum(key);
 	}
+	public PropertyTerm clone(){
+		return new PropertyTerm(getKey());
+	}
 }

@@ -16,16 +16,26 @@ import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import edu.uci.ics.jung.utils.UserDataContainer;
 
 public abstract class ComplexPropertyConstraint<T extends UserDataContainer> implements PropertyConstraint<T>{
+	public ComplexPropertyConstraint() {
+		super();
+	}
+	public ComplexPropertyConstraint(List<PropertyConstraint<T>> parts) {
+		super();
+		this.parts = parts;
+	}
+
 	protected List<PropertyConstraint<T>> parts = null;
 
 	public List<PropertyConstraint<T>> getParts() {
 		return parts;
 	}
 
-	public void setParts(List<PropertyConstraint<T>> parts) {
+	public void setParts(List<PropertyConstraint<T>> parts) {		
 		this.parts = parts;
 	}
 
-
-
+	public Object clone(){
+		return clone();
+	}
+	
 }

@@ -30,4 +30,7 @@ public class ValueTerm  implements Term {
 	public void setValue(Object value) {
 		this.value = value;
 	}
+	public ValueTerm clone(){
+		return new ValueTerm(getValue());
+	}
 }

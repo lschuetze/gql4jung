@@ -23,6 +23,7 @@ import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.QueryOptimizer;
 import nz.ac.massey.cs.gpl4jung.ResultListener;
 import nz.ac.massey.cs.gpl4jung.constraints.ComplexPropertyConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.NegatedPropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.Operator;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
 import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
@@ -48,7 +49,7 @@ public class GQLImpl implements GQL {
     	for(Object o:graph.getVertices()){
     		Vertex v = (Vertex) o;
     		List<Constraint> constraints = motif.getConstraints();
-    		//cs.prepare(graph, constraints);
+    		cs.prepare(graph, constraints);
     		Bindings binding = new Bindings();
     		binding.bind(role, v);
     		resolve(graph, constraints, binding, listener);
@@ -94,7 +95,8 @@ public class GQLImpl implements GQL {
 		}
 		//complex property constraints
 		else if (c instanceof ComplexPropertyConstraint){
-			ComplexPropertyConstraint cpc = (ComplexPropertyConstraint) c;
+			ComplexPropertyConstraint cpc1 = (ComplexPropertyConstraint) c;
+			ComplexPropertyConstraint cpc = (ComplexPropertyConstraint) cpc1.clone();
 			List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
 			List list = cpc.getParts();
 			List<Constraint> list1= copy(list);
@@ -137,23 +139,76 @@ public class GQLImpl implements GQL {
 					
 				}
 			}
+			
 			cpc.setParts(parts);
 			Operator op = Operator.getInstance("=");
-//			if(op.compare(val1, val2)){
-//				List<Constraint> newConstraints = copy(constraints);
-//				newConstraints.remove(cpc);
-//				resolve(g,newConstraints,replacement,listener);
-//			}
 			
 			if(cpc.check(g, edgeOrVertex1, edgeOrVertex2)){
 				List<Constraint> newConstraints = copy(constraints);
-				newConstraints.remove(cpc);
+				newConstraints.remove(cpc1);
 				resolve(g,newConstraints,replacement,listener);
 			}
 			else
 				
 				return; //backtrack
 			
+		}
+		//negated complex property constraints
+		else if (c instanceof  NegatedPropertyConstraint){
+			NegatedPropertyConstraint npc = (NegatedPropertyConstraint) c;
+			ComplexPropertyConstraint cpc = (ComplexPropertyConstraint) npc.getPart();
+			List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
+			List list = cpc.getParts();
+			List<Constraint> list1= copy(list);
+			SimplePropertyConstraint spc = (SimplePropertyConstraint) list1.get(0);
+			String owner = spc.getOwner(); 
+			Object instance1 = replacement.lookup(owner);
+			UserDataContainer edgeOrVertex1 = null;
+			
+			if(instance1 instanceof UserDataContainer){
+				edgeOrVertex1 = (UserDataContainer) instance1;
+				PropertyTerm term1 = (PropertyTerm) spc.getTerms()[0];
+				if(spc.getTerms()[1]!=null){
+					ValueTerm term2 = (ValueTerm) spc.getTerms()[1];
+					spc.setTerms(term1,term2);
+					parts.add(spc);
+				}
+				else {
+					ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex1));
+					spc.setTerms(term1,term2);
+					parts.add(spc);
+					
+				}
+			}
+			SimplePropertyConstraint spc2 = (SimplePropertyConstraint) list1.get(1);
+			String owner2 = spc2.getOwner();
+			Object instance2 = replacement.lookup(owner2);
+			UserDataContainer edgeOrVertex2 = null;
+			if(instance2 instanceof UserDataContainer){
+				edgeOrVertex2 = (UserDataContainer) instance2;
+				PropertyTerm term1 = (PropertyTerm) spc2.getTerms()[0];
+				if(spc2.getTerms()[1]!=null){
+					ValueTerm term2 = (ValueTerm) spc2.getTerms()[1];
+					spc2.setTerms(term1,term2);
+					parts.add(spc2);
+				}
+				else{
+					ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex2));
+					spc2.setTerms(term1,term2);
+					parts.add(spc2);
+					
+				}
+			}
+			
+			cpc.setParts(parts);
+			npc.setPart(cpc);
+			if(npc.check(g, edgeOrVertex1, edgeOrVertex2)){
+				List<Constraint> newConstraints = copy(constraints);
+				newConstraints.remove(npc);
+				resolve(g,newConstraints,replacement,listener);
+			}
+			else
+				return; //backtrack
 		}
 		//resolving constraints for binary constrainst
 		else if (c instanceof LinkConstraint){
