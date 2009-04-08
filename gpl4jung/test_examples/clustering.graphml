@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<graph edgedefault="directed" file="">
+<node id="0" container="clustering.jar" namespace="packageA" name="Class1" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="false"/>
+<node id="1" container="clustering.jar" namespace="java.lang" name="Object" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="2" container="clustering.jar" namespace="packageB" name="Class3" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false"/>
+<node id="3" container="clustering.jar" namespace="packageA" name="Class2" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="false"/>
+<node id="4" container="clustering.jar" namespace="packageB" name="Class4" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false"/>
+<edge id="edge-1" source="0" target="2" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-3" source="3" target="4" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<!--<edge id="edge-7" source="0" target="3" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />-->
+</graph>
+</graphml>

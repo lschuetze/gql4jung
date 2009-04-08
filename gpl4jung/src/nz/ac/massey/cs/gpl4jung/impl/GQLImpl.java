@@ -3,6 +3,7 @@ package nz.ac.massey.cs.gpl4jung.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.IteratorUtils;
 
@@ -10,6 +11,11 @@ import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.AbstractSparseEdge;
+import edu.uci.ics.jung.graph.impl.AbstractSparseGraph;
+import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.impl.SparseGraph;
+import edu.uci.ics.jung.graph.impl.SparseVertex;
+import edu.uci.ics.jung.io.GraphMLFile;
 import edu.uci.ics.jung.utils.UserDataContainer;
 
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
@@ -23,6 +29,7 @@ import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.QueryOptimizer;
 import nz.ac.massey.cs.gpl4jung.ResultListener;
 import nz.ac.massey.cs.gpl4jung.constraints.ComplexPropertyConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.GroupConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.NegatedPropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.Operator;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
@@ -36,35 +43,36 @@ import nz.ac.massey.cs.processors.Processor;
 public class GQLImpl implements GQL {
 	ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
 	private boolean cancelled = false;
+	private Motif motif = null;
+	private int counter = 1;
     
 	@Override
 	public void query(Graph graph, Motif motif, ResultListener listener) {
+		this.motif = motif;
 		if(motif.getRoles().contains("graphprocessor")){
 			Processor clusterProcessor = new ClusterProcessor();
 			graph = clusterProcessor.process(graph);
 			motif.getRoles().remove("graphprocessor");
 		}
-    	//gettting initial binding 
-    	String role = motif.getRoles().get(0);
+		//gettting initial binding 
+    	String role = motif.getRoles().get(0);  	
     	for(Object o:graph.getVertices()){
     		Vertex v = (Vertex) o;
     		List<Constraint> constraints = motif.getConstraints();
-    		cs.prepare(graph, constraints);
+    		//cs.prepare(graph, constraints);
     		Bindings binding = new Bindings();
     		binding.bind(role, v);
     		resolve(graph, constraints, binding, listener);
-    	}
+	    }
 	}
 
 	@Override
 	public void query(Graph graph, Motif motif, ResultListener listener,
 			QueryOptimizer optimizer) {
-		// TODO Auto-generated method stub
 
 	}
 	
 	public void resolve(Graph g, List<Constraint> constraints, Bindings replacement, ResultListener listener) {
-		
 		
 		if(cancelled){
 			return;
@@ -73,8 +81,44 @@ public class GQLImpl implements GQL {
 		//check for termination
     	if (constraints.isEmpty()){
     		MotifInstanceImpl motifInstance = new MotifInstanceImpl();
-    		motifInstance.addAll(replacement.asMap());
+            GraphMLFile gm = new GraphMLFile();
+    		Map<String, Object> motifGraph = replacement.asMap();
+    		Graph gr = new SparseGraph();
+    		for(Iterator iter = motifGraph.values().iterator();iter.hasNext();){
+    			Object obj = iter.next();
+    			if (obj instanceof SparseVertex){
+    				Vertex v = (Vertex)obj;
+    				v.copy(gr);
+    			}
+    		}
+    		for(Iterator iter = motifGraph.values().iterator();iter.hasNext();){
+    			Object obj = iter.next();
+    			if(obj instanceof Path){
+    				Path p = (Path)obj;
+    				List<Edge> edges = p.getEdges();
+    				for(int i=0;i<edges.size();i++){
+    					Edge e = edges.get(i); 
+    					e.copy(gr);
+    				}
+    			} else if(obj instanceof AbstractSparseEdge) {
+    				Edge e = (Edge) obj;
+    				e.copy(gr);
+    			}
+    		}
+    		motifInstance.addAll(motifGraph);
     		listener.found(motifInstance);
+    		gm.save(gr, "test_examples/packageB/result"+counter+".graphml");
+    		counter++;
+    		//check for core attributes
+    		for(Iterator itr = motif.getRoles().iterator();itr.hasNext();){
+    			String role = (String) itr.next();
+    			if(motif.isCore(role)){
+    				Object instance = replacement.lookup(role);
+    				if(instance!=null){
+    					cancelled = true;
+    				}
+    			}
+    		}
     		return;
     	}
 		Constraint c = cs.selectNext(g, constraints, replacement);
@@ -156,60 +200,81 @@ public class GQLImpl implements GQL {
 		//negated complex property constraints
 		else if (c instanceof  NegatedPropertyConstraint){
 			NegatedPropertyConstraint npc = (NegatedPropertyConstraint) c;
-			ComplexPropertyConstraint cpc = (ComplexPropertyConstraint) npc.getPart();
-			List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
-			List list = cpc.getParts();
-			List<Constraint> list1= copy(list);
-			SimplePropertyConstraint spc = (SimplePropertyConstraint) list1.get(0);
-			String owner = spc.getOwner(); 
-			Object instance1 = replacement.lookup(owner);
-			UserDataContainer edgeOrVertex1 = null;
+			if(npc.getPart() instanceof SimplePropertyConstraint){
+				SimplePropertyConstraint spc = (SimplePropertyConstraint) npc.getPart();
+				String owner = spc.getOwner();
+				Object instance1 = replacement.lookup(owner);
+				UserDataContainer edgeOrVertex1 = null;
+				if(instance1 instanceof UserDataContainer){
+					npc.setPart(spc);
+					UserDataContainer edgeOrVertex = (UserDataContainer) instance1;
+					if(!npc.check(g, edgeOrVertex)){
+						List<Constraint> newConstraints = copy(constraints);
+						newConstraints.remove(npc);
+						resolve(g,newConstraints,replacement,listener);
+					}
+					else
+						return; //backtrack
+				}	
+			}
+			else if (npc.getPart() instanceof ComplexPropertyConstraint){
+				ComplexPropertyConstraint cpc = (ComplexPropertyConstraint) npc.getPart();
+				List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
+				List list = cpc.getParts();
+				List<Constraint> list1= copy(list);
+				SimplePropertyConstraint spc = (SimplePropertyConstraint) list1.get(0);
+				String owner = spc.getOwner(); 
+				Object instance1 = replacement.lookup(owner);
+				UserDataContainer edgeOrVertex1 = null;
+				
+				if(instance1 instanceof UserDataContainer){
+					edgeOrVertex1 = (UserDataContainer) instance1;
+					PropertyTerm term1 = (PropertyTerm) spc.getTerms()[0];
+					if(spc.getTerms()[1]!=null){
+						ValueTerm term2 = (ValueTerm) spc.getTerms()[1];
+						spc.setTerms(term1,term2);
+						parts.add(spc);
+					}
+					else {
+						ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex1));
+						spc.setTerms(term1,term2);
+						parts.add(spc);
+						
+					}
+				}
+				SimplePropertyConstraint spc2 = (SimplePropertyConstraint) list1.get(1);
+				String owner2 = spc2.getOwner();
+				Object instance2 = replacement.lookup(owner2);
+				UserDataContainer edgeOrVertex2 = null;
+				if(instance2 instanceof UserDataContainer){
+					edgeOrVertex2 = (UserDataContainer) instance2;
+					PropertyTerm term1 = (PropertyTerm) spc2.getTerms()[0];
+					if(spc2.getTerms()[1]!=null){
+						ValueTerm term2 = (ValueTerm) spc2.getTerms()[1];
+						spc2.setTerms(term1,term2);
+						parts.add(spc2);
+					}
+					else{
+						ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex2));
+						spc2.setTerms(term1,term2);
+						parts.add(spc2);
+						
+					}
+				}
+				
+				cpc.setParts(parts);
+				npc.setPart(cpc);
+				if(npc.check(g, edgeOrVertex1, edgeOrVertex2)){
+					List<Constraint> newConstraints = copy(constraints);
+					newConstraints.remove(npc);
+					resolve(g,newConstraints,replacement,listener);
+				}
+				else
+					return; //backtrack
+			}
 			
-			if(instance1 instanceof UserDataContainer){
-				edgeOrVertex1 = (UserDataContainer) instance1;
-				PropertyTerm term1 = (PropertyTerm) spc.getTerms()[0];
-				if(spc.getTerms()[1]!=null){
-					ValueTerm term2 = (ValueTerm) spc.getTerms()[1];
-					spc.setTerms(term1,term2);
-					parts.add(spc);
-				}
-				else {
-					ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex1));
-					spc.setTerms(term1,term2);
-					parts.add(spc);
-					
-				}
-			}
-			SimplePropertyConstraint spc2 = (SimplePropertyConstraint) list1.get(1);
-			String owner2 = spc2.getOwner();
-			Object instance2 = replacement.lookup(owner2);
-			UserDataContainer edgeOrVertex2 = null;
-			if(instance2 instanceof UserDataContainer){
-				edgeOrVertex2 = (UserDataContainer) instance2;
-				PropertyTerm term1 = (PropertyTerm) spc2.getTerms()[0];
-				if(spc2.getTerms()[1]!=null){
-					ValueTerm term2 = (ValueTerm) spc2.getTerms()[1];
-					spc2.setTerms(term1,term2);
-					parts.add(spc2);
-				}
-				else{
-					ValueTerm term2 = new ValueTerm(term1.getValue(edgeOrVertex2));
-					spc2.setTerms(term1,term2);
-					parts.add(spc2);
-					
-				}
-			}
-			
-			cpc.setParts(parts);
-			npc.setPart(cpc);
-			if(npc.check(g, edgeOrVertex1, edgeOrVertex2)){
-				List<Constraint> newConstraints = copy(constraints);
-				newConstraints.remove(npc);
-				resolve(g,newConstraints,replacement,listener);
-			}
-			else
-				return; //backtrack
 		}
+		
 		//resolving constraints for binary constrainst
 		else if (c instanceof LinkConstraint){
 			LinkConstraint lc = (LinkConstraint) c;
@@ -286,7 +351,7 @@ public class GQLImpl implements GQL {
 					    			releaseBindingMap(nextReplacement);
 			    				}
 	    					}
-	    					//just added
+	    					
 	    					else if (edgePropConstraint==null){
 	    						if(!mustNotBinding(replacement, nextInstance.getVertex())){
 			    					//add new replacement
@@ -303,7 +368,19 @@ public class GQLImpl implements GQL {
 					    			releaseBindingMap(nextReplacement);
 	    						}
 	    					}
-	    				} 				
+	    				}
+		    			//added for group constraint,
+	    				else if (instance == null){
+	    					if(!mustNotBinding(replacement, nextInstance.getVertex())){
+		    					//add new replacement
+		    					Bindings nextReplacement = createBindingMap(replacement);
+				    			nextReplacement.bind(source, nextInstance.getVertex());
+				    			List<Constraint> newConstraints = copy(constraints);
+				    			newConstraints.remove(lc);
+				    			resolve(g,newConstraints,nextReplacement,listener);
+				    			releaseBindingMap(nextReplacement);
+    						}
+	    				}
 	    			}
     			}
 			}
@@ -390,7 +467,19 @@ public class GQLImpl implements GQL {
 					    			releaseBindingMap(nextReplacement);
 		    					}	
 		    				}
-	    				}	
+	    				}
+		    			//added for group constraint,
+	    				else if (instance == null){
+	    					if(!mustNotBinding(replacement, nextInstance.getVertex())){
+		    					//add new replacement
+		    					Bindings nextReplacement = createBindingMap(replacement);
+				    			nextReplacement.bind(target, nextInstance.getVertex());
+				    			List<Constraint> newConstraints = copy(constraints);
+				    			newConstraints.remove(lc);
+				    			resolve(g,newConstraints,nextReplacement,listener);
+				    			releaseBindingMap(nextReplacement);
+    						}
+	    				}
 		    		}
     			}	
 			}

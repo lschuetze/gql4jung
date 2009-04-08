@@ -11,7 +11,6 @@ import javax.swing.JFrame;
 import edu.uci.ics.jung.algorithms.cluster.*;
 import edu.uci.ics.jung.graph.ArchetypeEdge;
 import edu.uci.ics.jung.graph.ArchetypeVertex;
-import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.decorators.EdgeStringer;
@@ -47,7 +46,7 @@ public class DrawGraph {
 	public static void main(String[] args) throws IOException, Exception {
 		
 		JFrame jf = new JFrame();
-		Graph g = readJungGraphFromGraphML("test_examples/separation.graphml");
+		Graph g = readJungGraphFromGraphML("test_examples/packageB/clustering.graphml");
 		EdgeBetweennessClusterer clusterer = new EdgeBetweennessClusterer(0);
 		ClusterSet set = clusterer.extract(g); 
 		for(int i=0; i<set.size();i++){
@@ -81,6 +80,8 @@ public class DrawGraph {
 			}
         };
         pr.setVertexStringer(vstringer);
+        GraphMLFile gm = new GraphMLFile();
+        gm.save(g, "test_examples/packageB/mygraph.graphml");
         
 	}
 

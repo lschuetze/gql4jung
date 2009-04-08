@@ -12,6 +12,8 @@ import nz.ac.massey.cs.gpl4jung.Constraint;
 import nz.ac.massey.cs.gpl4jung.Motif;
 import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.GroupConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.OutGroupConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
 import nz.ac.massey.cs.gpl4jung.constraints.Term;
@@ -75,6 +77,16 @@ public class ConstraintSchedulerImpl implements ConstraintScheduler {
 				EdgeConstraint edgeConstraint = (EdgeConstraint) c;
 				if(bindings.lookup(edgeConstraint.getSource())!=null || bindings.lookup(edgeConstraint.getTarget())!=null)
 					return edgeConstraint;
+			}
+			else if (c instanceof GroupConstraint){
+				GroupConstraint groupConstraint = (GroupConstraint) c;
+				if(bindings.lookup(groupConstraint.getSource())!=null || bindings.lookup(groupConstraint.getTarget())!=null)
+					return groupConstraint;
+			}
+			else if (c instanceof OutGroupConstraint){
+				OutGroupConstraint outgroupConstraint = (OutGroupConstraint)c;
+				if(bindings.lookup(outgroupConstraint.getSource())!=null || bindings.lookup(outgroupConstraint.getTarget())!=null)
+					return outgroupConstraint;
 			}
 		}
 		return null;

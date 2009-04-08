@@ -43,6 +43,7 @@
               </xs:sequence>
               <xs:attribute name="id" type="xs:string" use="required" />
               <xs:attribute name="type" type="xs:string" use="optional" />
+			  <xs:attribute name="core" type="xs:string" use ="optional"/>
             </xs:complexType>
           </xs:element>
           <!--'path' element definition-->
@@ -154,7 +155,7 @@
           <xs:element name="not">
             <xs:complexType>
               <xs:sequence>
-                <xs:element name="condition">
+                <xs:element name="condition" minOccurs="0">
                   <xs:complexType>
                     <xs:sequence>
                       <xs:element name="attribute" maxOccurs="unbounded" >
@@ -168,7 +169,14 @@
                     <xs:attribute name="predicate" type="xs:string" use="required" />
                   </xs:complexType>
                 </xs:element>
-              </xs:sequence>
+				  <xs:element name="group" minOccurs="0">
+					  <xs:complexType>
+						  <xs:attribute name="key" type="xs:string" use="required"/>
+						  <xs:attribute name="member1" type="xs:string" use="required"/>
+						  <xs:attribute name="member2" type="xs:string" use="required"/>
+					  </xs:complexType>
+				  </xs:element>
+			  </xs:sequence>
             </xs:complexType>
           </xs:element>
           <!--'exists_not' element definition-->
@@ -197,6 +205,22 @@
 				<xs:attribute name="class" type="xs:string" use="required"/>
 		    </xs:complexType>		
 		  </xs:element>	 
+		  <!--'group' element definition -->
+		  <xs:element name="group">
+				<xs:complexType>
+					<xs:attribute name="key" type="xs:string" use="required"/>
+					<xs:attribute name="member1" type="xs:string" use="required"/>
+					<xs:attribute name="member2" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		  <!--'outgroup' element definition -->
+		  <xs:element name="outgroup">
+				<xs:complexType>
+					<xs:attribute name="key" type="xs:string" use="required"/>
+					<xs:attribute name="member1" type="xs:string" use="required"/>
+					<xs:attribute name="member2" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
 		</xs:choice>
       </xs:sequence>
     </xs:complexType>
