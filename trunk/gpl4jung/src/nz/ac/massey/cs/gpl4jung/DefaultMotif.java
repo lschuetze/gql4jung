@@ -1,7 +1,9 @@
 package nz.ac.massey.cs.gpl4jung;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DefaultMotif implements Motif {
 	public List<String> getRoles() {
@@ -17,10 +19,20 @@ public class DefaultMotif implements Motif {
 		this.constraints = constraints;
 	}
 	private List<String> roles = new ArrayList<String>();
+	private Map<String, String> coreInfo = new HashMap<String, String>();
 	private List<Constraint> constraints = new ArrayList<Constraint>();
-	// TODO replace dummy
 	public boolean isCore(String role) {
-		return true;
+		if(coreInfo.get(role).equals("true")){
+			return true;
+		}
+		else 
+			return false;
+	}
+	public Map<String, String> getCoreInfo() {
+		return coreInfo;
+	}
+	public void setCoreInfo(Map<String, String> coreInfo) {
+		this.coreInfo = coreInfo;
 	}
 
 }

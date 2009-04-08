@@ -34,10 +34,10 @@ import edu.uci.ics.jung.graph.Vertex;
  * @author jens.dietrich@gmail.com
  *
  */
-public class GroupConstraint extends LinkConstraint<Path> {
+public class OutGroupConstraint extends LinkConstraint<Path> {
 	private String key = null;
 	
-	public GroupConstraint() {
+	public OutGroupConstraint() {
 		super();
 		UID pathID = new UID();
 		super.id = pathID.toString();
@@ -54,7 +54,7 @@ public class GroupConstraint extends LinkConstraint<Path> {
 				if (target==v) {
 					return false;
 				}
-				else if(target.getUserDatum(key).equals(v.getUserDatum(key))){
+				else if(!target.getUserDatum(key).equals(v.getUserDatum(key))){
 					List path = ShortestPathUtils.getPath(SPA,v,target);
 					PathImpl pp = new PathImpl();
 					pp.setEdges(path);
@@ -84,7 +84,7 @@ public class GroupConstraint extends LinkConstraint<Path> {
 
 	public Path check(final Graph g, final Vertex source, final Vertex target){
 		PathImpl pp = null;
-		if(source.getUserDatum(key).equals(target.getUserDatum(key))){
+		if(!source.getUserDatum(key).equals(target.getUserDatum(key))){
 			final ShortestPath SPA = new DijkstraShortestPath(g);
 			List path = ShortestPathUtils.getPath(SPA, source,target);
 			pp = new PathImpl();

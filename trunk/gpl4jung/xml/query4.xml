@@ -2,10 +2,8 @@
 <query>
     <!--  Cluster implements interface Processor with method process(Graph) -->
 	<graphprocessor class="nz.ac.massey.cs.processors.ClusterProcessor"/>
-    <vertex id="class1"><property key="type" value="class"/></vertex>
-    <vertex id="class2"><property key="type" value="class"/></vertex>
-	<group key="package" member1="class1" member2="class2"/>
-	<not>
-		<group key="cluster" member1="class1" member2="class2"/>
-	</not>
+    <vertex id="class1" core="true"><property key="type" value="class"/></vertex>
+    <vertex id="class2" core="true"><property key="type" value="class"/></vertex>
+	<group key="namespace" member1="class1" member2="class2"/>
+	<outgroup key="cluster" member1="class1" member2="class2"/>
 </query>

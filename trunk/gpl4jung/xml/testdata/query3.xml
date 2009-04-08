@@ -8,10 +8,10 @@
     		<property key="namespace" value="java.awt"/>
     	</or>
    	</vertex>
-   	<vertex id="uilayerclass">
+   	<vertex id="uilayerclass" core="true">
     	<property key="type" value="class"/>
    	</vertex>
-   	<vertex id="dblayerclass">
+   	<vertex id="dblayerclass" core="true">
     	<property key="type" value="class"/>
    	</vertex>
     <vertex id="dbclass">
