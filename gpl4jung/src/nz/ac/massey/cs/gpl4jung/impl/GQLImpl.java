@@ -16,6 +16,7 @@ import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.SparseGraph;
 import edu.uci.ics.jung.graph.impl.SparseVertex;
 import edu.uci.ics.jung.io.GraphMLFile;
+import edu.uci.ics.jung.utils.UserData;
 import edu.uci.ics.jung.utils.UserDataContainer;
 
 import nz.ac.massey.cs.gpl4jung.ConnectedVertex;
@@ -81,16 +82,26 @@ public class GQLImpl implements GQL {
 		//check for termination
     	if (constraints.isEmpty()){
     		MotifInstanceImpl motifInstance = new MotifInstanceImpl();
-            GraphMLFile gm = new GraphMLFile();
+            motifInstance.setMotif(motif);
+    		GraphMLFile gm = new GraphMLFile();
     		Map<String, Object> motifGraph = replacement.asMap();
     		Graph gr = new SparseGraph();
-    		for(Iterator iter = motifGraph.values().iterator();iter.hasNext();){
-    			Object obj = iter.next();
-    			if (obj instanceof SparseVertex){
-    				Vertex v = (Vertex)obj;
-    				v.copy(gr);
+    		//annotating graph with role and core attributes
+    		for(Iterator iter=motif.getRoles().iterator();iter.hasNext();){
+    			String role = (String) iter.next();
+    			Vertex v1 = (Vertex) replacement.lookup(role);
+    			Vertex v = (Vertex) v1.copy(gr);
+    			if(v!=null){
+    				v.addUserDatum("role", role, UserData.SHARED);
+    			}
+    			if(motif.isCore(role)){
+    				v.addUserDatum("core", "true", UserData.SHARED);
+    			}
+    			else {
+    				v.addUserDatum("core", "false", UserData.SHARED);
     			}
     		}
+    		//creating graph from motif instance, 
     		for(Iterator iter = motifGraph.values().iterator();iter.hasNext();){
     			Object obj = iter.next();
     			if(obj instanceof Path){
@@ -98,11 +109,27 @@ public class GQLImpl implements GQL {
     				List<Edge> edges = p.getEdges();
     				for(int i=0;i<edges.size();i++){
     					Edge e = edges.get(i); 
-    					e.copy(gr);
+    					Vertex source = (Vertex) e.getEndpoints().getFirst();
+    					Vertex target = (Vertex) e.getEndpoints().getSecond();
+    					boolean v1 = gr.getVertices().contains(source);
+    					boolean v2 = gr.getVertices().contains(target);
+    					boolean e1 = gr.getEdges().contains(e);
+    					if(v1 && v2 && !e1){
+    						e.copy(gr);
+    					}
+    					else if(v1 && !v2 && !e1){
+    						target.copy(gr);
+    						e.copy(gr);
+    					}
+    					else if(!v1 && v2 && !e1){
+    						source.copy(gr);
+    						e.copy(gr);
+    					}
     				}
     			} else if(obj instanceof AbstractSparseEdge) {
     				Edge e = (Edge) obj;
-    				e.copy(gr);
+    				if(!gr.getEdges().contains(e))
+    					e.copy(gr);
     			}
     		}
     		motifInstance.addAll(motifGraph);
@@ -110,15 +137,15 @@ public class GQLImpl implements GQL {
     		gm.save(gr, "test_examples/packageB/result"+counter+".graphml");
     		counter++;
     		//check for core attributes
-    		for(Iterator itr = motif.getRoles().iterator();itr.hasNext();){
-    			String role = (String) itr.next();
-    			if(motif.isCore(role)){
-    				Object instance = replacement.lookup(role);
-    				if(instance!=null){
-    					cancelled = true;
-    				}
-    			}
-    		}
+//    		for(Iterator itr = motif.getRoles().iterator();itr.hasNext();){
+//    			String role = (String) itr.next();
+//    			if(motif.isCore(role)){
+//    				Object instance = replacement.lookup(role);
+//    				if(instance!=null){
+//    					cancelled = true;
+//    				}
+//    			}
+//    		}
     		return;
     	}
 		Constraint c = cs.selectNext(g, constraints, replacement);

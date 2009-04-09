@@ -210,7 +210,7 @@ public class GQLTests {
 		List<MotifInstance> result = listener.getInstances();
 		// analyse 1st results
 		assertEquals(listener.getInstances().size(),2);
-		MotifInstance instance1 = result.get(1);
+		MotifInstance instance1 = result.get(0);
 		assertEquals(instance1.getVertex("client"),this.getVertexById(g,"MyApplication"));
 		assertEquals(instance1.getVertex("service"),this.getVertexById(g,"Animal"));
 		assertEquals(instance1.getVertex("service_impl"),this.getVertexById(g,"Pony"));
@@ -221,7 +221,7 @@ public class GQLTests {
 		Path p3 = (Path)instance1.getLink(getConstraint(q,"service_impl","service"));
 		assertTrue(p3.getEdges().contains(this.getEdgeById(g,"edge-1")));
 		//analyse 2nd result
-		MotifInstance instance2 = result.get(0);
+		MotifInstance instance2 = result.get(1);
 		assertEquals(instance2.getVertex("client"),this.getVertexById(g,"MyApplication"));
 		assertEquals(instance2.getVertex("service"),this.getVertexById(g,"Animal"));
 		assertEquals(instance2.getVertex("service_impl"),this.getVertexById(g,"Horse"));
@@ -288,12 +288,12 @@ public class GQLTests {
 	public void test4() throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/separation.graphml");
 		XMLMotifReader r = new XMLMotifReader();
-		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/testdata/query3.xml"));
+		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/query3.xml"));
 		ResultCollector rc = new ResultCollector();
 		GQL gql = new GQLImpl();
 		gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
-		assertEquals(1,results.size());
+		assertEquals(6,results.size());
 		MotifInstance instance1 = results.get(0);
 		assertEquals("CounterPanel",instance1.getVertex("uilayerclass").getUserDatum("name"));
 		assertEquals("RunDB",instance1.getVertex("dblayerclass").getUserDatum("name"));
@@ -301,14 +301,14 @@ public class GQLTests {
 	@Test
 //	Testcase : two clusters in same package 
 	public void test5() throws Exception {
-		Graph g = this.readJungGraphFromGraphML("test_examples/packageB/clustering.graphml");
+		Graph g = this.readJungGraphFromGraphML("test_examples/clustering.graphml");
 		XMLMotifReader r = new XMLMotifReader();
 		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/query4.xml"));
 		GQL gql = new GQLImpl();
 		ResultCollector rc = new ResultCollector();
 		gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
-		assertEquals(1,results.size());
+		assertEquals(4,results.size());
 	}
 	private Vertex getVertexById(Graph g,String id) {
 		for (Object v:g.getVertices()) {
