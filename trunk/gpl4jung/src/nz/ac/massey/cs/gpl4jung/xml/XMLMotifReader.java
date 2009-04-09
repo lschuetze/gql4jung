@@ -70,7 +70,7 @@ public class XMLMotifReader implements MotifReader {
 					if(v.getCore()!=null){
 						core.put(v.getId(), v.getCore());
 					} else {
-						core.put(v.getId(), "false");
+						core.put(v.getId(), "true");
 					}
 					//getting simple vertex property constraints
 					for(Iterator itr=v.getProperty().iterator(); itr.hasNext();){

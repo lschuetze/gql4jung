@@ -1,4 +1,5 @@
 <!-- no class should depend on UI and DB classes (and therefore the respective layers) at the same time -->
+
 <query>
     <vertex id="uiclass">
     	<property key="type" value="class"/>
@@ -16,11 +17,11 @@
     <vertex id="dbclass">
     	<property key="type" value="class"/>    	
     	<or>
-    		<property predicate="http://www.w3.org/2005/02/xpath-functions:matches" key="namespace" value="java\.sql(.)*"/>
-    		<property predicate="http://www.w3.org/2005/02/xpath-functions:matches" key="namespace" value="org\.hibernate(.)*"/>
+    		<property key="namespace" value="java.sql"/>
+    		<property key="namespace" value="org.hibernate"/>
     	</or>
    	</vertex>
     <path from="dblayerclass" to="uilayerclass"></path>
-    <link from="dblayerclass" to="dbclass"></link>
-    <link from="uilayerclass" to="uiclass"></link>
+    <edge from="dblayerclass" to="dbclass"></edge>
+    <edge from="uilayerclass" to="uiclass"></edge>
 </query>
