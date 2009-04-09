@@ -350,9 +350,10 @@ public class Odem2GraphML {
 //					buffer.append(j);
 					buffer.append("\" type=\"");
 					buffer.append(te.getType());
-					buffer.append("\" isSelected=\"false\" state=\"null");
-					buffer.append("\" betweenness=\"null");
-					buffer.append("\" separation=\"null\" />");
+					buffer.append("\"/>");
+//					buffer.append("\" isSelected=\"false\" state=\"null");
+//					buffer.append("\" betweenness=\"null");
+//					buffer.append("\" separation=\"null\" />");
 					edges.add(buffer.toString());
 					break;
 				}
