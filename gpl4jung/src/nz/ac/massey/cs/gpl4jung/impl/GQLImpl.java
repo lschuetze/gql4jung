@@ -1,5 +1,6 @@
 package nz.ac.massey.cs.gpl4jung.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -134,8 +135,19 @@ public class GQLImpl implements GQL {
     		}
     		motifInstance.addAll(motifGraph);
     		listener.found(motifInstance);
-    		gm.save(gr, "test_examples/packageB/result"+counter+".graphml");
-    		counter++;
+    		//adding result files to their respective folders. 
+    		String path = (String) g.getUserDatum("path");
+    		String query = (String) g.getUserDatum("query");
+    		File inputFolder = new File(path);
+    		File[] files = inputFolder.listFiles();
+    		for(File in:files){
+    			String folder = in.getName();
+    			if (folder.equals(query)){
+    				gm.save(gr, path+query+"\\result"+counter+".graphml");
+    	    		counter++;
+    			}
+    		}
+    		
     		//check for core attributes
 //    		for(Iterator itr = motif.getRoles().iterator();itr.hasNext();){
 //    			String role = (String) itr.next();
