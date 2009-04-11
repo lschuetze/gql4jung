@@ -105,7 +105,7 @@ public class GQLTests {
 			else if (((Vertex)v).getUserDatum("name").equals("Horse")) 
 				v1=(Vertex)v;
 		}
-		DefaultMotif q = (DefaultMotif) readMotif("xml/query1.xml");
+		DefaultMotif q = (DefaultMotif) readMotif("xml/abstraction_coupling.xml");
 		ConstraintSchedulerImpl cs = new ConstraintSchedulerImpl();
 		List<Constraint> constraints = cs.getConstraints(q);
 		//List<Constraint> sortedConstraints = cs.prepare(g, constraints);
@@ -148,7 +148,8 @@ public class GQLTests {
 	@Test
 	public void test2() throws Exception {
 		Graph g = readJungGraphFromGraphML("test_examples/abstraction.graphml");
-		Motif q = (DefaultMotif) readMotif("xml/query1.xml");
+		//Graph g = readJungGraphFromGraphML("data/activation.jar.graphml");
+		Motif q = (DefaultMotif) readMotif("xml/abstraction_coupling.xml");
 		GQL gql = new GQLImpl();
 		ResultCollector listener = new ResultCollector();
 		gql.query(g, q, listener);
@@ -170,7 +171,7 @@ public class GQLTests {
 	@Test
 	public void test2_1() throws Exception {
 		Graph g = readJungGraphFromGraphML("test_examples/abstraction1.graphml");
-		Motif q = (DefaultMotif) readMotif("xml/query1.xml");
+		Motif q = (DefaultMotif) readMotif("xml/abstraction_coupling.xml");
 		GQL gql = new GQLImpl();
 		ResultCollector listener = new ResultCollector();
 		gql.query(g, q, listener);
@@ -203,7 +204,7 @@ public class GQLTests {
 	@Test
 	public void test2_2() throws Exception {
 		Graph g = readJungGraphFromGraphML("test_examples/abstraction2.graphml");
-		Motif q = (DefaultMotif) readMotif("xml/query1.xml");
+		Motif q = (DefaultMotif) readMotif("xml/abstraction_coupling.xml");
 		GQL gql = new GQLImpl();
 		ResultCollector listener = new ResultCollector();
 		gql.query(g, q, listener);
@@ -237,7 +238,7 @@ public class GQLTests {
 	@Test
 	public void test2_3() throws Exception {
 		Graph g = readJungGraphFromGraphML("test_examples/abstraction3.graphml");
-		Motif q = (DefaultMotif) readMotif("xml/query1.xml");
+		Motif q = (DefaultMotif) readMotif("xml/abstraction_coupling.xml");
 		GQL gql = new GQLImpl();
 		ResultCollector listener = new ResultCollector();
 		gql.query(g, q, listener);
@@ -271,7 +272,7 @@ public class GQLTests {
 	public void test3() throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/packageB/dependency.graphml");
 		XMLMotifReader r = new XMLMotifReader();
-		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/query2.xml"));
+		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/circular_dependency.xml"));
 		GQL gql = new GQLImpl();
 		ResultCollector rc = new ResultCollector();
 		gql.query(g,q,rc);
@@ -288,7 +289,7 @@ public class GQLTests {
 	public void test4() throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/separation.graphml");
 		XMLMotifReader r = new XMLMotifReader();
-		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/query3.xml"));
+		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/db2ui_dependency.xml"));
 		ResultCollector rc = new ResultCollector();
 		GQL gql = new GQLImpl();
 		gql.query(g,q,rc);
@@ -303,7 +304,7 @@ public class GQLTests {
 	public void test5() throws Exception {
 		Graph g = this.readJungGraphFromGraphML("test_examples/clustering.graphml");
 		XMLMotifReader r = new XMLMotifReader();
-		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/query4.xml"));
+		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/multiple_clusters.xml"));
 		GQL gql = new GQLImpl();
 		ResultCollector rc = new ResultCollector();
 		gql.query(g,q,rc);
