@@ -12,7 +12,7 @@ import nz.ac.massey.cs.gpl4jung.MotifInstance;
 
 
 public class MotifInstanceImpl implements MotifInstance {
-	Motif motif = new DefaultMotif();
+	Motif motif = null;
 	
 	
 	public Object getLink(LinkConstraint constraint) {
