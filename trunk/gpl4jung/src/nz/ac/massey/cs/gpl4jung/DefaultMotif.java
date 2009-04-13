@@ -22,11 +22,7 @@ public class DefaultMotif implements Motif {
 	private Map<String, String> coreInfo = new HashMap<String, String>();
 	private List<Constraint> constraints = new ArrayList<Constraint>();
 	public boolean isCore(String role) {
-		if(coreInfo.get(role).equals("true")){
-			return true;
-		}
-		else 
-			return false;
+		return coreInfo.get(role).equals("true");
 	}
 	public Map<String, String> getCoreInfo() {
 		return coreInfo;
