@@ -19,5 +19,8 @@ import edu.uci.ics.jung.graph.Graph;
 public interface GQL {
 	void query(Graph graph,Motif motif,ResultListener listener);
 	void query(Graph graph,Motif motif,ResultListener listener,QueryOptimizer optimizer);
-
+	// cancels the current computation
+	void cancel() ;
+	// reset the state of the engine
+	void reset() ;
 }
