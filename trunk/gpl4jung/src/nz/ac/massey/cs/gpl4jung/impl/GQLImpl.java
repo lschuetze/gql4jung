@@ -11,10 +11,6 @@ import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.AbstractSparseEdge;
-import edu.uci.ics.jung.graph.impl.AbstractSparseGraph;
-import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.impl.SparseGraph;
-import edu.uci.ics.jung.graph.impl.SparseVertex;
 import edu.uci.ics.jung.io.GraphMLFile;
 import edu.uci.ics.jung.utils.UserDataContainer;
 
@@ -29,14 +25,11 @@ import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.QueryOptimizer;
 import nz.ac.massey.cs.gpl4jung.ResultListener;
 import nz.ac.massey.cs.gpl4jung.constraints.ComplexPropertyConstraint;
-import nz.ac.massey.cs.gpl4jung.constraints.GroupConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.NegatedPropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.Operator;
 import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
 import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
-import nz.ac.massey.cs.gpl4jung.constraints.Term;
 import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
-import nz.ac.massey.cs.processors.ClusterProcessor;
 import nz.ac.massey.cs.processors.Processor;
 
 
@@ -56,13 +49,27 @@ public class GQLImpl implements GQL {
 	}
 	@Override
 	public void query(Graph graph, Motif motif, ResultListener listener) {
-		this.motif = motif;
+		this.motif = motif; 
+		//looking for graph processing instruction in motif roles
+		//first two roles in motif represent following
+		//<graphprocessor class="nz.ac.massey.cs.processors.ClusterProcessor"/>
 		if(motif.getRoles().contains("graphprocessor")){
-			// JENS: there should be no hard coded reference to a particular processor here
-			// instead, a processor must be dynamically instantiated
-			Processor clusterProcessor = new ClusterProcessor();
+			//getting class name for processor from motif
+			String processorClass = motif.getRoles().get(1);
+			//dynamically instatiating processor through java reflection
+			Processor clusterProcessor=null;
+			try {
+				clusterProcessor = (Processor) Class.forName(processorClass).newInstance();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
 			graph = clusterProcessor.process(graph);
 			motif.getRoles().remove("graphprocessor");
+			motif.getRoles().remove(processorClass);
 		}
 		//gettting initial binding 
     	String role = motif.getRoles().get(0);  	
@@ -94,34 +101,8 @@ public class GQLImpl implements GQL {
     		motifInstance.setMotif(motif);
             GraphMLFile gm = new GraphMLFile();
     		Map<String, Object> motifGraph = replacement.asMap();
-    		/* Jens: Ali WHAT IS THIS?? you just create a graph to save one example instance !!!
-    		Graph gr = new SparseGraph();
-    		for(Iterator iter = motifGraph.values().iterator();iter.hasNext();){
-    			Object obj = iter.next();
-    			if (obj instanceof SparseVertex){
-    				Vertex v = (Vertex)obj;
-    				v.copy(gr);
-    			}
-    		}
-    		
-    		for(Iterator iter = motifGraph.values().iterator();iter.hasNext();){
-    			Object obj = iter.next();
-    			if(obj instanceof Path){
-    				Path p = (Path)obj;
-    				List<Edge> edges = p.getEdges();
-    				for(int i=0;i<edges.size();i++){
-    					Edge e = edges.get(i); 
-    					e.copy(gr);
-    				}
-    			} else if(obj instanceof AbstractSparseEdge) {
-    				Edge e = (Edge) obj;
-    				e.copy(gr);
-    			}
-    		}
-    		*/
     		motifInstance.addAll(motifGraph);
     		listener.found(motifInstance);
-    		//gm.save(gr, "test_examples/packageB/result"+counter+".graphml");
     		counter++;
     		//check for core attributes
     		/*

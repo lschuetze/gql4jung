@@ -259,7 +259,9 @@ public class XMLMotifReader implements MotifReader {
 					constraints.add(negPropConstraint);
 				}
 				else if (o instanceof Query.Graphprocessor){
+					Query.Graphprocessor gp = (Query.Graphprocessor)o;
 					v_roles.add("graphprocessor");
+					v_roles.add(gp.getClazz());
 				}
 				else if (o instanceof Query.Group){
 					Query.Group qg = (Query.Group)o;

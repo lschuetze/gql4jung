@@ -46,7 +46,8 @@ public class DrawGraph {
 	public static void main(String[] args) throws IOException, Exception {
 		
 		JFrame jf = new JFrame();
-		Graph g = readJungGraphFromGraphML("test_examples/packageB/clustering.graphml");
+		//Graph g = readJungGraphFromGraphML("test_examples/packageB/clustering.graphml");
+		Graph g = readJungGraphFromGraphML("xml/result1.graphml");
 		EdgeBetweennessClusterer clusterer = new EdgeBetweennessClusterer(0);
 		ClusterSet set = clusterer.extract(g); 
 		for(int i=0; i<set.size();i++){
