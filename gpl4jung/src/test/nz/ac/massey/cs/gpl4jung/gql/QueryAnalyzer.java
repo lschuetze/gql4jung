@@ -5,47 +5,49 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.Iterator;
+import java.util.List;
 
 import nz.ac.massey.cs.gpl4jung.DefaultMotif;
 import nz.ac.massey.cs.gpl4jung.GQL;
 import nz.ac.massey.cs.gpl4jung.Motif;
+import nz.ac.massey.cs.gpl4jung.MotifInstance;
 import nz.ac.massey.cs.gpl4jung.impl.GQLImpl;
+import nz.ac.massey.cs.gpl4jung.impl.MotifInstance2Graphml;
 import nz.ac.massey.cs.gpl4jung.xml.XMLMotifReader;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.io.GraphMLFile;
-import edu.uci.ics.jung.utils.UserData;
+
 
 /**Analyzes all queries on projects. 
  * @author Ali
- *
  */
 public class QueryAnalyzer {
 
-	/**
-	 * @param a
-	 * @throws Exception 
-	 */
 	public static void main(String[] a) throws Exception {
-		String INPUT = "Data/";
+		String INPUT = "Data/"; //the main folder containing subfolders for every project
 		File inputFolder = new File(INPUT);
-		File[] files = inputFolder.listFiles();
-		System.out.println(""+files.length+" projects will be analyzed");
+		File[] projects = inputFolder.listFiles();
+		System.out.println(""+projects.length+" projects will be analyzed\n");
 		int counter = 0;
+		int instanceCounter =1;
 		long totalStartTime = System.currentTimeMillis();
-		for(File in:files){
+		//looping over all projects in main folder
+		for(File in:projects){
 			long startTime = System.currentTimeMillis();
 			counter = counter + 1;
 			System.out.print("Analyzing ");
 			System.out.print(counter);
 			System.out.print('/');
-			System.out.print(files.length);
+			System.out.print(projects.length);
 			System.out.print(": ");
-			System.out.print(in.getName());
-			
-			String prjFolder = in.getName();
-			File prjSubFolder = new File(INPUT+prjFolder);
-			File[] prjFiles = prjSubFolder.listFiles(new FileFilter() {
+			System.out.print(in.getName()+"\n");
+			//individual project folder in main folder
+			String prjctFolder = in.getName();
+			File projectFolder = new File(INPUT+prjctFolder);
+			//getting project files with .graphml extension
+			File[] prjFiles = projectFolder.listFiles(new FileFilter() {
 				@Override
 				public boolean accept(File f) {
 					return f.getAbsolutePath().endsWith(".graphml");
@@ -53,35 +55,42 @@ public class QueryAnalyzer {
 			for(File inp:prjFiles){
 				Graph g = readJungGraphFromGraphML(inp.getPath());
 				String path = inp.getPath().substring(0,inp.getPath().lastIndexOf("\\")+1);
-				g.addUserDatum("path", path, UserData.SHARED);
-				g.addUserDatum("query", "abstraction_coupling", UserData.SHARED);
-				Motif q = (DefaultMotif) readMotif("xml/abstraction_coupling.xml");
-				GQL gql = new GQLImpl();
-				ResultCollector listener = new ResultCollector();
-				gql.query(g, q, listener);
-				System.out.println("\nQuery1 executed");
-				Motif q2 = (DefaultMotif) readMotif("xml/circular_dependency.xml");
-				g.setUserDatum("query", "circular_dependency", UserData.SHARED);
-				GQL gql2 = new GQLImpl();
-				ResultCollector listener2 = new ResultCollector();
-				gql2.query(g, q2, listener2);
-				System.out.println("Query2 executed");
-				Motif q3 = (DefaultMotif) readMotif("xml/db2ui_dependency.xml");
-				g.setUserDatum("query", "db2ui_dependency", UserData.SHARED);
-				GQL gql3 = new GQLImpl();
-				ResultCollector listener3 = new ResultCollector();
-				gql3.query(g, q3, listener3);
-				System.out.println("Query3 executed");
-				Motif q4 = (DefaultMotif) readMotif("xml/multiple_clusters.xml");
-				g.setUserDatum("query", "multiple_clusters", UserData.SHARED);
-				GQL gql4 = new GQLImpl();
-				ResultCollector listener4 = new ResultCollector();
-				gql4.query(g, q4, listener4);
-				System.out.println("Query4 executed");
+				String queryInput = "xml/"; //queries main folder
+				File queryInputFolder = new File(queryInput);
+				//getting query files from xml folder
+				File[] queryFiles = queryInputFolder.listFiles(new FileFilter() {
+					@Override
+					public boolean accept(File f) {
+						return f.getAbsolutePath().endsWith(".xml");
+					}});
+				for(File query:queryFiles){
+					Motif q = (DefaultMotif) readMotif(query.getPath());
+					GQL gql = new GQLImpl();
+					ResultCollector listener = new ResultCollector();
+					gql.query(g, q, listener);
+					List<MotifInstance> motifInstance = listener.getInstances();
+					System.out.print("\tQuery " + query.getName() + " executed. Writing "
+							+ motifInstance.size() + " instances found. ");
+					if(motifInstance!=null){
+						String newPath = path + query.getName().substring(0,query.getName().lastIndexOf("."));
+						for(Iterator iter=motifInstance.iterator();iter.hasNext();){
+							MotifInstance2Graphml motifInstance2Graphml = new MotifInstance2Graphml();
+							String instanceNum = newPath + "\\result"+instanceCounter+".graphml";
+							MotifInstance instance = (MotifInstance)iter.next();
+							motifInstance2Graphml.convert(instance, instanceNum);
+							instanceCounter++;
+							instanceNum=null;
+						}
+						newPath=null;
+					}
+					System.out.print("Done\n");
+					instanceCounter = 1; //reset counter
+				}
 			}
 			long endTime = System.currentTimeMillis();
 	        System.out.println("Total elapsed time in analyzing "+in.getName()+ " project (ms): "+ (endTime-startTime));
-			System.out.println("Project analyzed successfully.");
+			System.out.println("Project analyzed successfully.\n");
+			System.gc();
 		}
 		long totalEndTime = System.currentTimeMillis();
         System.out.println("Total elapsed time in analyzing all projects (ms): "+ (totalEndTime-totalStartTime));
