@@ -2,20 +2,14 @@
 <!-- for properties, see edu.uci.ics.jung.utils.UserDataContainer - these are general purpose key-value annotations key-datum-->
 <query>
 	<!-- ids are of type ID, references in path and edge of type IDREF -->
-    <vertex id="client">
-    	<property key="type" value="class"/>
-    	<!--  this syntax is short for the following: -->
-    	<!--  <condition predicate="equals"> -->
-	    <!--  	<attribute owner="client" key="type"/>  -->
-	    <!--  	<value>class</value>  -->
-	    <!--  </condition> -->
-	    <!--   -->
+    <vertex id="client" core="true">
+		<property key="type" value="class"/>
     </vertex>
-    <vertex id="service" type="class">    
+    <vertex id="service" core="true">    
         <property key="isAbstract" value="true"/>
         <property key="type" value="class"/>
     </vertex>
-    <vertex id="service_impl" type="class">
+    <vertex id="service_impl" core="false">
         <property key="isAbstract" value="false"/>
         <property key="type" value="class"/>
     </vertex>
@@ -27,9 +21,9 @@
        		<property key="type" value="implements"/>
        </or>
     </path>
-    <path from="client" to="service">
+    <edge from="client" to="service">
         <property key="type" value="uses"/>
-    </path>
+    </edge>
     <path from="client" to="service_impl">
        <property key="type" value="uses"/>
     </path>
