@@ -30,7 +30,7 @@ public class MotifInstance2Graphml {
 		graph = new DirectedSparseGraph();
 		gm = new GraphMLFile();
 	}
-	public void convert(MotifInstance motifInstance, String path){
+	public Graph asGraph(MotifInstance motifInstance){
 		this.mi = motifInstance;
 		Motif motif = mi.getMotif();
 		//annotating graph with role and core attributes. Copying vertices to graph from motif instance
@@ -85,7 +85,10 @@ public class MotifInstance2Graphml {
 				}
 			}
 		}
-			
+		return graph;
+	}
+	public void export(MotifInstance motifInstance, String path){
+		Graph graph = this.asGraph(motifInstance);
 		//adding result file to its respective folder. 
 		gm.save(graph, path);
 	}
