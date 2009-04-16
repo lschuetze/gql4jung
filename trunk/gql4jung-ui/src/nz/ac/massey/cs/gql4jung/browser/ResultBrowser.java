@@ -22,25 +22,24 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-
 import org.apache.commons.lang.time.DurationFormatUtils;
 import nz.ac.massey.cs.gpl4jung.GQL;
 import nz.ac.massey.cs.gpl4jung.LinkConstraint;
 import nz.ac.massey.cs.gpl4jung.Motif;
 import nz.ac.massey.cs.gpl4jung.MotifInstance;
 import nz.ac.massey.cs.gpl4jung.impl.GQLImpl;
+import nz.ac.massey.cs.gpl4jung.impl.MotifInstance2Graphml;
 import nz.ac.massey.cs.gpl4jung.xml.XMLMotifReader;
 import nz.ac.massey.cs.gql4jung.browser.QueryResults.Cursor;
+import edu.uci.ics.jung.graph.ArchetypeEdge;
 import edu.uci.ics.jung.graph.ArchetypeVertex;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.graph.decorators.EdgeStringer;
 import edu.uci.ics.jung.graph.decorators.VertexIconFunction;
 import edu.uci.ics.jung.graph.decorators.VertexStringer;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
@@ -101,16 +100,19 @@ public class ResultBrowser extends JFrame {
 	private VertexIconFunction vertexIconFunction = new VertexIconFunction() {
 		Icon CLASS = ResultBrowser.this.getIcon("class.gif"); 
 		Icon INTERFACE = ResultBrowser.this.getIcon("interface.gif");
+		Icon CLASS_BW = ResultBrowser.this.getIcon("class-bw.gif"); 
+		Icon INTERFACE_BW = ResultBrowser.this.getIcon("interface-bw.gif");
 		@Override
 		public Icon getIcon(ArchetypeVertex v) {
+			boolean isPart = v.getUserDatum("role")!=null;
 			if ("true".equals(v.getUserDatum("isInterface"))) {
-				return INTERFACE;
+				return isPart?INTERFACE:INTERFACE_BW;
 			}
 			if ("true".equals(v.getUserDatum("isAbstract"))) {
-				return INTERFACE;
+				return isPart?INTERFACE:INTERFACE_BW;
 			}
 			if ("class".equals(v.getUserDatum("type"))) {
-				return CLASS;
+				return isPart?CLASS:CLASS_BW;
 			}
 			return null;
 		}
@@ -140,7 +142,14 @@ public class ResultBrowser extends JFrame {
 			b.append("</html>");
 			return b.toString();
 		}
-		
+	}; 
+	
+	private EdgeStringer edgeStringer = new EdgeStringer() {
+		@Override
+		public String getLabel(ArchetypeEdge e) {
+			String role  = (String)e.getUserDatum("type");
+			return role==null?"?":role;
+		}
 	}; 
 	
 	public static void main(String[] args) {
@@ -669,8 +678,9 @@ public class ResultBrowser extends JFrame {
 
 	}
 	
-	private void displayGraph(final MotifInstance instance) {		
-		Graph g = instance==null?new SparseGraph():asGraph(instance);
+	private void displayGraph(final MotifInstance instance) {	
+		MotifInstance2Graphml converter = new MotifInstance2Graphml();
+		Graph g = instance==null?new SparseGraph():converter.asGraph(instance);
 		visualizationViewer.removeMouseListener(popupListener);
 		if (graphPaneContainer!=null) {
 			graphPaneContainer.remove(visualizationViewer);
@@ -678,6 +688,7 @@ public class ResultBrowser extends JFrame {
 		}
 		PluggableRenderer pr = new PluggableRenderer();
 		pr.setVertexStringer(vertexStringer);
+		pr.setEdgeStringer(edgeStringer);
 		pr.setVertexIconFunction(vertexIconFunction);
 		visualizationViewer = new VisualizationViewer(new FRLayout(g),pr);
 		graphPaneContainer = new GraphZoomScrollPane(visualizationViewer);
