@@ -272,54 +272,71 @@ public class ResultBrowser extends JFrame {
 				actLoadData();
 			}
 		};
+		actLoadData.putValue(Action.SHORT_DESCRIPTION, "load a program dependency graph from a graphml file");
+
 		actLoadQuery = new AbstractAction("load query",getIcon("Import16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actLoadQuery();
 			}
 		};
+		actLoadQuery.putValue(Action.SHORT_DESCRIPTION, "load a query from a xml file");
+		
 		actRunQuery = new AbstractAction("run query",getIcon("Play16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actRunQuery();
 			}
 		};
+		actRunQuery.putValue(Action.SHORT_DESCRIPTION, "execute the query");
+		
 		actCancelQuery = new AbstractAction("cancel",getIcon("Stop16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actCancelQuery();
 			}
 		};
+		actCancelQuery.putValue(Action.SHORT_DESCRIPTION, "cancel the currently running query");
+		
 		actExport2CSV = new AbstractAction("export to csv",getIcon("Export16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actExport2CSV();
 			}
 		};
+		actExport2CSV.putValue(Action.SHORT_DESCRIPTION, "export the query results to a CSV (spreadsheet) file");
+		
 		actPreviousMinorInstance = new AbstractAction("previous minor instance",getIcon("PreviousMinor16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actPreviousMinorInstance();
 			}
-		};		
+		};	
+		actPreviousMinorInstance.putValue(Action.SHORT_DESCRIPTION, "show the previous variant of the selected instance");
+		
 		actNextMinorInstance = new AbstractAction("next minor instance",getIcon("NextMinor16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actNextMinorInstance();
 			}
 		};
+		actNextMinorInstance.putValue(Action.SHORT_DESCRIPTION, "show the next variant of the selected instance");
+		
 		actPreviousMajorInstance = new AbstractAction("previous major instance",getIcon("PreviousMajor16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actPreviousMajorInstance();
 			}
-		};		
+		};	
+		actPreviousMajorInstance.putValue(Action.SHORT_DESCRIPTION, "show the previous instance");
+		
 		actNextMajorInstance = new AbstractAction("next major instance",getIcon("NextMajor16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actNextMajorInstance();
 			}
-		};		
+		};	
+		actNextMajorInstance.putValue(Action.SHORT_DESCRIPTION, "show the next instance");
 	}
 	
 	private void initToolbar() {
