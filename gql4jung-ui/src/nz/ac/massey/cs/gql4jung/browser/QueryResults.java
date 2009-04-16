@@ -1,13 +1,15 @@
 package nz.ac.massey.cs.gql4jung.browser;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import nz.ac.massey.cs.gpl4jung.MotifInstance;
 import nz.ac.massey.cs.gpl4jung.ResultListener;
 
-public class QueryResults implements ResultListener{
+public class QueryResults implements ResultListener, Iterable {
 	
 	public class Cursor {
 		public Cursor(int major, int minor) {
@@ -159,5 +161,45 @@ public class QueryResults implements ResultListener{
 		return results.get(key).get(cursor.minor);
 	}
 
-	
+	class Entry<K,V> implements  Map.Entry<K,V> {
+		
+		public Entry(K key, V value) {
+			super();
+			this.key = key;
+			this.value = value;
+		}
+
+		K key;
+		V value;
+		@Override
+		public K getKey() {
+			return null;
+		}
+
+		@Override
+		public V getValue() {
+			return null;
+		}
+
+		@Override
+		public V setValue(V arg0) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+	};
+	public synchronized Iterator<Map.Entry<Cursor,MotifInstance>> iterator() {
+		// TODO use iterator with lazy initialisation
+		Map<Cursor,MotifInstance> map = new LinkedHashMap<Cursor,MotifInstance>();
+		for (int i=0;i<this.keys.size();i++) {
+			List<MotifInstance> instances = this.results.get(keys.get(i));
+			for (int j=0;j<instances.size();j++) {
+				map.put(new Cursor(i,j),instances.get(j));
+			}
+		}		
+		return map.entrySet().iterator();
+	}
+	public synchronized boolean hasResults() {
+		return this.keys.size()>0;
+	}
 }
