@@ -88,6 +88,7 @@ public class ResultBrowser extends JFrame {
 	private AbstractAction actPreviousMinorInstance;
 	private AbstractAction actNextMajorInstance;
 	private AbstractAction actPreviousMajorInstance;
+	private AbstractAction actExport2CSV;
 	
 	private enum Status {
 		waiting,computing,finished,cancelled
@@ -283,6 +284,12 @@ public class ResultBrowser extends JFrame {
 				actCancelQuery();
 			}
 		};
+		actExport2CSV = new AbstractAction("export to csv",getIcon("Export16.gif")) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				actExport2CSV();
+			}
+		};
 		actPreviousMinorInstance = new AbstractAction("previous minor instance",getIcon("PreviousMinor16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -324,7 +331,8 @@ public class ResultBrowser extends JFrame {
 		toolbar.addSeparator();
 		toolbar.add(actPreviousMinorInstance);
 		toolbar.add(actNextMinorInstance);
-	
+		toolbar.addSeparator();
+		toolbar.add(actExport2CSV);
 	}
 	
 	private void initPopupMenu() {
@@ -387,6 +395,32 @@ public class ResultBrowser extends JFrame {
 	private void actNextMinorInstance() {
 		Cursor cursor = this.results.nextMinorInstance();
 		this.selectAndDisplay(cursor);
+	}
+	private void actExport2CSV() {
+		JFileChooser fc = new JFileChooser();
+		int returnVal = fc.showOpenDialog(this);
+		FileFilter filter = new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				return f.getAbsolutePath().endsWith(".csv");
+			}
+			@Override
+			public String getDescription() {
+				return "csv files";
+			}			
+		};
+		fc.setFileFilter(filter);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            QueryResultsExporter2CSV exporter = new QueryResultsExporter2CSV();
+            try {
+				exporter.export(this.results,file);
+				log("results exported to " + file.getAbsolutePath());
+				JOptionPane.showMessageDialog(this,"Results have been exported to\n" + file.getAbsolutePath());
+			} catch (IOException x) {
+				this.handleException("Error exporting file", x);
+			}
+        }
 	}
 	private void selectAndDisplay(Cursor cursor) {
 		this.updateActions();
@@ -509,6 +543,7 @@ public class ResultBrowser extends JFrame {
 		boolean queryIsRunning = this.queryThread!=null;
 		this.actCancelQuery.setEnabled(queryIsRunning);
 		this.actRunQuery.setEnabled(!queryIsRunning);
+		this.actExport2CSV.setEnabled(!queryIsRunning && results.hasResults());
 		this.actNextMajorInstance.setEnabled(this.results.hasNextMajorInstance());
 		this.actNextMinorInstance.setEnabled(this.results.hasNextMinorInstance());
 		this.actPreviousMajorInstance.setEnabled(this.results.hasPreviousMajorInstance());
