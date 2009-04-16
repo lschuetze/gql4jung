@@ -1,6 +1,7 @@
 package nz.ac.massey.cs.gql4jung.browser;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.GridBagConstraints;
@@ -35,13 +36,8 @@ import nz.ac.massey.cs.gpl4jung.impl.GQLImpl;
 import nz.ac.massey.cs.gpl4jung.impl.MotifInstance2Graphml;
 import nz.ac.massey.cs.gpl4jung.xml.XMLMotifReader;
 import nz.ac.massey.cs.gql4jung.browser.QueryResults.Cursor;
-import edu.uci.ics.jung.graph.ArchetypeEdge;
-import edu.uci.ics.jung.graph.ArchetypeVertex;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.decorators.EdgeStringer;
-import edu.uci.ics.jung.graph.decorators.VertexIconFunction;
-import edu.uci.ics.jung.graph.decorators.VertexStringer;
 import edu.uci.ics.jung.graph.impl.DirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseVertex;
@@ -50,17 +46,17 @@ import edu.uci.ics.jung.io.GraphMLFile;
 import edu.uci.ics.jung.utils.UserData;
 import edu.uci.ics.jung.visualization.FRLayout;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
-import edu.uci.ics.jung.visualization.Layout;
 import edu.uci.ics.jung.visualization.PluggableRenderer;
-import edu.uci.ics.jung.visualization.Renderer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
-
+/**
+ * Stand alone user interface to run queries and visualise results.
+ * The graph visualisation is based on JUNG. 
+ * @author Jens Dietrich
+ */
 public class ResultBrowser extends JFrame {
 	// model
 	private Graph data = null;
 	private Motif query = null;
-	private Layout layout = null;
-	private Renderer renderer = null;
 	private QueryResults results = new QueryResults();
 	private GQL engine = new GQLImpl();
 	private Thread queryThread = null;
@@ -97,61 +93,7 @@ public class ResultBrowser extends JFrame {
 		waiting,computing,finished,cancelled
 	}
 	private Status status = Status.waiting;
-	private VertexIconFunction vertexIconFunction = new VertexIconFunction() {
-		Icon CLASS = ResultBrowser.this.getIcon("class.gif"); 
-		Icon INTERFACE = ResultBrowser.this.getIcon("interface.gif");
-		Icon CLASS_BW = ResultBrowser.this.getIcon("class-bw.gif"); 
-		Icon INTERFACE_BW = ResultBrowser.this.getIcon("interface-bw.gif");
-		@Override
-		public Icon getIcon(ArchetypeVertex v) {
-			boolean isPart = v.getUserDatum("role")!=null;
-			if ("true".equals(v.getUserDatum("isInterface"))) {
-				return isPart?INTERFACE:INTERFACE_BW;
-			}
-			if ("true".equals(v.getUserDatum("isAbstract"))) {
-				return isPart?INTERFACE:INTERFACE_BW;
-			}
-			if ("class".equals(v.getUserDatum("type"))) {
-				return isPart?CLASS:CLASS_BW;
-			}
-			return null;
-		}
-		
-	};
-	private VertexStringer vertexStringer = new VertexStringer() {
-		@Override
-		public String getLabel(ArchetypeVertex v) {
-			String role  = (String)v.getUserDatum("role");
-			String namespace = (String)v.getUserDatum("namespace");
-			String name = (String)v.getUserDatum("name");
-			StringBuffer b = new StringBuffer();
-			b.append("<html>");
-			if (role!=null) {
-				b.append("<it>&lt;&lt;");
-				b.append(role);
-				b.append("&gt;&gt;</it>");
-				b.append("<br/>");
-			}
-			if (namespace!=null) {
-				b.append(namespace);
-				b.append('.');
-			}
-			if (name!=null) {
-				b.append(name);
-			}
-			b.append("</html>");
-			return b.toString();
-		}
-	}; 
-	
-	private EdgeStringer edgeStringer = new EdgeStringer() {
-		@Override
-		public String getLabel(ArchetypeEdge e) {
-			String role  = (String)e.getUserDatum("type");
-			return role==null?"?":role;
-		}
-	}; 
-	
+
 	public static void main(String[] args) {
 		ResultBrowser browser = new ResultBrowser();
 		browser.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -177,8 +119,8 @@ public class ResultBrowser extends JFrame {
 		init();
 	}
 	private void init() {
-		this.setTitle("Architectural smells explorer");		
-		
+		this.setTitle("Architectural smells explorer");
+				
 		mainPanel = new JPanel(new BorderLayout(5,5));
 		this.tabbedPane = new JTabbedPane();
 		mainPanel.add(tabbedPane,BorderLayout.CENTER);
@@ -187,7 +129,9 @@ public class ResultBrowser extends JFrame {
 		this.tabbedPane.add("result as graph",graphPane);
 		// panel for table
 		this.table = new JTable();
-		this.tabbedPane.add("result as table",new JScrollPane(table));
+		JScrollPane sTable = new JScrollPane(table);
+		addBorder(sTable);
+		this.tabbedPane.add("result as table",sTable);
 		
 		this.setContentPane(mainPanel);
 		
@@ -561,19 +505,6 @@ public class ResultBrowser extends JFrame {
 		JOptionPane.showMessageDialog(this,"this function is not yet implemented");
 	}
 
-	public Layout getGraphLayout() {
-		return layout;
-	}
-	public void setGraphLayout(Layout layout) {
-		this.layout = layout;
-	}
-	public Renderer getRenderer() {
-		return renderer;
-	}
-	public void setRenderer(Renderer renderer) {
-		this.renderer = renderer;
-	}
-
 	private void updateActions() {
 		boolean queryIsRunning = this.queryThread!=null;
 		this.actCancelQuery.setEnabled(queryIsRunning);
@@ -689,12 +620,10 @@ public class ResultBrowser extends JFrame {
 			graphPaneContainer.remove(visualizationViewer);
 			graphPane.remove(graphPaneContainer);
 		}
-		PluggableRenderer pr = new PluggableRenderer();
-		pr.setVertexStringer(vertexStringer);
-		pr.setEdgeStringer(edgeStringer);
-		pr.setVertexIconFunction(vertexIconFunction);
-		visualizationViewer = new VisualizationViewer(new FRLayout(g),pr);
+		visualizationViewer = new VisualizationViewer(new FRLayout(g),GraphRenderer.getRenderer());
+		visualizationViewer.setBackground(Color.WHITE);
 		graphPaneContainer = new GraphZoomScrollPane(visualizationViewer);
+		addBorder(graphPaneContainer);
 		graphPane.add(graphPaneContainer,BorderLayout.CENTER);
 		graphPane.revalidate();
 		visualizationViewer.addMouseListener(popupListener);
@@ -735,5 +664,7 @@ public class ResultBrowser extends JFrame {
 		catch (Exception x){}
 		super.dispose();
 	}
-	
+	private void addBorder(JComponent c) {
+		c.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
+	}
 }
