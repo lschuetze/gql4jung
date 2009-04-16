@@ -88,8 +88,8 @@ public class ResultBrowser extends JFrame {
 	private AbstractAction actLoadQuery;
 	private AbstractAction actRunQuery;
 	private AbstractAction actCancelQuery;
-	private AbstractAction actNextInstance;
-	private AbstractAction actPreviousInstance;
+	private AbstractAction actNextMinorInstance;
+	private AbstractAction actPreviousMinorInstance;
 	private AbstractAction actNextMajorInstance;
 	private AbstractAction actPreviousMajorInstance;
 	
@@ -339,25 +339,25 @@ public class ResultBrowser extends JFrame {
 				actCancelQuery();
 			}
 		};
-		actPreviousInstance = new AbstractAction("previous minor instance",getIcon("StepBack16.gif")) {
+		actPreviousMinorInstance = new AbstractAction("previous minor instance",getIcon("PreviousMinor16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				actPreviousInstance();
+				actPreviousMinorInstance();
 			}
 		};		
-		actNextInstance = new AbstractAction("next minor instance",getIcon("StepForward16.gif")) {
+		actNextMinorInstance = new AbstractAction("next minor instance",getIcon("NextMinor16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				actNextInstance();
+				actNextMinorInstance();
 			}
 		};
-		actPreviousMajorInstance = new AbstractAction("previous major instance",getIcon("Rewind16.gif")) {
+		actPreviousMajorInstance = new AbstractAction("previous major instance",getIcon("PreviousMajor16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actPreviousMajorInstance();
 			}
 		};		
-		actNextMajorInstance = new AbstractAction("next major instance",getIcon("FastForward16.gif")) {
+		actNextMajorInstance = new AbstractAction("next major instance",getIcon("NextMajor16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actNextMajorInstance();
@@ -375,10 +375,12 @@ public class ResultBrowser extends JFrame {
 		toolbar.add(actRunQuery);
 		toolbar.add(actCancelQuery);
 		toolbar.addSeparator();
-		toolbar.add(actPreviousInstance);
-		toolbar.add(actNextInstance);
 		toolbar.add(actPreviousMajorInstance);	
-		toolbar.add(actNextMajorInstance);		
+		toolbar.add(actNextMajorInstance);	
+		toolbar.addSeparator();
+		toolbar.add(actPreviousMinorInstance);
+		toolbar.add(actNextMinorInstance);
+	
 	}
 	
 	private void initPopupMenu() {
@@ -392,8 +394,8 @@ public class ResultBrowser extends JFrame {
 		popup.add(this.actNextMajorInstance);
 		popup.add(this.actPreviousMajorInstance);
 		popup.addSeparator();
-		popup.add(this.actNextInstance);
-		popup.add(this.actPreviousInstance);
+		popup.add(this.actNextMinorInstance);
+		popup.add(this.actPreviousMinorInstance);
 		popupListener = new MouseAdapter() {
 		    public void mousePressed(MouseEvent e) {
 		        showPopup(e);
@@ -425,25 +427,28 @@ public class ResultBrowser extends JFrame {
 		log("query cancelled");
 	}
 
-
-
 	private void actPreviousMajorInstance() {
 		Cursor cursor = this.results.previousMajorInstance();
-		this.updateActions();
-		this.updateStatus();
-		MotifInstance instance = results.getInstance(cursor);
-		this.display(instance);
+		this.selectAndDisplay(cursor);
 	}
 	private void actNextMajorInstance() {
 		Cursor cursor = this.results.nextMajorInstance();
+		this.selectAndDisplay(cursor);
+	}
+
+	private void actPreviousMinorInstance() {
+		Cursor cursor = this.results.previousMinorInstance();
+		this.selectAndDisplay(cursor);
+	}
+	private void actNextMinorInstance() {
+		Cursor cursor = this.results.nextMinorInstance();
+		this.selectAndDisplay(cursor);
+	}
+	private void selectAndDisplay(Cursor cursor) {
 		this.updateActions();
 		this.updateStatus();
 		MotifInstance instance = results.getInstance(cursor);
-		this.display(instance);
-	}
-
-	private void actPreviousInstance() {
-		nyi();		
+		this.display(instance);		
 	}
 	private void actRunQuery() {
 		this.results.reset();
@@ -551,9 +556,7 @@ public class ResultBrowser extends JFrame {
 		System.err.println(string);
 		x.printStackTrace();
 	}
-	private void actNextInstance() {
-		nyi();
-	}
+
 	private void nyi() {
 		JOptionPane.showMessageDialog(this,"this function is not yet implemented");
 	}
@@ -576,9 +579,9 @@ public class ResultBrowser extends JFrame {
 		this.actCancelQuery.setEnabled(queryIsRunning);
 		this.actRunQuery.setEnabled(!queryIsRunning);
 		this.actNextMajorInstance.setEnabled(this.results.hasNextMajorInstance());
-		this.actNextInstance.setEnabled(this.results.hasNextMinorInstance());
+		this.actNextMinorInstance.setEnabled(this.results.hasNextMinorInstance());
 		this.actPreviousMajorInstance.setEnabled(this.results.hasPreviousMajorInstance());
-		this.actPreviousInstance.setEnabled(this.results.hasPreviousMinorInstance());
+		this.actPreviousMinorInstance.setEnabled(this.results.hasPreviousMinorInstance());
 	}
 	private void updateComputationTime() {
 		if (this.computationStarted==-1) {
