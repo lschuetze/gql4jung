@@ -68,7 +68,7 @@ public class ResultBrowser extends JFrame {
 	private JLabel dataField = null;
 	private JLabel queryField = null;
 	private JLabel timeField = null;
-	private JLabel statusField = null;
+	private JProgressBar statusField = null;
 	private JPanel mainPanel = null;
 	private JPopupMenu popup;
 	private MouseAdapter popupListener;
@@ -140,6 +140,9 @@ public class ResultBrowser extends JFrame {
 		QueryResults.QueryResultListener listener = new QueryResults.QueryResultListener() {
 			@Override
 			public void resultsChanged(QueryResults source) {
+				if (results.getCursor().major==-1 && results.hasResults()) {
+					actNextMajorInstance();
+				}
 				updateStatus();
 				updateComputationTime();
 			}
@@ -166,7 +169,10 @@ public class ResultBrowser extends JFrame {
 		this.cursorField = new JLabel();
 		this.queryField = new JLabel();
 		this.dataField = new JLabel();
-		this.statusField = new JLabel();
+		this.statusField = new JProgressBar();
+		statusField.setStringPainted(true);
+		statusField.setBorderPainted(true);
+
 		this.timeField = new JLabel();
 		Font font = new Font("monospaced",Font.PLAIN,this.cursorField.getFont().getSize());
 		this.cursorField.setFont(font);
@@ -583,7 +589,8 @@ public class ResultBrowser extends JFrame {
 			b.append(' ');
 		}
 		cursorField.setText(b.toString());
-		statusField.setText(this.status.toString());
+		statusField.setString(this.status.toString());
+		statusField.setIndeterminate(this.status==Status.computing);
 		updateActions();
 	};
 	
