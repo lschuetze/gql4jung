@@ -31,9 +31,13 @@ public class GroupByCoreAttributes implements VertexGroupByDefinition {
 			String role = coreRoles.next();
 			Vertex v = instance.getVertex(role);
 			// TODO check whether this attribute exists and is unique
-			b.append(v.getUserDatum("id"));
+			b.append(v.getUserDatum("namespace"));
+			b.append('.');
+			b.append(v.getUserDatum("name"));
 		}
-		return b;
+		
+		//System.out.println("key: " + instance + " -> " + b);
+		return b.toString();
 	}
 
 }

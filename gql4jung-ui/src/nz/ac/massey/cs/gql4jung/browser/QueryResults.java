@@ -19,12 +19,15 @@ public class QueryResults implements ResultListener{
 		public int minor = -1;
 	}
 	
-	private VertexGroupByDefinition groupByDef = new VertexGroupByDefinition() {
+	private VertexGroupByDefinition groupByDef = new GroupByCoreAttributes();
+	
+	/*= new VertexGroupByDefinition() {
 		@Override
 		public Object getGroupIdentifier(MotifInstance instance) {
 			return instance.toString();
 		}
 	};
+	*/
 	private LinkedHashMap<Object,List<MotifInstance>> results = new LinkedHashMap<Object,List<MotifInstance>>();
 	private List<Object> keys = new ArrayList<Object>();
 	private int majorCursor = -1;
