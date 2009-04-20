@@ -4,11 +4,9 @@ import java.io.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import edu.uci.ics.jung.graph.Vertex;
-
-import nz.ac.massey.cs.gpl4jung.Motif;
-import nz.ac.massey.cs.gpl4jung.MotifInstance;
+import nz.ac.massey.cs.gql4jung.Motif;
+import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.browser.QueryResults.Cursor;
 
 public class QueryResultsExporter2CSV {
