@@ -1,4 +1,4 @@
-package nz.ac.massey.cs.gql4jung.browser;
+package nz.ac.massey.cs.gql4jung.util;
 
 
 import nz.ac.massey.cs.gql4jung.MotifInstance;

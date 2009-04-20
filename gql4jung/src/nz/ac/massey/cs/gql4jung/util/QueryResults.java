@@ -1,4 +1,4 @@
-package nz.ac.massey.cs.gql4jung.browser;
+package nz.ac.massey.cs.gql4jung.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,8 +8,24 @@ import java.util.Map;
 import java.util.Vector;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.ResultListener;
-
+/**
+ * Utility class that listens to results computed by the GQL engine, 
+ * and aggregates them using a MotifInstanceAggregation.
+ * Supports cursor based access to results. This class can be used as model 
+ * in user interfaces.
+ * @author Jens Dietrich
+ */
 public class QueryResults implements ResultListener, Iterable {
+	
+	public QueryResults() {
+		super();
+	}
+	
+	public QueryResults(MotifInstanceAggregation aggregation) {
+		super();
+		this.aggregation = aggregation;
+	}
+	
 	
 	public class Cursor {
 		public Cursor(int major, int minor) {
@@ -21,8 +37,9 @@ public class QueryResults implements ResultListener, Iterable {
 		public int minor = -1;
 	}
 	
-	private MotifInstanceAggregation groupByDef = new GroupByAggregation();
+	private MotifInstanceAggregation aggregation = new GroupByAggregation();
 	
+
 	/*= new VertexGroupByDefinition() {
 		@Override
 		public Object getGroupIdentifier(MotifInstance instance) {
@@ -65,7 +82,7 @@ public class QueryResults implements ResultListener, Iterable {
 		callback();			
 	}
 	public synchronized boolean found(MotifInstance instance) {
-		Object key = groupByDef.getGroupIdentifier(instance);
+		Object key = aggregation.getGroupIdentifier(instance);
 		List<MotifInstance> instances = results.get(key);
 		if (instances==null) {
 			instances = new ArrayList<MotifInstance>();
