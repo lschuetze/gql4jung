@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<graph edgedefault="directed" file="">
+<node id="0" container="abstraction3.jar" namespace="animal" name="Animal" isInterface="false" type="class" isAbstract="true" isException="false" access="public" isBoundry="false"/>
+<node id="1" container="abstraction3.jar" namespace="java.lang" name="Object" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="2" container="abstraction3.jar" namespace="animal" name="Pony" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="false"/>
+<node id="3" container="abstraction3.jar" namespace="animal" name="Horse" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false"/>
+<node id="4" container="abstraction3.jar" namespace="client" name="Instructor" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="false"/>
+<node id="5" container="abstraction3.jar" namespace="client" name="MyApplication" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="false"/>
+<node id="6" container="abstraction3.jar" namespace="java.lang" name="String" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="7" container="abstraction3.jar" namespace="client" name="Plough" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false"/>
+<node id="8" container="abstraction3.jar" namespace="java.lang" name="System" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="9" container="abstraction3.jar" namespace="java.io" name="PrintStream" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="10" container="abstraction3.jar" namespace="java.lang" name="StringBuilder" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<edge id="edge-0" source="0" target="1" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-1" source="2" target="3" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-2" source="3" target="0" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-3" source="4" target="1" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-4" source="4" target="2" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-5" source="5" target="1" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-6" source="5" target="6" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-7" source="5" target="0" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-8" source="5" target="3" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-9" source="5" target="7" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-10" source="5" target="4" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-11" source="5" target="8" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-12" source="5" target="9" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-13" source="5" target="10" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-14" source="7" target="1" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-15" source="7" target="0" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+</graph>
+</graphml>

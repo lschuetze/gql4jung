@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  no decoupling through abstraction -->
+<!--test query "False-Negative: Changed path order FROM TO"-->
+<!-- for properties, see edu.uci.ics.jung.utils.UserDataContainer - these are general purpose key-value annotations key-datum-->
+<query>
+  <!-- ids are of type ID, references in path and edge of type IDREF -->
+  <vertex id="client">
+    <property key="type" value="class"/>
+  </vertex>
+  <vertex id="service" type="class">
+    <property key="isAbstract" value='true'/>
+    <property key="type" value="class"/>
+  </vertex>
+  <vertex id="service_impl" type="class">
+    <property key="isAbstract" value='false'/>
+    <property key="type" value="class"/>
+  </vertex>
+  <!-- minLength and maxLength are optional, defaults are 1 and  infinite-->
+  
+  <path minLength="1" maxLength="42" from="service_impl" to="service">
+    <!-- properties can be complex using standard boolean operators AND,OR,NOT,XOR  -->
+    <or>
+      <property key="type" value="extends"/>
+      <property key="type" value="implements"/>
+    </or>
+
+  </path>
+  <!--changed path order-->
+  <path to="service" from="client" >
+    <property key="type" value="uses"/>
+  </path>
+  <path from="client" to="service_impl">
+    <property key="type" value="uses"/>
+  </path>
+</query>
