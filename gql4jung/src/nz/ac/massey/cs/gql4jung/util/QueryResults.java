@@ -108,6 +108,13 @@ public class QueryResults implements ResultListener, Iterable {
 	public synchronized int getNumberOfGroups() {
 		return results.size();
 	}
+	public synchronized int getNumberOfInstances() {
+		int s = 0;
+		for (int i=0;i<results.size();i++) {
+			s = s + getNumberOfInstances(i);
+		}
+		return s;
+	}
 	public synchronized int getNumberOfInstances(int groupIndex) {
 		if (groupIndex==-1) return 0;
 		Object key = keys.get(groupIndex);
