@@ -28,13 +28,13 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import nz.ac.massey.cs.gpl4jung.GQL;
-import nz.ac.massey.cs.gpl4jung.LinkConstraint;
-import nz.ac.massey.cs.gpl4jung.Motif;
-import nz.ac.massey.cs.gpl4jung.MotifInstance;
-import nz.ac.massey.cs.gpl4jung.impl.GQLImpl;
-import nz.ac.massey.cs.gpl4jung.impl.MotifInstance2Graphml;
-import nz.ac.massey.cs.gpl4jung.xml.XMLMotifReader;
+import nz.ac.massey.cs.gql4jung.GQL;
+import nz.ac.massey.cs.gql4jung.LinkConstraint;
+import nz.ac.massey.cs.gql4jung.Motif;
+import nz.ac.massey.cs.gql4jung.MotifInstance;
+import nz.ac.massey.cs.gql4jung.MotifInstance2Graph;
+import nz.ac.massey.cs.gql4jung.impl.GQLImpl;
+import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 import nz.ac.massey.cs.gql4jung.browser.QueryResults.Cursor;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -160,7 +160,7 @@ public class ResultBrowser extends JFrame {
 		// load sample data
 		// TODO remove
 		this.loadData(new File("exampledata/ant.jar.graphml"));
-		this.loadQuery(new File("exampledata/query1.xml"));
+		this.loadQuery(new File("exampledata/abstraction_coupling.xml"));
 		
 		updateActions();
 		updateStatus();
@@ -672,7 +672,7 @@ public class ResultBrowser extends JFrame {
 	}
 	
 	private void displayGraph(final MotifInstance instance) {	
-		MotifInstance2Graphml converter = new MotifInstance2Graphml();
+		MotifInstance2Graph converter = new MotifInstance2Graph();
 		Graph g = instance==null?new SparseGraph():converter.asGraph(instance);
 		visualizationViewer.removeMouseListener(popupListener);
 		if (graphPaneContainer!=null) {

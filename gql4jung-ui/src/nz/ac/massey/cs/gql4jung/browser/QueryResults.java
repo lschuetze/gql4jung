@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import nz.ac.massey.cs.gpl4jung.MotifInstance;
-import nz.ac.massey.cs.gpl4jung.ResultListener;
+import nz.ac.massey.cs.gql4jung.MotifInstance;
+import nz.ac.massey.cs.gql4jung.ResultListener;
 
 public class QueryResults implements ResultListener, Iterable {
 	
@@ -21,7 +21,7 @@ public class QueryResults implements ResultListener, Iterable {
 		public int minor = -1;
 	}
 	
-	private VertexGroupByDefinition groupByDef = new GroupByCoreAttributes();
+	private MotifInstanceAggregation groupByDef = new GroupByAggregation();
 	
 	/*= new VertexGroupByDefinition() {
 		@Override
