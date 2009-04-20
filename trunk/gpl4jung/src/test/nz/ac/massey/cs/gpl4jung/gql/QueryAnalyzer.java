@@ -12,8 +12,8 @@ import nz.ac.massey.cs.gpl4jung.DefaultMotif;
 import nz.ac.massey.cs.gpl4jung.GQL;
 import nz.ac.massey.cs.gpl4jung.Motif;
 import nz.ac.massey.cs.gpl4jung.MotifInstance;
+import nz.ac.massey.cs.gpl4jung.MotifInstance2Graph;
 import nz.ac.massey.cs.gpl4jung.impl.GQLImpl;
-import nz.ac.massey.cs.gpl4jung.impl.MotifInstance2Graphml;
 import nz.ac.massey.cs.gpl4jung.xml.XMLMotifReader;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
@@ -74,10 +74,10 @@ public class QueryAnalyzer {
 					if(motifInstance!=null){
 						String newPath = path + query.getName().substring(0,query.getName().lastIndexOf("."));
 						for(Iterator iter=motifInstance.iterator();iter.hasNext();){
-							MotifInstance2Graphml motifInstance2Graphml = new MotifInstance2Graphml();
+							MotifInstance2Graph motifInstance2Graphml = new MotifInstance2Graph();
 							String instanceNum = newPath + "\\result"+instanceCounter+".graphml";
 							MotifInstance instance = (MotifInstance)iter.next();
-							motifInstance2Graphml.convert(instance, instanceNum);
+							motifInstance2Graphml.asGraph(instance);
 							instanceCounter++;
 							instanceNum=null;
 						}

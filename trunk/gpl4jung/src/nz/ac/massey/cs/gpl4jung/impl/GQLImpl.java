@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections.IteratorUtils;
 
@@ -76,7 +77,7 @@ public class GQLImpl implements GQL {
     	for(Object o:graph.getVertices()){
     		Vertex v = (Vertex) o;
     		List<Constraint> constraints = motif.getConstraints();
-    		//cs.prepare(graph, constraints);
+    		cs.prepare(graph, constraints);
     		Bindings binding = new Bindings();
     		binding.bind(role, v);
     		resolve(graph, constraints, binding, listener);
@@ -99,26 +100,18 @@ public class GQLImpl implements GQL {
     	if (constraints.isEmpty()){
     		MotifInstanceImpl motifInstance = new MotifInstanceImpl();
     		motifInstance.setMotif(motif);
-            GraphMLFile gm = new GraphMLFile();
     		Map<String, Object> motifGraph = replacement.asMap();
+    		//skipping if the classes are anonymous inner classes
+    		List<String> roles = motif.getRoles();
+    		for(String s:roles){
+    			Vertex v = (Vertex) replacement.lookup(s);
+    			String name = (String) v.getUserDatum("name");
+    			if(Pattern.matches(".*\\$\\d",name)){
+    				return;
+    			}
+    		}
     		motifInstance.addAll(motifGraph);
     		listener.found(motifInstance);
-    		counter++;
-    		//check for core attributes
-    		/*
-    		if (onePerCoreSetOnly) {
-	    		for(Iterator itr = motif.getRoles().iterator();itr.hasNext();){
-	    			String role = (String) itr.next();
-	    			if(motif.isCore(role)){
-	    				Object instance = replacement.lookup(role);
-	    				if(instance!=null){
-	    					cancelled = true;
-	    				}
-	    			}
-	    		}
-    		}
-    		return;
-    		*/
     	}
 		Constraint c = cs.selectNext(g, constraints, replacement);
 		if(c instanceof SimplePropertyConstraint){
@@ -277,8 +270,8 @@ public class GQLImpl implements GQL {
 		//resolving constraints for binary constrainst
 		else if (c instanceof LinkConstraint){
 			LinkConstraint lc = (LinkConstraint) c;
-			String source = lc.getSource();
-			String target = lc.getTarget();
+			String source = lc.getSource().toString();
+			String target = lc.getTarget().toString();
 			Object instance1 = replacement.lookup(source);
 			Object instance2 = replacement.lookup(target);
 			if(instance1 == null && instance2 == null){

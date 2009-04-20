@@ -41,9 +41,8 @@
                   </xs:complexType>
                 </xs:element>
               </xs:sequence>
-              <xs:attribute name="id" type="xs:string" use="required" />
+              <xs:attribute name="id" type="xs:ID" use="required" />
               <xs:attribute name="type" type="xs:string" use="optional" />
-			  <xs:attribute name="core" type="xs:string" use ="optional"/>
             </xs:complexType>
           </xs:element>
           <!--'path' element definition-->
@@ -116,8 +115,8 @@
               </xs:sequence>
               <xs:attribute name="minLength" type="xs:positiveInteger" use="optional" />
               <xs:attribute name="maxLength" type="xs:positiveInteger" use="optional" />
-              <xs:attribute name="from" type="xs:string" use="required" />
-              <xs:attribute name="to" type="xs:string" use="required" />
+              <xs:attribute name="from" type="xs:IDREF" use="required" />
+              <xs:attribute name="to" type="xs:IDREF" use="required" />
             </xs:complexType>
           </xs:element>
           <!--'edge' element definition-->
@@ -131,10 +130,10 @@
                   </xs:complexType>
                 </xs:element>
               </xs:sequence>
-              <xs:attribute name="source" type="xs:string" use="optional" />
-              <xs:attribute name="target" type="xs:string" use="optional" />
-			  <xs:attribute name="from" type="xs:string" use="required" />
-			  <xs:attribute name="to" type="xs:string" use="required" />
+              <xs:attribute name="source" type="xs:IDREF" use="optional" />
+              <xs:attribute name="target" type="xs:IDREF" use="optional" />
+			  <xs:attribute name="from" type="xs:IDREF" use="required" />
+			  <xs:attribute name="to" type="xs:IDREF" use="required" />
             </xs:complexType>
           </xs:element>
           <!--'condition' element definition-->
@@ -221,8 +220,27 @@
 					<xs:attribute name="member2" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
+		  <!--'groupby definition-->
+		  <xs:element name="groupby">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="element" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:attribute name="vertex" type="xs:IDREF" use="required" />
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="vertex" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:attribute name="id" type="xs:IDREF" use="required" />
+								<xs:attribute name="property" type="xs:string" use="optional" />
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 		</xs:choice>
       </xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="optional" />
     </xs:complexType>
   </xs:element>
 </xs:schema>

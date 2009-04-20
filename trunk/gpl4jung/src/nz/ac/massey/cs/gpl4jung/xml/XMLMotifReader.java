@@ -12,20 +12,14 @@ package nz.ac.massey.cs.gpl4jung.xml;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Vertex;
-
 import nz.ac.massey.cs.gpl4jung.*;
-import nz.ac.massey.cs.gpl4jung.constraints.ComplexPropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.GroupConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.NegatedPropertyConstraint;
@@ -38,11 +32,10 @@ import nz.ac.massey.cs.gpl4jung.constraints.PropertyTerm;
 import nz.ac.massey.cs.gpl4jung.constraints.SimplePropertyConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.ValueTerm;
 import nz.ac.massey.cs.gpl4jung.xml.Query.ExistsNot;
-import nz.ac.massey.cs.gpl4jung.xml.Query.Graphprocessor;
+import nz.ac.massey.cs.gpl4jung.xml.Query.Groupby;
 import nz.ac.massey.cs.gpl4jung.xml.Query.Not;
-import nz.ac.massey.cs.gpl4jung.xml.Query.Condition.Attribute;
-import nz.ac.massey.cs.processors.ClusterProcessor;
-import nz.ac.massey.cs.processors.Processor;
+import nz.ac.massey.cs.gpl4jung.xml.Query.Groupby.Element;
+
 
 public class XMLMotifReader implements MotifReader {
 
@@ -51,11 +44,11 @@ public class XMLMotifReader implements MotifReader {
 		try {
 			DefaultMotif motif = new DefaultMotif();
 			List<String> v_roles = new ArrayList<String>();
-			Map<String, String> core = new HashMap<String, String>();
 			List<Constraint> constraints = new ArrayList<Constraint>();
+			List<GroupByClause> groupByClauses = new ArrayList<GroupByClause>();
 			motif.setRoles(v_roles);
-			motif.setCoreInfo(core);
 			motif.setConstraints(constraints);
+			motif.setGroupByClauses(groupByClauses);
 			
 			//unmarshalling xml query
 			JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gpl4jung.xml");
@@ -67,11 +60,7 @@ public class XMLMotifReader implements MotifReader {
 				if (o instanceof Query.Vertex) {
 					Query.Vertex v = (Query.Vertex)o;
 					v_roles.add(v.id); 
-					if(v.getCore()!=null){
-						core.put(v.getId(), v.getCore());
-					} else {
-						core.put(v.getId(), "true");
-					}
+					
 					//getting simple vertex property constraints
 					for(Iterator itr=v.getProperty().iterator(); itr.hasNext();){
 						Query.Vertex.Property p = (Query.Vertex.Property) itr.next();
@@ -114,9 +103,10 @@ public class XMLMotifReader implements MotifReader {
 					if(p.getMaxLength()!=0){
 						pathConstraint.setMaxLength(p.getMaxLength());
 					}
-					
-					pathConstraint.setSource(p.getFrom());
-					pathConstraint.setTarget(p.getTo());
+					Query.Vertex from = (Query.Vertex) p.getFrom();
+					Query.Vertex to = (Query.Vertex) p.getTo();
+					pathConstraint.setSource(from.getId());
+					pathConstraint.setTarget(to.getId());
 					//getting simple path property constraint
 					Query.Path.Property pp = p.getProperty();
 					if(pp!=null){
@@ -150,8 +140,10 @@ public class XMLMotifReader implements MotifReader {
 				else if (o instanceof Query.Edge){
 					EdgeConstraint edgeConstraint = new EdgeConstraint();
 					Query.Edge e = (Query.Edge) o;
-					edgeConstraint.setSource(e.getFrom());
-					edgeConstraint.setTarget(e.getTo());
+					Query.Vertex from = (Query.Vertex) e.getFrom();
+					Query.Vertex to = (Query.Vertex) e.getTo();
+					edgeConstraint.setSource(from.getId());
+					edgeConstraint.setTarget(to.getId());
 					//getting edge properties
 					Query.Edge.Property ee = e.getProperty();
 					if(ee!=null){
@@ -164,7 +156,7 @@ public class XMLMotifReader implements MotifReader {
 					}
 					constraints.add(edgeConstraint);
 				}
-				//TODO: to be comepleted
+				
 				else if (o instanceof Query.Condition) {
 					Query.Condition c = (Query.Condition)o;
 					
@@ -194,7 +186,6 @@ public class XMLMotifReader implements MotifReader {
 					constraints.add(complexProp);
 					
 				}
-				//TODO: to be completed
 				else if (o instanceof Query.Not){
 					Query.Not n = (Query.Not) o;
 					Query.Not.Condition c1 = n.getCondition();
@@ -263,6 +254,7 @@ public class XMLMotifReader implements MotifReader {
 					v_roles.add("graphprocessor");
 					v_roles.add(gp.getClazz());
 				}
+				//getting group constraint
 				else if (o instanceof Query.Group){
 					Query.Group qg = (Query.Group)o;
 					GroupConstraint groupConstraint = new GroupConstraint();
@@ -273,6 +265,7 @@ public class XMLMotifReader implements MotifReader {
 					}
 					constraints.add(groupConstraint);
 				}
+				//getting outgroup constraint
 				else if (o instanceof Query.Outgroup){
 					Query.Outgroup og = (Query.Outgroup)o;
 					OutGroupConstraint outgroupConstraint = new OutGroupConstraint();
@@ -282,6 +275,29 @@ public class XMLMotifReader implements MotifReader {
 						outgroupConstraint.setTarget(og.getMember2());
 					}
 					constraints.add(outgroupConstraint);
+				}
+				else if (o instanceof Query.Groupby){
+					Query.Groupby groupBy = (Query.Groupby)o;
+					GroupByClause groupByClause = new GroupByClause();
+					List<Query.Groupby.Element> elements = groupBy.getElement();
+					if(elements!=null){
+						for(Iterator itr=elements.iterator();itr.hasNext();){
+							Query.Groupby.Element e = (Element) itr.next();
+							Query.Vertex role = (Query.Vertex)e.getVertex();
+							groupByClause.setRole(role.getId());
+							groupByClauses.add(groupByClause);
+						}
+					} 
+					List<Query.Groupby.Vertex> vertexRoles = groupBy.getVertex();
+					if(vertexRoles!=null){
+						for(Iterator itr = vertexRoles.iterator();itr.hasNext();){
+							Query.Groupby.Vertex v = (Query.Groupby.Vertex) itr.next();
+							Query.Vertex role = (Query.Vertex) v.getId();
+							groupByClause.setRole(role.getId());
+							groupByClause.setProperty(v.getProperty());
+							groupByClauses.add(groupByClause);
+						}
+					}
 				}
 				
 			}

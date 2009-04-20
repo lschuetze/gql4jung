@@ -1,4 +1,4 @@
-package nz.ac.massey.cs.gpl4jung.impl;
+package nz.ac.massey.cs.gpl4jung;
 
 import java.util.Iterator;
 import java.util.List;
@@ -11,21 +11,16 @@ import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.io.GraphFile;
 import edu.uci.ics.jung.io.GraphMLFile;
 import edu.uci.ics.jung.utils.UserData;
-import nz.ac.massey.cs.gpl4jung.Constraint;
-import nz.ac.massey.cs.gpl4jung.LinkConstraint;
-import nz.ac.massey.cs.gpl4jung.Motif;
-import nz.ac.massey.cs.gpl4jung.MotifInstance;
-import nz.ac.massey.cs.gpl4jung.Path;
 /**
  * Adapter class for converting motif instances to graphml files
  * @author Ali
  *
  */
-public class MotifInstance2Graphml {
+public class MotifInstance2Graph {
 	private MotifInstance mi; 
 	Graph graph;
 	GraphFile gm;
-	public MotifInstance2Graphml(){
+	public MotifInstance2Graph(){
 		this.mi = null;
 		graph = new DirectedSparseGraph();
 		gm = new GraphMLFile();
@@ -40,12 +35,6 @@ public class MotifInstance2Graphml {
 			Vertex v = (Vertex) v1.copy(graph);
 			if(v!=null){
 				v.addUserDatum("role", role, UserData.SHARED);
-			}
-			if(motif.isCore(role)){
-				v.addUserDatum("core", "true", UserData.SHARED);
-			}
-			else {
-				v.addUserDatum("core", "false", UserData.SHARED);
 			}
 		}
 		//copying edges in graph from motif instance, 
