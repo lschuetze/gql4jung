@@ -51,6 +51,16 @@ public class ConstraintSchedulerImpl implements ConstraintScheduler {
 				interimConstraints.add(c);
 			}
 		}
+		for(Constraint c:constraints){
+			if(c instanceof GroupConstraint){
+				interimConstraints.add(c);
+			}
+		}
+		for(Constraint c:constraints){
+			if(c instanceof OutGroupConstraint){
+				interimConstraints.add(c);
+			}
+		}
 		//List<Constraint> sortedConstraints = sort(interimConstraints);
 		//return sortedConstraints;
 		return interimConstraints;

@@ -10,6 +10,7 @@
 
 package nz.ac.massey.cs.gpl4jung;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -25,6 +26,5 @@ public interface Motif {
 	List<String> getRoles();
 	List<Constraint> getConstraints();
 	void setConstraints(List<Constraint> constraints);
-	boolean isCore(String role);
-	
+	Collection<GroupByClause> getgroupByClauses(); 	
 }

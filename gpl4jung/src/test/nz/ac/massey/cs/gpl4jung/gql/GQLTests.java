@@ -19,6 +19,7 @@ import nz.ac.massey.cs.gpl4jung.Motif;
 import nz.ac.massey.cs.gpl4jung.MotifInstance;
 import nz.ac.massey.cs.gpl4jung.Path;
 import nz.ac.massey.cs.gpl4jung.PropertyConstraint;
+import nz.ac.massey.cs.gpl4jung.constraints.EdgeConstraint;
 import nz.ac.massey.cs.gpl4jung.constraints.PathConstraint;
 import nz.ac.massey.cs.gpl4jung.impl.Bindings;
 import nz.ac.massey.cs.gpl4jung.impl.ConstraintSchedulerImpl;
@@ -34,7 +35,9 @@ import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.impl.SparseGraph;
 import edu.uci.ics.jung.io.GraphMLFile;
+import edu.uci.ics.jung.utils.UserData;
 
 public class GQLTests {
 	static {
@@ -96,7 +99,18 @@ public class GQLTests {
 	public void test1()throws Exception{
 		Graph g = readJungGraphFromGraphML("test_examples/abstraction.graphml");
 		Vertex v2 = null, v0=null, v1=null;
-		
+		Vertex newtest = getVertexById(g, "Animal");
+		newtest.addUserDatum("testkey", "testData", UserData.SHARED);
+		Graph gr = new SparseGraph();
+		newtest.copy(gr);
+		Vertex copiedVertex = getVertexById(gr, "Animal");
+		System.out.println(copiedVertex.getUserDatum("testkey"));
+		newtest.setUserDatum("testkey", "UpdatedData", UserData.SHARED);
+		System.out.println(copiedVertex.getUserDatum("testkey"));
+		System.out.println(newtest.getUserDatum("testkey"));
+		copiedVertex.setUserDatum("testkey", "copiedData", UserData.SHARED);
+		System.out.println(copiedVertex.getUserDatum("testkey"));
+
 		for (Object v:g.getVertices()) {
 			if (((Vertex)v).getUserDatum("name").equals("MyApplication")) 
 				v2=(Vertex)v;
@@ -159,8 +173,8 @@ public class GQLTests {
 			assertEquals(result.getVertex("client"),this.getVertexById(g,"MyApplication"));
 			assertEquals(result.getVertex("service"),this.getVertexById(g,"Animal"));
 			assertEquals(result.getVertex("service_impl"),this.getVertexById(g,"Horse"));
-			Path p1 = (Path)result.getLink(getConstraint(q,"client","service"));
-			assertTrue(p1.getEdges().contains(this.getEdgeById(g,"edge-4")));
+			Edge p1 = (Edge)result.getLink(getConstraint(q,"client","service"));
+			assertTrue(p1 == (this.getEdgeById(g,"edge-4")));
 			Path p2 = (Path)result.getLink(getConstraint(q,"client","service_impl"));
 			assertTrue(p2.getEdges().contains(this.getEdgeById(g,"edge-5")));
 			Path p3 = (Path)result.getLink(getConstraint(q,"service_impl","service"));
@@ -277,7 +291,7 @@ public class GQLTests {
 		ResultCollector rc = new ResultCollector();
 		gql.query(g,q,rc);
 		List<MotifInstance> results = rc.getInstances();
-		assertEquals(2,results.size());
+		assertEquals(1,results.size());
 		MotifInstance instance1 = results.get(0);
 		assertEquals("Class1",instance1.getVertex("class1").getUserDatum("name"));
 		assertEquals("Class3",instance1.getVertex("class3").getUserDatum("name"));
@@ -334,6 +348,10 @@ public class GQLTests {
 			Constraint c = (Constraint) itr.next();
 			if(c instanceof PathConstraint){
 				if(((PathConstraint) c).getSource().equals(source) && ((PathConstraint) c).getTarget().equals(target)){
+					return (LinkConstraint) c;
+				}
+			} else if (c instanceof EdgeConstraint){
+				if(((EdgeConstraint) c).getSource().equals(source) && ((EdgeConstraint) c).getTarget().equals(target)){
 					return (LinkConstraint) c;
 				}
 			}

@@ -1,9 +1,8 @@
 package nz.ac.massey.cs.gpl4jung;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class DefaultMotif implements Motif {
 	public List<String> getRoles() {
@@ -19,16 +18,16 @@ public class DefaultMotif implements Motif {
 		this.constraints = constraints;
 	}
 	private List<String> roles = new ArrayList<String>();
-	private Map<String, String> coreInfo = new HashMap<String, String>();
+	private Collection<GroupByClause> groupByClasses = new ArrayList<GroupByClause>();
+	
 	private List<Constraint> constraints = new ArrayList<Constraint>();
-	public boolean isCore(String role) {
-		return coreInfo.get(role).equals("true");
+	@Override
+	public Collection<GroupByClause> getgroupByClauses() {	
+		return groupByClasses;
 	}
-	public Map<String, String> getCoreInfo() {
-		return coreInfo;
+	public void setGroupByClauses(Collection<GroupByClause> groupBy){
+		this.groupByClasses = groupBy;
 	}
-	public void setCoreInfo(Map<String, String> coreInfo) {
-		this.coreInfo = coreInfo;
-	}
+	
 
 }
