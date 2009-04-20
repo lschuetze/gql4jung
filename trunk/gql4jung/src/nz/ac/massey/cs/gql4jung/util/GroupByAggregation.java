@@ -1,4 +1,4 @@
-package nz.ac.massey.cs.gql4jung.browser;
+package nz.ac.massey.cs.gql4jung.util;
 
 import java.util.Collection;
 import nz.ac.massey.cs.gql4jung.GroupByClause;

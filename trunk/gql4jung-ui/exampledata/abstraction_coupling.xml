@@ -1,15 +1,15 @@
 <!--  no decoupling through abstraction -->
 <!-- for properties, see edu.uci.ics.jung.utils.UserDataContainer - these are general purpose key-value annotations key-datum-->
-<query>
+<query name="abstraction_coupling">
 	<!-- ids are of type ID, references in path and edge of type IDREF -->
-    <vertex id="client" core="true">
+    <vertex id="client">
 		<property key="type" value="class"/>
     </vertex>
-    <vertex id="service" core="true">    
+    <vertex id="service">    
         <property key="isAbstract" value="true"/>
         <property key="type" value="class"/>
     </vertex>
-    <vertex id="service_impl" core="false">
+    <vertex id="service_impl">
         <property key="isAbstract" value="false"/>
         <property key="type" value="class"/>
     </vertex>
@@ -27,4 +27,8 @@
     <path from="client" to="service_impl">
        <property key="type" value="uses"/>
     </path>
+    <groupby>
+        <element vertex="service"/>
+        <element vertex="client"/>
+    </groupby>
 </query>

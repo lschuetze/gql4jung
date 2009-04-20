@@ -1,4 +1,4 @@
-package nz.ac.massey.cs.gql4jung.browser;
+package nz.ac.massey.cs.gql4jung.util;
 
 import java.io.*;
 import java.util.Iterator;
@@ -7,7 +7,7 @@ import java.util.Map;
 import edu.uci.ics.jung.graph.Vertex;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
-import nz.ac.massey.cs.gql4jung.browser.QueryResults.Cursor;
+import nz.ac.massey.cs.gql4jung.util.QueryResults.Cursor;
 
 public class QueryResultsExporter2CSV {
 	public final static String SEP = ",";
