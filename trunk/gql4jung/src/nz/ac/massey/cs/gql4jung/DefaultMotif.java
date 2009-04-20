@@ -22,7 +22,7 @@ public class DefaultMotif implements Motif {
 	
 	private List<Constraint> constraints = new ArrayList<Constraint>();
 	@Override
-	public Collection<GroupByClause> getgroupByClauses() {	
+	public Collection<GroupByClause> getGroupByClauses() {	
 		return groupByClasses;
 	}
 	public void setGroupByClauses(Collection<GroupByClause> groupBy){
