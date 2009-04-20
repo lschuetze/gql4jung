@@ -41,7 +41,7 @@ public class GroupByAggregation implements MotifInstanceAggregation {
 		}
 
 
-		System.out.println("key: " + instance + " -> " + b);
+		//System.out.println("key: " + instance + " -> " + b);
 		return b.toString();
 	}
 

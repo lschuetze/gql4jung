@@ -12,6 +12,8 @@ import nz.ac.massey.cs.gql4jung.util.QueryResults.Cursor;
 public class QueryResultsExporter2CSV {
 	public final static String SEP = ",";
 	public void export(QueryResults results,File target) throws IOException {
+		File folder = target.getParentFile();
+		if (!folder.exists()) folder.mkdir();
 		PrintStream out = new PrintStream(new FileOutputStream(target)); 
 		List<String> roles = null;
 		Iterator<Map.Entry<Cursor,MotifInstance>> iter = results.iterator();
