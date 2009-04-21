@@ -486,6 +486,7 @@ public class ResultBrowser extends JFrame {
 
 	private void actLoadQuery() {
 		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle("Load query");
 		int returnVal = fc.showOpenDialog(this);
 		FileFilter filter = new FileFilter() {
 			@Override
@@ -510,6 +511,7 @@ public class ResultBrowser extends JFrame {
 	}
 	private void actLoadData() {
 		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle("Load graph");
 		int returnVal = fc.showOpenDialog(this);
 		FileFilter filter = new FileFilter() {
 			@Override
