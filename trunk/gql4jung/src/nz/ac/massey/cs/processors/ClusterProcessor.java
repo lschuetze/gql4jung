@@ -14,7 +14,9 @@ import edu.uci.ics.jung.utils.UserData;
  *
  */
 public class ClusterProcessor implements Processor {
-
+	
+	String processorClass; 
+	
 	@Override
 	public Graph process(Graph g) {
 		EdgeBetweennessClusterer clusterer = new EdgeBetweennessClusterer(0);
@@ -28,5 +30,11 @@ public class ClusterProcessor implements Processor {
 			}
 		}
 		return g;
+	}
+	public String getProcessorClass() {
+		return processorClass;
+	}
+	public void setProcessorClass(String processorClass) {
+		this.processorClass = processorClass;
 	}
 }

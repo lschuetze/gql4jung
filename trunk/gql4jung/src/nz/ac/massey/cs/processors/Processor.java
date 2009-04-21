@@ -11,4 +11,5 @@ import edu.uci.ics.jung.graph.Graph;
  */
 public interface Processor {
 	Graph process(Graph g);
+	String getProcessorClass();
 }

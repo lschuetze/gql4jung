@@ -35,6 +35,8 @@ import nz.ac.massey.cs.gql4jung.xml.Query.ExistsNot;
 import nz.ac.massey.cs.gql4jung.xml.Query.Groupby;
 import nz.ac.massey.cs.gql4jung.xml.Query.Not;
 import nz.ac.massey.cs.gql4jung.xml.Query.Groupby.Element;
+import nz.ac.massey.cs.processors.ClusterProcessor;
+import nz.ac.massey.cs.processors.Processor;
 
 
 public class XMLMotifReader implements MotifReader {
@@ -46,9 +48,11 @@ public class XMLMotifReader implements MotifReader {
 			List<String> v_roles = new ArrayList<String>();
 			List<Constraint> constraints = new ArrayList<Constraint>();
 			List<GroupByClause> groupByClauses = new ArrayList<GroupByClause>();
+			List<Processor> graphProcessors = new ArrayList<Processor>();
 			motif.setRoles(v_roles);
 			motif.setConstraints(constraints);
 			motif.setGroupByClauses(groupByClauses);
+			motif.setGraphProcessor(graphProcessors);
 			
 			//unmarshalling xml query
 			JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gql4jung.xml");
@@ -251,8 +255,9 @@ public class XMLMotifReader implements MotifReader {
 				}
 				else if (o instanceof Query.Graphprocessor){
 					Query.Graphprocessor gp = (Query.Graphprocessor)o;
-					v_roles.add("graphprocessor");
-					v_roles.add(gp.getClazz());
+					ClusterProcessor cp= new ClusterProcessor(); 
+					cp.setProcessorClass(gp.getClazz());
+					graphProcessors.add(cp);
 				}
 				//getting group constraint
 				else if (o instanceof Query.Group){
