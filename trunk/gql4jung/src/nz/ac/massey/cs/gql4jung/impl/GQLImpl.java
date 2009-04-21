@@ -1,6 +1,7 @@
 package nz.ac.massey.cs.gql4jung.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class GQLImpl implements GQL {
 		if(motif.getRoles().contains("graphprocessor")){
 			//getting class name for processor from motif
 			String processorClass = motif.getRoles().get(1);
-			//dynamically instatiating processor through java reflection
+			//dynamically instantiating processor through java reflection
 			Processor clusterProcessor=null;
 			try {
 				clusterProcessor = (Processor) Class.forName(processorClass).newInstance();
@@ -72,15 +73,24 @@ public class GQLImpl implements GQL {
 			motif.getRoles().remove("graphprocessor");
 			motif.getRoles().remove(processorClass);
 		}
-		//gettting initial binding 
-    	String role = motif.getRoles().get(0);  	
+		//getting initial binding 
+    	String role = motif.getRoles().get(0);  
+    	Collection vertices = graph.getVertices();
+    	int S = vertices.size();
+    	int counter = 0;
+    	int stepSize = S<100?1:Math.round(S/100);
+    	listener.progressMade(0,S);
     	for(Object o:graph.getVertices()){
     		Vertex v = (Vertex) o;
     		List<Constraint> constraints = motif.getConstraints();
     		cs.prepare(graph, constraints);
     		Bindings binding = new Bindings();
     		binding.bind(role, v);
+    		counter = counter+1;
     		resolve(graph, constraints, binding, listener);
+    		if (counter%stepSize==0) {
+    			listener.progressMade(counter,S);
+    		}
 	    }
 	}
 

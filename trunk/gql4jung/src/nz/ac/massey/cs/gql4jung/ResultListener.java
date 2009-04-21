@@ -21,6 +21,12 @@ public interface ResultListener {
 	 */
 	boolean found(MotifInstance instance);
 	/**
+	 * Notify listener about progress made. 
+	 * @param progress the number of tasks performed
+	 * @param total the total number of steps that have to be performed
+	 */
+	void progressMade(int progress,int total);
+	/**
 	 * Notify listener that there will be no more results.
 	 */
 	void done();
