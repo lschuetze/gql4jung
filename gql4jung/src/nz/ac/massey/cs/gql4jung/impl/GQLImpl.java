@@ -53,25 +53,25 @@ public class GQLImpl implements GQL {
 	public void query(Graph graph, Motif motif, ResultListener listener) {
 		this.motif = motif; 
 		//looking for graph processing instruction in motif roles
-		//first two roles in motif represent following
 		//<graphprocessor class="nz.ac.massey.cs.processors.ClusterProcessor"/>
-		if(motif.getRoles().contains("graphprocessor")){
-			//getting class name for processor from motif
-			String processorClass = motif.getRoles().get(1);
-			//dynamically instantiating processor through java reflection
-			Processor clusterProcessor=null;
-			try {
-				clusterProcessor = (Processor) Class.forName(processorClass).newInstance();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+		if(motif.getGraphProcessor().size()!=0){
+			for(Object o:motif.getGraphProcessor()){
+				Processor p = (Processor)o;
+				//getting class name for processor from motif
+				String processorClass = p.getProcessorClass();
+				//dynamically instatiating processor through java reflection
+				Processor clusterProcessor=null;
+				try {
+					clusterProcessor = (Processor) Class.forName(processorClass).newInstance();
+				} catch (InstantiationException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+				graph = clusterProcessor.process(graph);
 			}
-			graph = clusterProcessor.process(graph);
-			motif.getRoles().remove("graphprocessor");
-			motif.getRoles().remove(processorClass);
 		}
 		//getting initial binding 
     	String role = motif.getRoles().get(0);  

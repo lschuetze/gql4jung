@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import nz.ac.massey.cs.processors.Processor;
+
 public class DefaultMotif implements Motif {
 	public List<String> getRoles() {
 		return roles;
@@ -19,6 +21,7 @@ public class DefaultMotif implements Motif {
 	}
 	private List<String> roles = new ArrayList<String>();
 	private Collection<GroupByClause> groupByClasses = new ArrayList<GroupByClause>();
+	private Collection<Processor> graphProcessors = new ArrayList<Processor>();
 	
 	private List<Constraint> constraints = new ArrayList<Constraint>();
 	@Override
@@ -27,6 +30,13 @@ public class DefaultMotif implements Motif {
 	}
 	public void setGroupByClauses(Collection<GroupByClause> groupBy){
 		this.groupByClasses = groupBy;
+	}
+	@Override
+	public Collection<Processor> getGraphProcessor() {
+		return graphProcessors;
+	}
+	public void setGraphProcessor(Collection<Processor> processors){
+		this.graphProcessors = processors; 
 	}
 	
 
