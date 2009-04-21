@@ -148,6 +148,13 @@ public class ResultBrowser extends JFrame {
 				updateStatus();
 				updateComputationTime();
 			}
+
+			@Override
+			public void progressMade(int progress, int total) {
+				statusField.setMaximum(total);
+				statusField.setValue(progress);
+				updateComputationTime();
+			}
 		};
 		this.results.addListener(listener);
 		
@@ -609,7 +616,8 @@ public class ResultBrowser extends JFrame {
 		}
 		cursorField.setText(b.toString());
 		statusField.setString(this.status.toString());
-		statusField.setIndeterminate(this.status==Status.computing);
+		if (this.status!=Status.computing) statusField.setValue(0);
+		//statusField.setIndeterminate(this.status==Status.computing);
 		updateActions();
 	};
 	

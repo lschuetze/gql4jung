@@ -29,4 +29,10 @@ public class ResultCollector implements ResultListener {
 		return true;
 	}
 
+	@Override
+	public void progressMade(int progress, int total) {
+		System.out.println("Computing query, "+progress+"/"+total+" done");
+		
+	}
+
 }

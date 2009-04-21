@@ -56,6 +56,7 @@ public class QueryResults implements ResultListener, Iterable {
 	
 	public interface QueryResultListener {
 		public void resultsChanged(QueryResults source);
+		public void progressMade(int progress,int total);
 	} 
 	private List<QueryResultListener> listeners = new Vector<QueryResultListener>();
 
@@ -225,5 +226,14 @@ public class QueryResults implements ResultListener, Iterable {
 	}
 	public synchronized boolean hasResults() {
 		return this.keys.size()>0;
+	}
+
+	@Override
+	public void progressMade(int progress, int total) {
+		// dispatch events
+		for (QueryResultListener l:this.listeners) {
+			l.progressMade(progress, total);
+		}
+		
 	}
 }
