@@ -486,6 +486,7 @@ public class ResultBrowser extends JFrame {
 
 	private void actLoadQuery() {
 		JFileChooser fc = new JFileChooser();
+		fc.setCurrentDirectory(new File("."));
 		fc.setDialogTitle("Load query");
 		int returnVal = fc.showOpenDialog(this);
 		FileFilter filter = new FileFilter() {
@@ -511,6 +512,7 @@ public class ResultBrowser extends JFrame {
 	}
 	private void actLoadData() {
 		JFileChooser fc = new JFileChooser();
+		fc.setCurrentDirectory(new File("."));
 		fc.setDialogTitle("Load graph");
 		int returnVal = fc.showOpenDialog(this);
 		FileFilter filter = new FileFilter() {
@@ -651,6 +653,7 @@ public class ResultBrowser extends JFrame {
 		        	case 1: return "name";
 		        	case 2: return "namespace";
 		        	case 3: return "container";
+		        	case 4: return "cluster";
 		        	default: return null;
 		        }
 		    }
@@ -658,17 +661,20 @@ public class ResultBrowser extends JFrame {
 		    	return roles.size(); 
 		    }
 		    public int getColumnCount() { 
-		    	return 4; 
+		    	return 5; 
 		    }
 		    public Object getValueAt(int row, int col) {
 		    	String role = roles.get(row);
 		    	if (instance==null) return "";
 		    	Vertex v = instance.getVertex(role);
+		    	String cluster = (String)v.getUserDatum("cluster");
+		    	if (cluster==null) cluster="n/a";
 		        switch (col) {
 	        		case 0: return role;
 	        		case 1: return v.getUserDatum("name");
 	        		case 2: return v.getUserDatum("namespace");
 	        		case 3: return v.getUserDatum("container");
+	        		case 4: return cluster;
 	        		default: return null;
 		        }
 		    }
