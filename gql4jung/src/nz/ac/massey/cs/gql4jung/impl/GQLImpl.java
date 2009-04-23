@@ -201,7 +201,9 @@ public class GQLImpl implements GQL {
 		}
 		//negated complex property constraints
 		else if (c instanceof  NegatedPropertyConstraint){
-			NegatedPropertyConstraint npc = (NegatedPropertyConstraint) c;
+			NegatedPropertyConstraint npc1 = (NegatedPropertyConstraint) c;
+			NegatedPropertyConstraint npc = npc1.clone();
+			//NegatedPropertyConstraint npc = (NegatedPropertyConstraint) npc1.clone();
 			if(npc.getPart() instanceof SimplePropertyConstraint){
 				SimplePropertyConstraint spc = (SimplePropertyConstraint) npc.getPart();
 				String owner = spc.getOwner();
@@ -220,7 +222,8 @@ public class GQLImpl implements GQL {
 				}	
 			}
 			else if (npc.getPart() instanceof ComplexPropertyConstraint){
-				ComplexPropertyConstraint cpc = (ComplexPropertyConstraint) npc.getPart();
+				ComplexPropertyConstraint cpc1 = (ComplexPropertyConstraint) npc.getPart();
+				ComplexPropertyConstraint cpc = (ComplexPropertyConstraint) cpc1.clone();
 				List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
 				List list = cpc.getParts();
 				List<Constraint> list1= copy(list);
@@ -268,7 +271,7 @@ public class GQLImpl implements GQL {
 				npc.setPart(cpc);
 				if(npc.check(g, edgeOrVertex1, edgeOrVertex2)){
 					List<Constraint> newConstraints = copy(constraints);
-					newConstraints.remove(npc);
+					newConstraints.remove(npc1);
 					resolve(g,newConstraints,replacement,listener);
 				}
 				else
