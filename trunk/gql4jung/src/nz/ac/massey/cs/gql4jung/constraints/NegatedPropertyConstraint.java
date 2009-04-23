@@ -44,5 +44,19 @@ public class NegatedPropertyConstraint<T extends UserDataContainer> implements P
 	public void setTerms(Term... terms) {
 		this.terms = terms;
 	}
-
+	public NegatedPropertyConstraint clone(){
+		NegatedPropertyConstraint clone = new NegatedPropertyConstraint();
+		if(this.getPart() instanceof ComplexPropertyConstraint){
+			ComplexPropertyConstraint cpc = (ComplexPropertyConstraint) this.getPart();
+			clone.setPart((PropertyConstraint) cpc.clone());
+			clone.setOwner(owner);
+			clone.setTerms(terms);
+		}
+		else {
+			clone.setPart(this.getPart());
+			clone.setOwner(this.getOwner());
+			clone.setTerms(this.getTerms());
+		}
+		return clone;
+	}
 }
