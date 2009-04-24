@@ -10,6 +10,7 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -79,6 +80,7 @@ public class ResultBrowser extends JFrame {
 	private JTable table = null;
 	private JTabbedPane tabbedPane = null;
 	private JPanel graphPane = null;
+	private JMenuBar menuBar = null;
 	
 	// actions
 	private AbstractAction actExit;
@@ -91,6 +93,7 @@ public class ResultBrowser extends JFrame {
 	private AbstractAction actNextMajorInstance;
 	private AbstractAction actPreviousMajorInstance;
 	private AbstractAction actExport2CSV;
+	private List<AbstractAction> actLoadBuiltInQueries = new ArrayList<AbstractAction>();
 	
 	private enum Status {
 		waiting,computing,finished,cancelled
@@ -163,6 +166,7 @@ public class ResultBrowser extends JFrame {
 		initActions();
 		initPopupMenu();
 		initToolbar();
+		initMenubar();
 		initStatusBar();
 
 		
@@ -174,6 +178,42 @@ public class ResultBrowser extends JFrame {
 		updateActions();
 		updateStatus();
 	}
+	private void initMenubar() {
+		menuBar = new JMenuBar();
+		this.setJMenuBar(menuBar);
+		
+		JMenu menu = new JMenu("File");
+		menu.setMnemonic(KeyEvent.VK_F);
+		menu.add(actLoadData);
+		menu.add(actLoadQuery);
+		if (this.actLoadBuiltInQueries.size()>0) {
+			JMenu menu2 = new JMenu("Built-in queries");
+			for (Action act:actLoadBuiltInQueries) {
+				menu2.add(act);
+			}
+			menu.add(menu2);
+		}
+		menu.addSeparator();
+		menu.add(actExport2CSV);
+		menu.addSeparator();
+		menu.add(actExit);
+		menuBar.add(menu);
+		menu = new JMenu("Query");
+		menu.setMnemonic(KeyEvent.VK_Q);
+		menu.add(actRunQuery);
+		menu.add(actCancelQuery);
+		menuBar.add(menu);
+		menu = new JMenu("Explore");
+		menu.setMnemonic(KeyEvent.VK_X);
+		menu.add(actPreviousMajorInstance);	
+		menu.add(actNextMajorInstance);	
+		menu.addSeparator();
+		menu.add(actPreviousMinorInstance);
+		menu.add(actNextMinorInstance);
+		menuBar.add(menu);
+		
+	}
+
 	private void initStatusBar() {
 		this.cursorField = new JLabel();
 		this.queryField = new JLabel();
@@ -265,15 +305,13 @@ public class ResultBrowser extends JFrame {
 	}
 
 	private void initActions() {
-		/*
+		
 		actExit = new AbstractAction("exit") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
 			}
 		};
-		toolbar.add(actExit);
-		*/
 		
 		actLoadData = new AbstractAction("load data",getIcon("Open16.gif")) {
 			@Override
@@ -346,8 +384,34 @@ public class ResultBrowser extends JFrame {
 			}
 		};	
 		actNextMajorInstance.putValue(Action.SHORT_DESCRIPTION, "show the next instance");
+		
+		initBuiltInQueries();
 	}
 	
+	private void initBuiltInQueries() {
+		initBuildInQuery("missing decoupling by abstraction","queries/abstraction_coupling.xml");
+		initBuildInQuery("circular dependencies between packages","queries/circular_dependency.xml");
+		initBuildInQuery("db 2 ui layer dependencies","queries/db2ui_dependency.xml");
+		initBuildInQuery("multiple dependency clusters in same package","queries/multiple_clusters.xml");
+	}
+
+	private void initBuildInQuery(String name, final String file) {
+		final File f = new File(file);
+		if (f.exists()) {
+			AbstractAction act = new AbstractAction(name) {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					loadQuery(f);
+				}			
+			};
+			this.actLoadBuiltInQueries.add(act);
+			log("added action to load query from file "+f);
+		}
+		else {
+			log("cannot add action to load query from file "+f);
+		}
+	}
+
 	private void initToolbar() {
 		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
@@ -667,7 +731,7 @@ public class ResultBrowser extends JFrame {
 		    	String role = roles.get(row);
 		    	if (instance==null) return "";
 		    	Vertex v = instance.getVertex(role);
-		    	String cluster = (String)v.getUserDatum("cluster");
+		    	Object cluster = v.getUserDatum("cluster");
 		    	if (cluster==null) cluster="n/a";
 		        switch (col) {
 	        		case 0: return role;
