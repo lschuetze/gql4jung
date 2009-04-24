@@ -284,7 +284,7 @@ public class GQLTests {
 @Test
 //	Testcase : circular dependency between classes and packages. 
 	public void test3() throws Exception {
-		Graph g = this.readJungGraphFromGraphML("test_examples/packageB/dependency.graphml");
+		Graph g = this.readJungGraphFromGraphML("test_examples/dependency1.graphml");
 		XMLMotifReader r = new XMLMotifReader();
 		DefaultMotif q = (DefaultMotif) r.read(new FileInputStream ("xml/circular_dependency.xml"));
 		GQL gql = new GQLImpl();
