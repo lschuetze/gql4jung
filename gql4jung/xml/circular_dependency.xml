@@ -6,7 +6,7 @@
     <vertex id="class4"><property key="type" value="class"/></vertex>
     <edge from="class1" to="class2"/>
     <edge from="class4" to="class3"/>
-    <path from="class2" to="class4" minLength="0"/>
+    <path from="class2" to="class4" canBeEmpty="true"/>
     <!--  todo: URI for equals should be used here -->
     <!--  could also use <and> here -->
     <condition predicate="equals">

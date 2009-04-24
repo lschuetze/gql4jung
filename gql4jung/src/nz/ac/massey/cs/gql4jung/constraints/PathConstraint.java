@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections.iterators.SingletonIterator;
+
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
@@ -37,6 +41,7 @@ import edu.uci.ics.jung.graph.Vertex;
 public class PathConstraint extends LinkConstraint<Path> {
 	private int maxLength = -1; // this means unbound	
 	//private String id = null;
+	private boolean canBeEmpty; 
 	
 	public PathConstraint() {
 		super();
@@ -77,7 +82,8 @@ public class PathConstraint extends LinkConstraint<Path> {
 	}
 	public Iterator<ConnectedVertex<Path>>  getPossibleTargets(final Graph g, final Vertex source){
 		final Collection<Vertex> nodes= g.getVertices();
-		final Iterator<Vertex> vItr = nodes.iterator();
+		final Iterator<Vertex> nItr = nodes.iterator();
+		Iterator<Vertex> vItr = null;
 		final ShortestPath SPA = new DijkstraShortestPath(g);
 		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
 		Predicate<Vertex> filter = new Predicate<Vertex>() {
@@ -104,6 +110,10 @@ public class PathConstraint extends LinkConstraint<Path> {
 					return p;
 				}			
 		};
+		if(canBeEmpty){
+			Iterator<Vertex> thisI = new SingletonIterator(source);
+			vItr = IteratorUtils.chainedIterator(thisI, nItr);
+		}
 		Iterator<Vertex>  targets = Iterators.filter(vItr,filter);
 		return Iterators.transform(targets,transformer);
 	}
@@ -128,6 +138,14 @@ public class PathConstraint extends LinkConstraint<Path> {
 	}
 	public void setMaxLength(int maxLength) {
 		this.maxLength = maxLength;
+	}
+
+	public boolean CanBeEmpty() {
+		return canBeEmpty;
+	}
+
+	public void setCanBeEmpty(boolean canBeEmpty) {
+		this.canBeEmpty = canBeEmpty;
 	}
 
 
