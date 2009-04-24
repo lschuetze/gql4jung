@@ -48,7 +48,7 @@ public class DrawGraph {
 		
 		JFrame jf = new JFrame();
 		//Graph g = readJungGraphFromGraphML("test_examples/packageB/clustering.graphml");
-		Graph g = readJungGraphFromGraphML("xml/activation-1.1.jar.graphml");
+		Graph g = readJungGraphFromGraphML("test_examples/dependency.graphml");
 		EdgeBetweennessClusterer clusterer = new EdgeBetweennessClusterer(0);
 		for(Object o: g.getVertices()){
 			Vertex v = (Vertex)o;
