@@ -32,9 +32,11 @@ public class MotifInstance2Graph {
 		for(Iterator iter=motif.getRoles().iterator();iter.hasNext();){
 			String role = (String) iter.next();
 			Vertex v1 = mi.getVertex(role);
-			Vertex v = (Vertex) v1.copy(graph);
-			if(v!=null){
-				v.addUserDatum("role", role, UserData.SHARED);
+			if(!graph.getVertices().contains(v1)){
+				Vertex v = (Vertex) v1.copy(graph);
+				if(v!=null){
+					v.addUserDatum("role", role, UserData.SHARED);
+				}
 			}
 		}
 		//copying edges in graph from motif instance, 

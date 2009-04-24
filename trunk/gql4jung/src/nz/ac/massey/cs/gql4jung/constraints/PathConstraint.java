@@ -27,6 +27,7 @@ import com.google.common.collect.Iterators;
 import nz.ac.massey.cs.gql4jung.ConnectedVertex;
 import nz.ac.massey.cs.gql4jung.LinkConstraint;
 import nz.ac.massey.cs.gql4jung.Path;
+import nz.ac.massey.cs.gql4jung.impl.EmptyPath;
 import nz.ac.massey.cs.gql4jung.impl.PathImpl;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.algorithms.shortestpath.ShortestPath;
@@ -40,8 +41,8 @@ import edu.uci.ics.jung.graph.Vertex;
  */
 public class PathConstraint extends LinkConstraint<Path> {
 	private int maxLength = -1; // this means unbound	
+	private int minLength = -1;
 	//private String id = null;
-	private boolean canBeEmpty; 
 	
 	public PathConstraint() {
 		super();
@@ -83,13 +84,20 @@ public class PathConstraint extends LinkConstraint<Path> {
 	public Iterator<ConnectedVertex<Path>>  getPossibleTargets(final Graph g, final Vertex source){
 		final Collection<Vertex> nodes= g.getVertices();
 		final Iterator<Vertex> nItr = nodes.iterator();
-		Iterator<Vertex> vItr = null;
+		
 		final ShortestPath SPA = new DijkstraShortestPath(g);
 		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
 		Predicate<Vertex> filter = new Predicate<Vertex>() {
 			@Override
 			public boolean apply(Vertex v) {
 				Vertex otherNode = (Vertex)v;
+				if(v==source){
+					EmptyPath emptyPath = new EmptyPath(otherNode);
+					emptyPath.setVertex(otherNode);
+					ConnectedVertex<Path> p = new ConnectedVertex(emptyPath,otherNode);
+					links.put(otherNode, p);
+					return true;
+				}
 				List path = ShortestPathUtils.getPath(SPA, source,otherNode);
 				if (checkPath(path)) {
 					PathImpl pp = new PathImpl();
@@ -110,11 +118,14 @@ public class PathConstraint extends LinkConstraint<Path> {
 					return p;
 				}			
 		};
-		if(canBeEmpty){
+		if(minLength==0){
+			Iterator<Vertex> vItr=null;
 			Iterator<Vertex> thisI = new SingletonIterator(source);
 			vItr = IteratorUtils.chainedIterator(thisI, nItr);
+			Iterator<Vertex>  targets = Iterators.filter(vItr,filter);
+			return Iterators.transform(targets,transformer);
 		}
-		Iterator<Vertex>  targets = Iterators.filter(vItr,filter);
+		Iterator<Vertex>  targets = Iterators.filter(nItr,filter);
 		return Iterators.transform(targets,transformer);
 	}
 	private boolean checkPath(List path) {
@@ -140,12 +151,12 @@ public class PathConstraint extends LinkConstraint<Path> {
 		this.maxLength = maxLength;
 	}
 
-	public boolean CanBeEmpty() {
-		return canBeEmpty;
+	public int getMinLength() {
+		return minLength;
 	}
 
-	public void setCanBeEmpty(boolean canBeEmpty) {
-		this.canBeEmpty = canBeEmpty;
+	public void setMinLength(int minLength) {
+		this.minLength = minLength;
 	}
 
 

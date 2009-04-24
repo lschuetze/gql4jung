@@ -107,9 +107,9 @@ public class XMLMotifReader implements MotifReader {
 					if(p.getMaxLength()!=0){
 						pathConstraint.setMaxLength(p.getMaxLength());
 					}
-					if(p.getCanBeEmpty()!=null && p.getCanBeEmpty().equals("true")){
-						pathConstraint.setCanBeEmpty(true);
-					} else pathConstraint.setCanBeEmpty(false);
+					if(p.getMinLength()!=-1){
+						pathConstraint.setMinLength(p.getMinLength());
+					} 
 					Query.Vertex from = (Query.Vertex) p.getFrom();
 					Query.Vertex to = (Query.Vertex) p.getTo();
 					pathConstraint.setSource(from.getId());

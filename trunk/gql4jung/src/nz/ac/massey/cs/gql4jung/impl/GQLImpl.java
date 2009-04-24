@@ -122,6 +122,7 @@ public class GQLImpl implements GQL {
     		}
     		motifInstance.addAll(motifGraph);
     		listener.found(motifInstance);
+    		return;
     	}
 		Constraint c = cs.selectNext(g, constraints, replacement);
 		if(c instanceof SimplePropertyConstraint){
@@ -440,7 +441,7 @@ public class GQLImpl implements GQL {
 	    					List<Edge> list = p.getEdges(); 
 	    					Edge[] path = getEdgesFromPath(list);
 	    					if(edgePropConstraint!=null && edgePropConstraint.check(g, path)){
-	    						if(!mustNotBinding(replacement, nextInstance.getVertex())){
+	    						if(!mustNotBinding(replacement, nextInstance.getLink())){
 		    						//add new replacement
 			    					Bindings nextReplacement = createBindingMap(replacement);
 					    			nextReplacement.bind(target, nextInstance.getVertex());
@@ -457,7 +458,7 @@ public class GQLImpl implements GQL {
 	    					}
 	    					//added
 		    				else if (edgePropConstraint==null){
-		    					if(!mustNotBinding(replacement, nextInstance.getVertex())){
+		    					if(!mustNotBinding(replacement, nextInstance.getLink())){
 		    						//add new replacement
 			    					Bindings nextReplacement = createBindingMap(replacement);
 					    			nextReplacement.bind(target, nextInstance.getVertex());
