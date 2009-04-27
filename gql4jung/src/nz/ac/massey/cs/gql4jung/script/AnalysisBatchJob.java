@@ -114,18 +114,40 @@ public class AnalysisBatchJob {
 		log("Query results exported to ",out.getAbsolutePath());
 		
 		String time = DurationFormatUtils.formatDuration(after-before,"H:m:s.S",true);
-		printSummary(querySource,graphSource,results,time);
+		printSummary(querySource,graphSource,results,time,graph);
 		results.reset();
 	
 	} 
 	
-	private static void printSummary(File querySource, File graphSource,QueryResults results,String time) throws IOException {
+	private static void printSummary(File querySource, File graphSource,QueryResults results,String time,Graph graph) throws IOException {
 		File summary = new File(SUMMARY);
 		FileWriter out = new FileWriter(summary,true);
+		if (!summary.exists()) {
+			StringBuffer b = new StringBuffer()
+			.append("graph source")
+			.append(SEP)
+			.append("query source")
+			.append(SEP)
+			.append("vertex count")
+			.append(SEP)
+			.append("edge count")
+			.append(SEP)
+			.append("instances")
+			.append(SEP)
+			.append("variants")
+			.append(SEP)
+			.append("time")
+			.append(NL);
+		out.write(b.toString());
+		}
 		StringBuffer b = new StringBuffer()
 			.append(graphSource.getName())
 			.append(SEP)
 			.append(querySource.getName())
+			.append(SEP)
+			.append(graph.getVertices().size())
+			.append(SEP)
+			.append(graph.getEdges().size())
 			.append(SEP)
 			.append(results.getNumberOfGroups())
 			.append(SEP)
