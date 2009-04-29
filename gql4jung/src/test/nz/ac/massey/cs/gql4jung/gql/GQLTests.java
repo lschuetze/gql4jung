@@ -1,16 +1,11 @@
 package test.nz.ac.massey.cs.gql4jung.gql;
 
 import static org.junit.Assert.*;
-
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
-
 import nz.ac.massey.cs.gql4jung.Constraint;
 import nz.ac.massey.cs.gql4jung.DefaultMotif;
 import nz.ac.massey.cs.gql4jung.GQL;
@@ -24,14 +19,10 @@ import nz.ac.massey.cs.gql4jung.constraints.PathConstraint;
 import nz.ac.massey.cs.gql4jung.impl.Bindings;
 import nz.ac.massey.cs.gql4jung.impl.ConstraintSchedulerImpl;
 import nz.ac.massey.cs.gql4jung.impl.GQLImpl;
-import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
-import nz.ac.massey.cs.utils.odem2graphml.Odem2GraphML;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -72,20 +63,7 @@ public class GQLTests {
 		reader.close();
 		return g;
 	}
-	private Graph readJungGraphFromODEM(String odemSource) throws Exception {
-		Odem2GraphML converter = new Odem2GraphML();
-		File odem = new File(odemSource);
-		Reader odemReader = new FileReader(odem);
-		// jens: we try to do this in memory, if this does not scale,
-		// change to filewriter using tmp files
-		StringWriter writer = new StringWriter();
-		converter.convert(odemReader, writer);
-		odemReader.close();
-		writer.close();
-		String graphML = writer.getBuffer().toString();
-		StringReader graphmlReader = new StringReader(graphML);
-		return readJungGraphFromGraphML(graphmlReader);
-	}
+
 	private Motif readMotif(String motifSource) throws Exception {
 		// refer to your own MotifParser here (unmarshal)
 		// use XMLMotifReader
