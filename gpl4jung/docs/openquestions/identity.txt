@@ -1,2 +1,0 @@
-are results that have the same objects for different roles valid? 
-similar problem  in WebOFPatterns -> see there for possible solution
