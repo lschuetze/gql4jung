@@ -16,6 +16,5 @@
     </condition>    
 	<groupby>
         <vertex id="class1" property="namespace"/>
-        <vertex id="class2" property="namespace"/>
     </groupby>
 </query>
