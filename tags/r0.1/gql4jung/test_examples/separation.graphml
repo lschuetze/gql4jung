@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<graph edgedefault="directed" file="">
+<node id="0" container="separation.jar" namespace="db" name="RunDB" isInterface="false" type="class" isAbstract="false" isException="false" access="public" isBoundry="false"/>
+<node id="1" container="separation.jar" namespace="java.lang" name="Object" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="2" container="separation.jar" namespace="java.sql" name="Connection" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="3" container="separation.jar" namespace="ui" name="CounterPanel" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="false"/>
+<node id="4" container="separation.jar" namespace="java.sql" name="SQLException" isInterface="false" type="class" isAbstract="false" isException="true" access="null" isBoundry="true"/>
+<node id="5" container="separation.jar" namespace="java.sql" name="DriverManager" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="6" container="separation.jar" namespace="java.lang" name="String" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="7" container="separation.jar" namespace="javax.swing" name="JPanel" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<node id="8" container="separation.jar" namespace="javax.swing" name="JButton" isInterface="false" type="class" isAbstract="false" isException="false" access="null" isBoundry="true"/>
+<edge id="edge-0" source="0" target="1" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-1" source="0" target="2" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-2" source="0" target="3" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-3" source="0" target="4" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-4" source="0" target="5" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-5" source="0" target="6" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-6" source="3" target="7" type="extends" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-7" source="3" target="8" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+<edge id="edge-8" source="3" target="6" type="uses" isSelected="false" state="null" betweenness="null" separation="null" />
+</graph>
+</graphml>

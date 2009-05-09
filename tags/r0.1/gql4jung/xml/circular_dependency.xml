@@ -1,0 +1,33 @@
+<!-- circular dependencies between packages -->
+<query name="circuler_dependency">
+    <vertex id="inside1"><property key="type" value="class"/></vertex>
+    <vertex id="inside2"><property key="type" value="class"/></vertex>
+    <vertex id="outside1"><property key="type" value="class"/></vertex>
+    <vertex id="outside2"><property key="type" value="class"/></vertex>
+    <edge from="inside1" to="outside1"/>
+    <edge from="outside2" to="inside2"/>
+    <path from="outside1" to="outside2" minLength="0"/>
+    <!--  todo: URI for equals should be used here -->
+    <!--  could also use <and> here -->
+    <condition predicate="equals">
+    	<!--  attributes map to property terms -->
+    	<attribute vertex="inside1" key="namespace"/> 
+    	<attribute vertex="inside2" key="namespace"/> 
+    </condition>
+    <not>
+	    <condition predicate="equals">
+	    	<attribute owner="inside1" key="namespace"/> 
+	    	<attribute owner="outside1" key="namespace"/> 
+	    </condition>
+    </not>
+    <not>
+	    <condition predicate="equals">
+	    	<attribute owner="inside1" key="namespace"/> 
+	    	<attribute owner="outside2" key="namespace"/> 
+	    </condition>
+    </not>
+    <groupby>
+        <vertex id="inside1" property="namespace"/>
+    </groupby>
+    
+</query>
