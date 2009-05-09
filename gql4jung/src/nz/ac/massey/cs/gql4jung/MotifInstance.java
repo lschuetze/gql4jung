@@ -10,7 +10,6 @@
 
 package nz.ac.massey.cs.gql4jung;
 
-import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 
 public interface MotifInstance {

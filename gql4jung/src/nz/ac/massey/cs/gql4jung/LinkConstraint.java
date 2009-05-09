@@ -23,7 +23,7 @@ import edu.uci.ics.jung.graph.Vertex;
  */
 public abstract class LinkConstraint<T> implements Constraint {
 
-	private PropertyConstraint<Edge> edgePropertyConstraint = null;
+	protected PropertyConstraint<Edge> edgePropertyConstraint = null;
 	private String predicate = null, source=null, target=null;
 	protected String id = null;
 	public void setPredicate(String predicate){
@@ -80,4 +80,5 @@ public abstract class LinkConstraint<T> implements Constraint {
 	public void setTarget(String target) {
 		this.target = target;
 	};
+	
 }

@@ -87,4 +87,21 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 		clone.setOperator(getOperator());
 		return clone;
 	}
+	
+	public String toString() {
+		StringBuffer b = new StringBuffer()
+			.append("property constraint[")
+			.append(this.getOwner())
+			.append(" ")
+			.append(operator)
+			.append(" ");
+		boolean f = true;
+		for (Term t:terms) {
+			if (f) f=false;
+			else b.append(',');
+			b.append(t);
+		}
+		b.append(")");
+		return b.toString();
+	}
 }

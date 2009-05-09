@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 //}
 
 public abstract class Operator {
+	
 	static class EQ extends Operator { 
 		public boolean compare(Object o1, Object o2) { 
 			return o1==null?o2==null:o1.equals(o2); 
@@ -141,7 +142,9 @@ public abstract class Operator {
 		else throw new IllegalArgumentException("double parameter expected here"); 
 	}  
   
-	   
+	public String toString() {
+		return this.getName();
+	}   
 	
 
 }

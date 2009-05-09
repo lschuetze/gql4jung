@@ -33,4 +33,8 @@ public class ValueTerm  implements Term {
 	public ValueTerm clone(){
 		return new ValueTerm(getValue());
 	}
+	
+	public String toString() {
+		return ""+value;
+	}
 }
