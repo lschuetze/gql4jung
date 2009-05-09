@@ -13,6 +13,7 @@ package nz.ac.massey.cs.gql4jung.constraints;
 import java.rmi.server.UID;
 import java.util.Iterator;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 
 import nz.ac.massey.cs.gql4jung.ConnectedVertex;
@@ -35,8 +36,24 @@ public class EdgeConstraint extends LinkConstraint<Edge> {
 		super.id = edgeID.toString();
 	}
 	
+	public boolean checkProperty(Graph g,Edge e) {
+		if (edgePropertyConstraint==null) {
+			return true;
+		}
+		else {
+			return edgePropertyConstraint.check(g,e);
+		}
+	};
+	
 	public Iterator<ConnectedVertex<Edge>> getPossibleSources(final Graph g,final Vertex target) {
 		Iterator<Edge> incomingEdges = target.getInEdges().iterator();
+		Predicate<Edge> checkProperty = new Predicate<Edge> () {
+			@Override
+			public boolean apply(Edge e) {
+				return checkProperty(g,e);
+			}
+		};
+		incomingEdges = Iterators.filter(incomingEdges,checkProperty);
 		
 		Function<Edge,ConnectedVertex<Edge>> transformer = new Function<Edge,ConnectedVertex<Edge>>() {
 			@Override
@@ -50,6 +67,13 @@ public class EdgeConstraint extends LinkConstraint<Edge> {
 	}
 	public Iterator<ConnectedVertex<Edge>> getPossibleTargets(final Graph g,final Vertex source){
 		Iterator<Edge> outgoingEdges = source.getOutEdges().iterator();
+		Predicate<Edge> checkProperty = new Predicate<Edge> () {
+			@Override
+			public boolean apply(Edge e) {
+				return checkProperty(g,e);
+			}
+		};
+		outgoingEdges = Iterators.filter(outgoingEdges,checkProperty);
 		
 		Function<Edge,ConnectedVertex<Edge>> transformer = new Function<Edge,ConnectedVertex<Edge>>(){
 
@@ -66,6 +90,17 @@ public class EdgeConstraint extends LinkConstraint<Edge> {
 	public Edge check(final Graph g,final Vertex source, final Vertex target){
 		
 		Edge edge = source.findEdge(target);
-		return edge;
+		if (edge!=null && this.checkProperty(g,edge)) return edge;
+		return null;
+	}
+	
+	public String toString() {
+		return new StringBuffer()
+			.append("edge constraint[")
+			.append(this.getSource())
+			.append("->")
+			.append(this.getTarget())
+			.append("]")
+			.toString();
 	}
 }

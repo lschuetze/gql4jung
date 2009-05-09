@@ -24,11 +24,12 @@ import nz.ac.massey.cs.gql4jung.MotifReaderException;
 import nz.ac.massey.cs.gql4jung.impl.GQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.QueryResultsExporter2CSV;
+import nz.ac.massey.cs.gql4jung.util.QueryResults.QueryResultListener;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 
 public class AnalysisBatchJob {
 	public static final String ROOT = "batch/";
-	public static final String INPUT_DATA_FOLDER = ROOT+"inputdata";
+	public static final String INPUT_DATA_FOLDER = "/media/disk-3/input";
 	public static final String QUERY_FOLDER = ROOT+"queries";
 	public static final String OUTPUT_FOLDER = ROOT+"output";
 	public static final String SUMMARY = ROOT+"summary.csv";
@@ -72,8 +73,8 @@ public class AnalysisBatchJob {
 			output.mkdir();
 		}
 		// delete old summary file
-		File summary = new File(SUMMARY);
-		if (summary.exists()) summary.delete();
+		//File summary = new File(SUMMARY);
+		//if (summary.exists()) summary.delete();
 
 		
 		// queries
@@ -81,9 +82,10 @@ public class AnalysisBatchJob {
 		File[] dataFiles = data.listFiles();
 		for (int i=0;i<queryFiles.length;i++) {
 			for (int j=0;j<dataFiles.length;j++) {
-				log("query ",i+1,"/",queryFiles.length," graph ",j+1,"/",dataFiles.length);
+				String cursorLog = "graph "+(j+1)+"/"+dataFiles.length;
+				log("query ",i+1,"/",queryFiles.length," ",cursorLog);
 				try {
-					analyse(queryFiles[i],dataFiles[j]);
+					analyse(queryFiles[i],dataFiles[j],cursorLog);
 				}
 				catch (Exception x) {
 					LOGGER.error("analysis error",x);
@@ -93,11 +95,29 @@ public class AnalysisBatchJob {
 	}
 	
 	
-	public static void analyse (File querySource,File graphSource) throws IOException, MotifReaderException {
+	public static void analyse (File querySource,final File graphSource,final String cursorLog) throws IOException, MotifReaderException {
 		Graph graph = loadGraph(graphSource);
 		Motif motif = loadMotif(querySource);
 		
+		if (graph.getVertices()==null) {
+			log("Skipping ",graphSource.getName()," - no vertices found");
+			return;
+		}
+		
 		QueryResults results = new QueryResults();
+		results.addListener(new QueryResultListener() {
+
+			@Override
+			public void progressMade(int progress, int total) {
+				log(progress,"/",total," done in ",graphSource.getName()," ",cursorLog);
+			}
+
+			@Override
+			public void resultsChanged(QueryResults source) {
+				
+			}
+			
+		});
 		log("Starting query ",querySource.getName()," on data ",graphSource.getName());
 		
 		// query
@@ -108,20 +128,23 @@ public class AnalysisBatchJob {
 		log("Query finished, this took ",""+(after-before)," ms");
 		
 		// export results
-		QueryResultsExporter2CSV exporter = new QueryResultsExporter2CSV();
-		File out = getOutputFile(querySource,graphSource);
-		exporter.export(results, out);
-		log("Query results exported to ",out.getAbsolutePath());
+		//QueryResultsExporter2CSV exporter = new QueryResultsExporter2CSV();
+		//File out = getOutputFile(querySource,graphSource);
+		//exporter.export(results, out);
+		//log("Query results exported to ",out.getAbsolutePath());
 		
 		String time = DurationFormatUtils.formatDuration(after-before,"H:m:s.S",true);
 		printSummary(querySource,graphSource,results,time,graph);
 		results.reset();
+		
+		graphSource.delete();
 	
 	} 
 	
 	private static void printSummary(File querySource, File graphSource,QueryResults results,String time,Graph graph) throws IOException {
-		File summary = new File(SUMMARY);
-		FileWriter out = new FileWriter(summary,true);
+		//File summary = new File(SUMMARY);
+		FileWriter out = new FileWriter(SUMMARY,true);
+		/*
 		if (!summary.exists()) {
 			StringBuffer b = new StringBuffer()
 			.append("graph source")
@@ -140,6 +163,7 @@ public class AnalysisBatchJob {
 			.append(NL);
 		out.write(b.toString());
 		}
+		*/
 		StringBuffer b = new StringBuffer()
 			.append(graphSource.getName())
 			.append(SEP)
@@ -157,7 +181,7 @@ public class AnalysisBatchJob {
 			.append(NL);
 		out.write(b.toString());
 		out.close();
-		log("Query result summary added to ",summary.getAbsolutePath());
+		log("Query result summary added to ",SUMMARY);
 	}
 
 

@@ -42,4 +42,8 @@ public class PropertyTerm  implements Term {
 	public PropertyTerm clone(){
 		return new PropertyTerm(getKey());
 	}
+	
+	public String toString() {
+		return key;
+	}
 }

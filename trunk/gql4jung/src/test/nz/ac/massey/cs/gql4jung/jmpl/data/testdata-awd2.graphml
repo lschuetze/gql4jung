@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<graph edgedefault="directed" file="">
+<node id="0" container="example.jar" namespace="org.example" name="AClient" isInterface="false" type="class" isAbstract="false" access="default" isBoundry="false" />
+<node id="1" container="example.jar" namespace="org.example" name="AService"  isInterface="true" type="class" isAbstract="true" access="null" isBoundry="false" />
+<node id="2" container="example.jar" namespace="org.example" name="AServiceImpl"  isInterface="false" type="class" isAbstract="false" access="null" isBoundry="false" />
+<edge id="edge-1" source="0" target="1" type="uses"  />
+<edge id="edge-2" source="0" target="2" type="uses"  />
+<edge id="edge-3" source="2" target="1" type="implements"  />
+</graph>
+</graphml>

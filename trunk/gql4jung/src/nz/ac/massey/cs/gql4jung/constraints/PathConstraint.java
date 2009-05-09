@@ -32,6 +32,7 @@ import nz.ac.massey.cs.gql4jung.impl.PathImpl;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.algorithms.shortestpath.ShortestPath;
 import edu.uci.ics.jung.algorithms.shortestpath.ShortestPathUtils;
+import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 /**
@@ -41,7 +42,7 @@ import edu.uci.ics.jung.graph.Vertex;
  */
 public class PathConstraint extends LinkConstraint<Path> {
 	private int maxLength = -1; // this means unbound	
-	private int minLength = -1;
+	private int minLength = 1;
 	//private String id = null;
 	
 	public PathConstraint() {
@@ -49,99 +50,103 @@ public class PathConstraint extends LinkConstraint<Path> {
 		UID pathID = new UID();
 		super.id = pathID.toString();
 	}
-	
-	public Iterator<ConnectedVertex<Path>> getPossibleSources(final Graph g,final Vertex target) {
 		
-		final Collection<Vertex> nodes= g.getVertices();
-		final Iterator<Vertex> vItr = nodes.iterator();
-		final ShortestPath SPA = new DijkstraShortestPath(g);
-		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
-		Predicate<Vertex> filter = new Predicate<Vertex>() {
+	public Iterator<ConnectedVertex<Path>> getPossibleSources(final Graph g,final Vertex target) {
+
+		Predicate<Edge> filter = new Predicate<Edge>() {
 			@Override
-			public boolean apply(Vertex v) {
-				List path = ShortestPathUtils.getPath(SPA,v,target);
-				if (checkPath(path)) {
-					PathImpl pp = new PathImpl();
-					pp.setEdges(path);
-					ConnectedVertex<Path> p = new ConnectedVertex(pp,v); 
-					links.put(v,p);
-				}
-				return path.size()!=0;
+			public boolean apply(Edge e) {
+				if (edgePropertyConstraint==null) return true;
+				else return edgePropertyConstraint.check(g,e);
 			}
 		};
+		NodeIterator sources = new NodeIterator(target,this.minLength,this.maxLength, false,filter);
+
 		// vertex to path transformer
-		Function<Vertex,ConnectedVertex<Path>> transformer = new Function<Vertex,ConnectedVertex<Path>>() {
+		Function<List<Edge>,ConnectedVertex<Path>> transformer = new Function<List<Edge>,ConnectedVertex<Path>>() {
 			@Override
-			public ConnectedVertex<Path> apply(Vertex n) {
-				ConnectedVertex<Path> p = links.get(n);
-				links.remove(p); //this should make it faster by keeping the size of the cache small
+			public ConnectedVertex<Path> apply(List<Edge> edges) {
+				PathImpl path = new PathImpl();
+				path.setEdges(edges);
+				if (edges.size()==0) {
+					path.setStart(target);
+					path.setEnd(target);
+				}
+				else {
+					path.setStart((Vertex) edges.get(0).getEndpoints().getFirst());
+					path.setEnd(target);
+				}
+				
+				ConnectedVertex<Path> p = new ConnectedVertex<Path>(path,path.getStart());
 				return p;
 			}
 		};
-		Iterator<Vertex> sources = Iterators.filter(vItr,filter);
-		return Iterators.transform(sources,transformer);
+		
+		return Iterators.transform(sources.iterator(),transformer);
 	}
 	public Iterator<ConnectedVertex<Path>>  getPossibleTargets(final Graph g, final Vertex source){
-		final Collection<Vertex> nodes= g.getVertices();
-		final Iterator<Vertex> nItr = nodes.iterator();
-		
-		final ShortestPath SPA = new DijkstraShortestPath(g);
-		final Map<Vertex,ConnectedVertex<Path>> links = new HashMap<Vertex,ConnectedVertex<Path>>();
-		Predicate<Vertex> filter = new Predicate<Vertex>() {
+
+		Predicate<Edge> filter = new Predicate<Edge>() {
 			@Override
-			public boolean apply(Vertex v) {
-				Vertex otherNode = (Vertex)v;
-				if(v==source){
-					EmptyPath emptyPath = new EmptyPath(otherNode);
-					emptyPath.setVertex(otherNode);
-					ConnectedVertex<Path> p = new ConnectedVertex(emptyPath,otherNode);
-					links.put(otherNode, p);
-					return true;
-				}
-				List path = ShortestPathUtils.getPath(SPA, source,otherNode);
-				if (checkPath(path)) {
-					PathImpl pp = new PathImpl();
-					pp.setEdges(path);
-					ConnectedVertex<Path> p = new ConnectedVertex(pp,otherNode); 
-					links.put(otherNode,p);
-				}
-				return path.size()!=0;
+			public boolean apply(Edge e) {
+				if (edgePropertyConstraint==null) return true;
+				else return edgePropertyConstraint.check(g,e);
 			}
 		};
-		// vertex to path transformer
-		Function<Vertex,ConnectedVertex<Path>> transformer = new Function<Vertex,ConnectedVertex<Path>>() {
+		NodeIterator sources = new NodeIterator(source,this.minLength,this.maxLength, true, filter);
 
+		// vertex to path transformer
+		Function<List<Edge>,ConnectedVertex<Path>> transformer = new Function<List<Edge>,ConnectedVertex<Path>>() {
 			@Override
-			public ConnectedVertex<Path> apply(Vertex n) {
-					ConnectedVertex<Path> p = links.get(n);
-					links.remove(p); // this should make it faster by keeping the size of the cache small
-					return p;
-				}			
+			public ConnectedVertex<Path> apply(List<Edge> edges) {
+				PathImpl path = new PathImpl();
+				path.setEdges(edges);
+				if (edges.size()==0) {
+					path.setStart(source);
+					path.setEnd(source);
+				}
+				else {
+					path.setStart(source);
+					path.setEnd((Vertex) edges.get(edges.size()-1).getEndpoints().getSecond());
+				}
+				
+				ConnectedVertex<Path> p = new ConnectedVertex<Path>(path,path.getEnd());
+				return p;
+			}
 		};
-		if(minLength==0){
-			Iterator<Vertex> vItr=null;
-			Iterator<Vertex> thisI = new SingletonIterator(source);
-			vItr = IteratorUtils.chainedIterator(thisI, nItr);
-			Iterator<Vertex>  targets = Iterators.filter(vItr,filter);
-			return Iterators.transform(targets,transformer);
-		}
-		Iterator<Vertex>  targets = Iterators.filter(nItr,filter);
-		return Iterators.transform(targets,transformer);
+		
+		return Iterators.transform(sources.iterator(),transformer);
 	}
-	private boolean checkPath(List path) {
-		return path.size()!=0 && (maxLength==-1 || path.size()<maxLength);
+	private boolean checkPath(Graph g,List<Edge> path) {
+		boolean lengthOK =  path.size()!=0 && (maxLength==-1 || path.size()<maxLength);
+		if (lengthOK) {
+			for (Edge e:path) {
+				if (!edgePropertyConstraint.check(g,e)) return false;
+			}
+		};
+		return false;
 	}
 	public Path check(final Graph g, final Vertex source, final Vertex target){
-		final ShortestPath SPA = new DijkstraShortestPath(g);
-		List path = ShortestPathUtils.getPath(SPA, source,target);
-		PathImpl pp = null;
-		if (checkPath(path)) {
-			pp = new PathImpl();
-			pp.setEdges(path);
-			pp.setStart(source);
-			pp.setEnd(target);
-		};	
-		return pp;
+		
+		Predicate<Edge> filter = new Predicate<Edge>() {
+			@Override
+			public boolean apply(Edge e) {
+				if (edgePropertyConstraint==null) return true;
+				else return edgePropertyConstraint.check(g,e);
+			}
+		};
+		NodeIterator links = new NodeIterator(source,this.minLength,this.maxLength, true, filter);
+		links.iterator();
+		for (List<Edge> link:links) {
+			if ((link.size()==0 && source==target) || target==link.get(link.size()-1).getEndpoints().getSecond()) {
+				PathImpl pp = new PathImpl();
+				pp.setEdges(link);
+				pp.setStart(source);
+				pp.setEnd(target);
+				return pp;
+			}
+		}
+		return null;
 	}
 
 	public int getMaxLength() {
@@ -149,6 +154,16 @@ public class PathConstraint extends LinkConstraint<Path> {
 	}
 	public void setMaxLength(int maxLength) {
 		this.maxLength = maxLength;
+	}
+
+	public String toString() {
+		return new StringBuffer()
+			.append("path constraint[")
+			.append(this.getSource())
+			.append("->")
+			.append(this.getTarget())
+			.append("]")
+			.toString();
 	}
 
 	public int getMinLength() {
