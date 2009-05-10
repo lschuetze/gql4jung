@@ -12,19 +12,26 @@ package nz.ac.massey.cs.gql4jung.constraints;
 
 import edu.uci.ics.jung.utils.UserDataContainer;
 /**
- * Property term. For instance, when a vertex with the id (role name) "class1" is used, 
- * then a property term might refer to the "isAbstract" property. 
- * "isAbstract" would be the key.
+ * Similar to property term, but with a reference to the property owner.
  * @author jens.dietrich@gmail.com
  */
 
-public class PropertyTerm  implements Term {
-	public PropertyTerm(String key) {
+public class RolePropertyTerm  implements Term {
+	public RolePropertyTerm(String role,String key) {
 		super();
+		this.role = role;
 		this.key = key;
 	}
 
+	public String getRole() {
+		return role;
+	}
 
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	private String role = null;
 	private String key = null;  // this is the property key that can be used to query the property
 
 	public String getKey() {
@@ -39,11 +46,11 @@ public class PropertyTerm  implements Term {
 	public Object getValue(UserDataContainer vertexOrEdge) {
 		return vertexOrEdge.getUserDatum(key);
 	}
-	public PropertyTerm clone(){
-		return new PropertyTerm(getKey());
+	public RolePropertyTerm clone(){
+		return new RolePropertyTerm(getRole(),getKey());
 	}
 	
 	public String toString() {
-		return "{owner}."+key;
+		return this.getRole()+'.'+this.getKey();
 	}
 }

@@ -13,6 +13,7 @@ package nz.ac.massey.cs.gql4jung.constraints;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import nz.ac.massey.cs.gql4jung.PropertyConstraint;
 import edu.uci.ics.jung.graph.Graph;
@@ -36,7 +37,7 @@ public class PropertyConstraintConjunction<T  extends UserDataContainer> extends
 	private Term[] terms = null;
 	private String owner = null;
 	
-	public boolean check(Graph g, T... edgeOrVertex) {
+	public boolean check(Graph g, T edgeOrVertex) {
 		for (PropertyConstraint part:parts) {
 			if (!part.check(g,edgeOrVertex)) {
 				return false;
@@ -44,7 +45,14 @@ public class PropertyConstraintConjunction<T  extends UserDataContainer> extends
 		}
 		return true;
 	}
-
+	public boolean check(Graph g, Map<String,T> bindings) {
+		for (PropertyConstraint part:parts) {
+			if (!part.check(g,bindings)) {
+				return false;
+			}
+		}
+		return true;
+	}
 	@Override
 	public String getOwner() {
 		return owner;
@@ -72,6 +80,17 @@ public class PropertyConstraintConjunction<T  extends UserDataContainer> extends
 		clone.setOwner(getOwner());
 		clone.setTerms(getTerms());
 		return clone;
+	}
+	
+	public String toString() {
+		boolean f = true;
+		StringBuffer b = new StringBuffer();
+		for (PropertyConstraint c:this.parts) {
+			if (f) f=false;
+			else b.append(" and ");
+			b.append(c);
+		}
+		return b.toString();
 	}
 	
 }

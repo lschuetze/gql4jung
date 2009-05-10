@@ -10,6 +10,9 @@
 
 package nz.ac.massey.cs.gql4jung.constraints;
 
+import java.util.List;
+import java.util.Map;
+
 import nz.ac.massey.cs.gql4jung.PropertyConstraint;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
@@ -19,8 +22,11 @@ public class NegatedPropertyConstraint<T extends UserDataContainer> implements P
 	private Term[] terms = null;
 	private String owner = null;
 	
-	public boolean check(Graph g, T... edgeOrVertex) {
+	public boolean check(Graph g, T edgeOrVertex) {
 		return !part.check(g,edgeOrVertex);
+	}
+	public boolean check(Graph g, Map<String,T> bindings) {
+		return !part.check(g,bindings);
 	}
 	public PropertyConstraint<T> getPart() {
 		return part;
@@ -58,5 +64,12 @@ public class NegatedPropertyConstraint<T extends UserDataContainer> implements P
 			clone.setTerms(this.getTerms());
 		}
 		return clone;
+	}
+	public List<String> getOwnerRoles() {
+		return part.getOwnerRoles();
+	}
+	
+	public String toString() {
+		return "not "+this.part;
 	}
 }

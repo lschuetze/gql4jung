@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import edu.uci.ics.jung.graph.*;
 import nz.ac.massey.cs.gql4jung.*;
 import nz.ac.massey.cs.processors.Processor;
@@ -75,9 +77,18 @@ public class GQLImpl implements GQL {
 		if (nextConstraint instanceof PropertyConstraint) {
 			PropertyConstraint propertyConstraint = (PropertyConstraint)nextConstraint;
 			String role = propertyConstraint.getOwner();
-			Vertex v = (Vertex)bindings.lookup(role);
-			if (propertyConstraint.check(graph,v)) {
-				resolve(graph,motif,newAgenda,bindings,listener);
+			// constraint has owner
+			if (role!=null) {
+				Vertex v = (Vertex)bindings.lookup(role);
+				if (propertyConstraint.check(graph,v)) {
+					resolve(graph,motif,newAgenda,bindings,listener);
+				}
+			}
+			else {
+				Map<String,Vertex> map = bindings.getRoleBindingsAsMap();
+				if (propertyConstraint.check(graph,map)) {
+					resolve(graph,motif,newAgenda,bindings,listener);
+				}				
 			}
 		}
 		else if (nextConstraint instanceof LinkConstraint) {

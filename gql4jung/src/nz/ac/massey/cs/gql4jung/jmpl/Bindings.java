@@ -41,7 +41,7 @@ public class Bindings  {
 		assert(v!=null);		
 		keys4roles[position]= k;
 		values4roles[position] = v;
-		//System.out.println("binding "+k+" -> "+v);
+		// System.out.println("binding "+k+" -> "+v);
 	}
 	/**
 	 * Add a new entry.

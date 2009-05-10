@@ -54,4 +54,5 @@ public class MotifInstanceImpl implements MotifInstance {
 		b.append(")");
 		return b.toString();
 	}
+	
 }

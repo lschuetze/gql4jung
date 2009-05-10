@@ -10,6 +10,9 @@
 
 package nz.ac.massey.cs.gql4jung;
 
+import java.util.List;
+import java.util.Map;
+
 import nz.ac.massey.cs.gql4jung.constraints.Term;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
@@ -18,6 +21,14 @@ public interface PropertyConstraint<T extends UserDataContainer> extends Constra
 
 	public abstract Term[] getTerms();
 	public abstract String getOwner();
-	public abstract boolean check(Graph g, T... edgeOrVertex);
+	// check method suitable if property is attached to one vertex 
+	// (references only one role) or one edge
+	public abstract boolean check(Graph g, T edgeOrVertex);
+	// check method suitable constraint associates properties from
+	// different elements (usually vertices)
+	public abstract boolean check(Graph g, Map<String,T> bindings);
+	// return the owner role id the constraint is attached to a role,
+	// or a collection of roles if terms are attached to different constraints
+	public abstract List<String> getOwnerRoles();
 
 }

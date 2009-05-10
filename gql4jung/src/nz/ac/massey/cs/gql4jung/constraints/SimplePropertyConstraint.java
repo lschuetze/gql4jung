@@ -10,6 +10,10 @@
 
 package nz.ac.massey.cs.gql4jung.constraints;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import nz.ac.massey.cs.gql4jung.PropertyConstraint;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.utils.UserDataContainer;
@@ -27,6 +31,7 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 
 	private Term[] terms = null;
 	private String owner = null;
+	private List<String> ownerSingleton = new ArrayList<String>();
 
 	// the default operator is
 	private Operator operator = Operator.getInstance("=");
@@ -54,31 +59,47 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 	 * nz.ac.massey.cs.gpl4jung.PropertyConstraint#check(edu.uci.ics.jung.graph
 	 * .Graph, T)
 	 */
-	public boolean check(Graph g, T... edgeOrVertex) {
-		for(T element:edgeOrVertex){
+	public boolean check(Graph g, T edgeOrVertex) {
+		
 		// instantiate
 		Object[] values = new Object[terms.length];
 		for (int i=0;i<terms.length;i++) {
 			if (terms[i] instanceof PropertyTerm) {
-				Object value = ((PropertyTerm)terms[i]).getValue(element);
+				Object value = ((PropertyTerm)terms[i]).getValue(edgeOrVertex);
 				values[i] = value;
 			}
 			else if (terms[i] instanceof ValueTerm) {
 				values[i] = ((ValueTerm)terms[i]).getValue();
 			}
-		
 		}
-		if(!operator.compare(values[0], values[1]))
-			return false;
-		}
-		return true;
+		return operator.compare(values[0], values[1]);
 	}
+	
+	public boolean check(Graph g, Map<String,T> bindings) {
+		
+		// instantiate
+		Object[] values = new Object[terms.length];
+		for (int i=0;i<terms.length;i++) {
+			if (terms[i] instanceof RolePropertyTerm) {
+				T owner = bindings.get(((RolePropertyTerm)terms[i]).getRole());
+				Object value = ((RolePropertyTerm)terms[i]).getValue(owner);
+				values[i] = value;
+			}
+			else if (terms[i] instanceof ValueTerm) {
+				values[i] = ((ValueTerm)terms[i]).getValue();
+			}
+		}
+		return operator.compare(values[0], values[1]);
+	}
+	
 	@Override
 	public String getOwner() {
 		return owner;	
 	}
 	public void setOwner(String owner){
 		this.owner = owner;
+		this.ownerSingleton.clear();
+		this.ownerSingleton.add(owner);
 	}
 	public SimplePropertyConstraint clone(){
 		SimplePropertyConstraint clone = new SimplePropertyConstraint();
@@ -89,19 +110,33 @@ public class SimplePropertyConstraint<T extends UserDataContainer> implements
 	}
 	
 	public String toString() {
-		StringBuffer b = new StringBuffer()
-			.append("property constraint[")
-			.append(this.getOwner())
-			.append(" ")
-			.append(operator)
-			.append(" ");
-		boolean f = true;
-		for (Term t:terms) {
-			if (f) f=false;
-			else b.append(',');
-			b.append(t);
+		if (terms.length==2) {
+			return new StringBuffer()
+				.append(terms[0])
+				.append(operator)
+				.append(terms[1])
+				.toString();
 		}
-		b.append(")");
-		return b.toString();
+		else return super.toString();
+	}
+	
+	// return the owner role id the constraint is attached to a role,
+	// or a collection of roles if terms are attached to different constraints
+	public List<String> getOwnerRoles() {
+		if (this.owner!=null) {
+			return this.ownerSingleton;
+		}
+		else {
+			List<String> l = new ArrayList<String>(terms.length);
+			for (Term t:terms) {
+				if (t instanceof RolePropertyTerm) {
+					l.add(((RolePropertyTerm)t).getRole());
+				}
+				else if (!(t instanceof ValueTerm)) {
+					throw new IllegalStateException("Property constraints without owner should only have value and role property terms");
+				}
+			}
+			return l;
+		}
 	}
 }
