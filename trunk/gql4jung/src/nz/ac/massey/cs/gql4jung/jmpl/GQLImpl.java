@@ -5,15 +5,19 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import edu.uci.ics.jung.graph.*;
 import nz.ac.massey.cs.gql4jung.*;
 import nz.ac.massey.cs.processors.Processor;
+
 /**
  * Improved graph query engine.
  * @author jens dietrich
  */
-public class GQLImpl implements GQL {
+public class GQLImpl extends Logging implements GQL {
+	public GQLImpl() {
+		super();
+	}
+
 	private boolean cancel = false;
 	private ConstraintScheduler scheduler = new ConstraintSchedulerImpl();
 
@@ -72,7 +76,9 @@ public class GQLImpl implements GQL {
 			if (c!=nextConstraint) newAgenda.add(c);
 		} 
 		
-		//System.out.println("recursion level "+bindings.getPosition()+", resolving: "+nextConstraint);
+		if (LOG_GQL.isDebugEnabled()) {
+			LOG_GQL.debug("recursion level "+bindings.getPosition()+", resolving: "+nextConstraint);
+		}
 		
 		if (nextConstraint instanceof PropertyConstraint) {
 			PropertyConstraint propertyConstraint = (PropertyConstraint)nextConstraint;

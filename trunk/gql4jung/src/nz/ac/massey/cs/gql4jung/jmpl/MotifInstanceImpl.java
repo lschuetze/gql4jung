@@ -12,7 +12,7 @@ import nz.ac.massey.cs.gql4jung.MotifInstance;
  * @author jens dietrich
  */
 
-public class MotifInstanceImpl implements MotifInstance {
+public class MotifInstanceImpl extends Logging implements MotifInstance {
 	
 	private Motif motif = null;
 	private Map<String,Vertex> vertexBindings = new HashMap<String, Vertex>();
@@ -22,7 +22,9 @@ public class MotifInstanceImpl implements MotifInstance {
 		this.motif = motif;
 		this.vertexBindings.putAll(bindings.getRoleBindingsAsMap());
 		this.linkBindings.putAll(bindings.getLinkBindingsAsMap());
-		//System.out.println("result created: " + this);
+		if (LOG_INST.isDebugEnabled()) {
+			LOG_INST.debug("result created: " + this);
+		}
 	}
 	
 	public Object getLink(LinkConstraint constraint) {

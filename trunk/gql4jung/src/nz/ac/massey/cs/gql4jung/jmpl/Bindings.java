@@ -7,7 +7,7 @@ import edu.uci.ics.jung.graph.Vertex;
  * Data structure for variable bindings.
  * @author jens dietrich
  */
-public class Bindings  {
+public class Bindings  extends Logging {
 	public static int SIZE = 100;
 	private String[] keys4roles = new String[SIZE];
 	private Vertex[] values4roles = new Vertex[SIZE];
@@ -41,7 +41,9 @@ public class Bindings  {
 		assert(v!=null);		
 		keys4roles[position]= k;
 		values4roles[position] = v;
-		// System.out.println("binding "+k+" -> "+v);
+		if (LOG_BIND.isDebugEnabled()) {
+			LOG_BIND.debug("binding "+k+" -> "+v);
+		}
 	}
 	/**
 	 * Add a new entry.
