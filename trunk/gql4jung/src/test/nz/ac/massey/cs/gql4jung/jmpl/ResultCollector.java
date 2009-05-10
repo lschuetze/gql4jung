@@ -8,6 +8,8 @@ import nz.ac.massey.cs.gql4jung.ResultListener;
 
 public class ResultCollector implements ResultListener {
 
+	private long creationTime = System.currentTimeMillis();
+	private boolean logProgress = false;
 	private List<MotifInstance> instances = new ArrayList<MotifInstance>();
 	
 	public List<MotifInstance> getInstances() {
@@ -31,8 +33,13 @@ public class ResultCollector implements ResultListener {
 
 	@Override
 	public void progressMade(int progress, int total) {
-		System.out.println("Computing query, "+progress+"/"+total+" done");
-		
+		// Switch on progress logging only after query takes more than 5 sec
+		if (!logProgress) {
+			logProgress =(System.currentTimeMillis()-this.creationTime > 5000);
+		}
+		if (logProgress) {
+			System.out.println("Computing query, "+progress+"/"+total+" done");
+		}
 	}
 
 }

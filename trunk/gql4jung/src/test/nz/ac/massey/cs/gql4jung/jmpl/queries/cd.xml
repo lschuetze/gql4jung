@@ -16,14 +16,14 @@
     </condition>
     <not>
 	    <condition predicate="equals">
-	    	<attribute owner="inside1" key="namespace"/> 
-	    	<attribute owner="outside1" key="namespace"/> 
+	    	<attribute vertex="inside1" key="namespace"/> 
+	    	<attribute vertex="outside1" key="namespace"/> 
 	    </condition>
     </not>
     <not>
 	    <condition predicate="equals">
-	    	<attribute owner="inside1" key="namespace"/> 
-	    	<attribute owner="outside2" key="namespace"/> 
+	    	<attribute vertex="inside1" key="namespace"/> 
+	    	<attribute vertex="outside2" key="namespace"/> 
 	    </condition>
     </not>
     <groupby>
