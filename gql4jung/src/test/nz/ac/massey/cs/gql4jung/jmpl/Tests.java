@@ -3,7 +3,6 @@ package test.nz.ac.massey.cs.gql4jung.jmpl;
 import static junit.framework.Assert.*;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import nz.ac.massey.cs.gql4jung.GQL;
@@ -14,18 +13,17 @@ import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
 import edu.uci.ics.jung.io.GraphMLFile;
 
 /**
- * Tests for the new (jmpl) query engine implementation.
+ * Abstract superclass for tests for the new (jmpl) query engine implementation.
  * @author jens dietrich
  */
 
-public class Tests {
+public abstract class Tests {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -67,7 +65,8 @@ public class Tests {
 		}
 		return false;
 	} 
-	private void doTest(String motif, String data,Map<String, String> expected,boolean shouldSucceed) throws Exception {
+	// check whether a result specified as map is or is not in the result set
+	protected void doTest(String motif, String data,Map<String, String> expected,boolean shouldSucceed) throws Exception {
 		Graph g = this.loadGraph(data);
 		Motif m = this.loadQuery(motif);
 		ResultCollector coll = new ResultCollector();
@@ -79,70 +78,17 @@ public class Tests {
 		System.out.println("query "+motif+" on data "+data+ " took "+(t2-t1)+" millis");
 		assertTrue(shouldSucceed==check(coll.getInstances(),expected));
 	}
-	@Test
-	public void testAWDAnt1() throws Exception {
-		Map<String,String> expected = new HashMap<String,String>();
-		expected.put("client","org.apache.tools.ant.filters.TokenFilter");
-		expected.put("service","org.apache.tools.ant.filters.TokenFilter$ChainableReaderFilter");
-		expected.put("service_impl","org.apache.tools.ant.filters.TokenFilter$ContainsRegex");		
-		doTest("awd.xml","ant.jar.graphml",expected,true);
+	// check the expected number of results
+	protected void doTest(String motif, String data,int expected) throws Exception {
+		Graph g = this.loadGraph(data);
+		Motif m = this.loadQuery(motif);
+		ResultCollector coll = new ResultCollector();
+		GQL engine = new GQLImpl();
+		long t1 = System.currentTimeMillis();
+		engine.query(g,m,coll);
+		long t2 = System.currentTimeMillis();
+		System.out.println("query "+motif+" on data "+data+ " returned "+coll.getInstances().size()+" results");
+		System.out.println("query "+motif+" on data "+data+ " took "+(t2-t1)+" millis");
+		assertEquals(expected,coll.getInstances().size());
 	}
-	@Test
-	public void testAWDAnt2() throws Exception {
-		Map<String,String> expected = new HashMap<String,String>();
-		expected.put("client","org.apache.tools.ant.filters.util.ChainReaderHelper");
-		expected.put("service","org.apache.tools.ant.filters.BaseFilterReader");
-		expected.put("service_impl","org.apache.tools.ant.filters.LineContains");		
-		doTest("awd.xml","ant.jar.graphml",expected,true);
-	}
-	@Test
-	public void testAWD1() throws Exception {
-		Map<String,String> expected = new HashMap<String,String>();
-		expected.put("client","org.example.AClient");
-		expected.put("service","org.example.AService");
-		expected.put("service_impl","org.example.AServiceImpl");		
-		doTest("awd.xml","testdata-awd1.graphml",expected,true);
-	}
-	@Test
-	public void testAWD2() throws Exception {
-		Map<String,String> expected = new HashMap<String,String>();
-		expected.put("client","org.example.AClient");
-		expected.put("service","org.example.AService");
-		expected.put("service_impl","org.example.AServiceImpl");		
-		doTest("awd.xml","testdata-awd2.graphml",expected,true);
-	}
-	@Test
-	public void testAWD3() throws Exception {
-		Map<String,String> expected = new HashMap<String,String>();
-		expected.put("client","org.example.AClient");
-		expected.put("service","org.example.AService");
-		expected.put("service_impl","org.example.AServiceImpl");		
-		doTest("awd.xml","testdata-awd3.graphml",expected,true);
-	}
-	@Test
-	public void testAWD4() throws Exception {
-		Map<String,String> expected = new HashMap<String,String>();
-		expected.put("client","org.example.AClient");
-		expected.put("service","org.example.AService");
-		expected.put("service_impl","org.example.AServiceImpl");		
-		doTest("awd.xml","testdata-awd4.graphml",expected,true);
-	}
-	@Test
-	public void testAWD5() throws Exception {
-		Map<String,String> expected = new HashMap<String,String>();
-		expected.put("client","org.example.AClient");
-		expected.put("service","org.example.AService");
-		expected.put("service_impl","org.example.AServiceImpl");		
-		doTest("awd.xml","testdata-awd5.graphml",expected,true);
-	}
-	
-	public void testCD1() throws Exception {
-		Map<String,String> expected = new HashMap<String,String>();
-		expected.put("inside1","org.example1.Inside1");
-		expected.put("outside1","org.example2.Outside1");
-		expected.put("outside2","org.example2.Outside2");
-		expected.put("inside2","org.example1.Inside2");
-		doTest("cd.xml","testdata-cd1.graphml",expected,true);
-	}
-	
 }
