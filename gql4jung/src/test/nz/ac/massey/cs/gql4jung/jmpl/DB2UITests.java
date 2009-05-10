@@ -33,4 +33,25 @@ public class DB2UITests extends Tests{
 		doTest("db2ui.xml","testdata-db2ui2.graphml",1);
 	}
 	
+	@Test
+	public void testCD3() throws Exception {
+		Map<String,String> expected = new HashMap<String,String>();
+		expected.put("dbclass","java.sql.Driver");
+		expected.put("uiclass","javax.swing.JFrame");
+		expected.put("dblayerclass","org.example1.MyDB");
+		expected.put("uilayerclass","org.example1.MyFrame");
+		doTest("db2ui.xml","testdata-db2ui3.graphml",expected,true);
+		doTest("db2ui.xml","testdata-db2ui3.graphml",1);
+	}
+	
+	@Test
+	public void testCD4() throws Exception {
+		Map<String,String> expected = new HashMap<String,String>();
+		expected.put("dbclass","java.sql.Driver");
+		expected.put("uiclass","javax.swing.JFrame");
+		expected.put("dblayerclass","org.example1.MyClass");
+		expected.put("uilayerclass","org.example1.MyClass");
+		doTest("db2ui.xml","testdata-db2ui4.graphml",expected,true);
+		doTest("db2ui.xml","testdata-db2ui4.graphml",1);
+	}
 }
