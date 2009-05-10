@@ -12,7 +12,7 @@ import org.junit.Test;
 public class CDTests extends Tests{
 
 	@Test
-	public void testCD1() throws Exception {
+	public void test1() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("inside1","org.example1.Inside1");
 		expected.put("outside1","org.example2.Outside1");
@@ -23,7 +23,7 @@ public class CDTests extends Tests{
 	}
 	
 	@Test
-	public void testCD2() throws Exception {
+	public void test2() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("inside1","org.example1.Inside1");
 		expected.put("outside1","org.example2.Outside");
@@ -34,12 +34,12 @@ public class CDTests extends Tests{
 	}
 	
 	@Test
-	public void testCD3() throws Exception {
+	public void test3() throws Exception {
 		doTest("cd.xml","testdata-cd3.graphml",0);
 	}
 	
 	@Test
-	public void testCDAnt1() throws Exception {	
+	public void testAnt1() throws Exception {	
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("inside1","org.apache.tools.ant.input.PropertyFileInputHandler");
 		expected.put("outside1","org.apache.tools.ant.BuildException");
