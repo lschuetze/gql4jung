@@ -249,12 +249,13 @@ public class XMLMotifReader implements MotifReader {
 			return motif;
 		
 		} catch (JAXBException e) {
+			e.printStackTrace();
 			throw new MotifReaderException("exception reading motif from xml",e);
 		}	
 				
 	}
 
-	private PropertyConstraint buildStandaloneConstraint(Condition c) throws MotifReaderException {
+	private Constraint buildStandaloneConstraint(Condition c) throws MotifReaderException {
 		SimplePropertyConstraint constraint = new SimplePropertyConstraint();
 		if (!"equals".equals(c.getPredicate())) throw new MotifReaderException("the only opertator currently supported is equals");
 		Operator op = Operator.getInstance("="); // TODO this is hardcoded here !!
