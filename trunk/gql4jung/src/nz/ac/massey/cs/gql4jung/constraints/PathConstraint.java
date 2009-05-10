@@ -11,27 +11,15 @@
 package nz.ac.massey.cs.gql4jung.constraints;
 
 import java.rmi.server.UID;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.collections.iterators.SingletonIterator;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
-
 import nz.ac.massey.cs.gql4jung.ConnectedVertex;
 import nz.ac.massey.cs.gql4jung.LinkConstraint;
 import nz.ac.massey.cs.gql4jung.Path;
-import nz.ac.massey.cs.gql4jung.impl.EmptyPath;
-import nz.ac.massey.cs.gql4jung.impl.PathImpl;
-import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
-import edu.uci.ics.jung.algorithms.shortestpath.ShortestPath;
-import edu.uci.ics.jung.algorithms.shortestpath.ShortestPathUtils;
+import nz.ac.massey.cs.gql4jung.jmpl.PathImpl;
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;

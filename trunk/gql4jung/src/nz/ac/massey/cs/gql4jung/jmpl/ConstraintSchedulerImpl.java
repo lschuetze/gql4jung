@@ -73,7 +73,10 @@ public class ConstraintSchedulerImpl implements ConstraintScheduler {
 	}
 
 	private boolean hasBinding(PropertyConstraint pc,Bindings b) {
-		return null!= b.lookup(pc.getOwner());
+		for (Object role:pc.getOwnerRoles()) {
+			if (null== b.lookup((String)role)) return false;
+		}
+		return true;
 	}
 	private int getBindingsCount(LinkConstraint lc,Bindings b) {
 		int i = null==b.lookup(lc.getTarget())?0:1;

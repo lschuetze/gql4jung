@@ -10,6 +10,7 @@
 
 package nz.ac.massey.cs.gql4jung.constraints;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import nz.ac.massey.cs.gql4jung.PropertyConstraint;
@@ -38,4 +39,11 @@ public abstract class ComplexPropertyConstraint<T extends UserDataContainer> imp
 		return clone();
 	}
 	
+	public List<String> getOwnerRoles() {
+		List<String> l = new ArrayList<String>();
+		for (PropertyConstraint part:parts) {
+			l.addAll(part.getOwnerRoles());
+		}
+		return l;
+	}
 }

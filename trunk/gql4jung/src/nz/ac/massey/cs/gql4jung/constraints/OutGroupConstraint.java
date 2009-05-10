@@ -23,7 +23,7 @@ import com.google.common.collect.Iterators;
 import nz.ac.massey.cs.gql4jung.ConnectedVertex;
 import nz.ac.massey.cs.gql4jung.LinkConstraint;
 import nz.ac.massey.cs.gql4jung.Path;
-import nz.ac.massey.cs.gql4jung.impl.PathImpl;
+import nz.ac.massey.cs.gql4jung.jmpl.PathImpl;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.algorithms.shortestpath.ShortestPath;
 import edu.uci.ics.jung.algorithms.shortestpath.ShortestPathUtils;
