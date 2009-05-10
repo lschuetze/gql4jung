@@ -2227,10 +2227,10 @@ public class Query {
         protected Query.Path.Not not;
         @XmlAttribute
         @XmlSchemaType(name = "positiveInteger")
-        protected int minLength;
+        protected int minLength = 1;
         @XmlAttribute
         @XmlSchemaType(name = "positiveInteger")
-        protected int maxLength;
+        protected int maxLength = -1;
         @XmlAttribute(required = true)
         @XmlIDREF
         @XmlSchemaType(name = "IDREF")

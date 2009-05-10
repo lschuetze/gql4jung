@@ -29,8 +29,10 @@ import nz.ac.massey.cs.gql4jung.constraints.PathConstraint;
 import nz.ac.massey.cs.gql4jung.constraints.PropertyConstraintConjunction;
 import nz.ac.massey.cs.gql4jung.constraints.PropertyConstraintDisjunction;
 import nz.ac.massey.cs.gql4jung.constraints.PropertyTerm;
+import nz.ac.massey.cs.gql4jung.constraints.RolePropertyTerm;
 import nz.ac.massey.cs.gql4jung.constraints.SimplePropertyConstraint;
 import nz.ac.massey.cs.gql4jung.constraints.ValueTerm;
+import nz.ac.massey.cs.gql4jung.xml.Query.Condition;
 import nz.ac.massey.cs.gql4jung.xml.Query.ExistsNot;
 import nz.ac.massey.cs.gql4jung.xml.Query.Groupby;
 import nz.ac.massey.cs.gql4jung.xml.Query.Not;
@@ -104,17 +106,12 @@ public class XMLMotifReader implements MotifReader {
 					PathConstraint pathConstraint = new PathConstraint();
 					Query.Path p = (Query.Path)o;
 					//System.out.println("path from " + p.getFrom() + " to " + p.getTo());
-					if(p.getMaxLength()!=0){
-						pathConstraint.setMaxLength(p.getMaxLength());
-					}
-					if(p.getMinLength()!=-1){
-						pathConstraint.setMinLength(p.getMinLength());
-					} 
+					pathConstraint.setMaxLength(p.getMaxLength());
+					pathConstraint.setMinLength(p.getMinLength());
 					Query.Vertex from = (Query.Vertex) p.getFrom();
 					Query.Vertex to = (Query.Vertex) p.getTo();
 					pathConstraint.setSource(from.getId());
 					pathConstraint.setTarget(to.getId());
-					
 					//getting simple path property constraint
 					Query.Path.Property pp = p.getProperty();
 					if(pp!=null){
@@ -167,78 +164,16 @@ public class XMLMotifReader implements MotifReader {
 				
 				else if (o instanceof Query.Condition) {
 					Query.Condition c = (Query.Condition)o;
-					
-					SimplePropertyConstraint part1 = new SimplePropertyConstraint();
-					SimplePropertyConstraint part2 = new SimplePropertyConstraint();
-					List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
-					Operator op = Operator.getInstance("=");
-					PropertyConstraintConjunction complexProp = new PropertyConstraintConjunction();
-					//getting condition attributes and mapping to property terms
-					Query.Condition.Attribute a = c.getAttribute().get(0);
-					part1.setOperator(op);
-					PropertyTerm term1 = new PropertyTerm(a.getKey());
-					ValueTerm term2 = null;
-					part1.setOwner(a.getVertex());
-					part1.setTerms(term1,term2);
-					parts.add(part1);
-					//getting 2nd part
-					Query.Condition.Attribute a1 = c.getAttribute().get(1);
-					part2.setOperator(op);
-					PropertyTerm term3 = new PropertyTerm(a1.getKey());
-					ValueTerm term4 = null;
-					part2.setOwner(a1.getVertex());
-					part2.setTerms(term3,term4);
-					parts.add(part2);
-					complexProp.setParts(parts);
-					complexProp.setOwner(a.getVertex());
-					constraints.add(complexProp);
+					Constraint constraint = buildStandaloneConstraint(c);
+					constraints.add(constraint);
 					
 				}
 				else if (o instanceof Query.Not){
 					Query.Not n = (Query.Not) o;
 					Query.Not.Condition c1 = n.getCondition();
 					NegatedPropertyConstraint negPropConstraint = new NegatedPropertyConstraint();
-					if(c1!=null){
-						SimplePropertyConstraint part1 = new SimplePropertyConstraint();
-						SimplePropertyConstraint part2 = new SimplePropertyConstraint();
-						List<PropertyConstraint> parts = new ArrayList<PropertyConstraint>();
-						Operator op = Operator.getInstance("=");
-						PropertyConstraintConjunction complexProp = new PropertyConstraintConjunction();
-						//getting condition attributes and mapping to property terms
-						Query.Not.Condition.Attribute attr = c1.getAttribute().get(0);
-						part1.setOperator(op);
-						PropertyTerm term1 = new PropertyTerm(attr.getKey());
-						ValueTerm term2 = null;
-						if(attr.getOwner()!=null){
-							part1.setOwner(attr.getOwner());
-						} else
-							part1.setOwner(attr.getVertex());
-						part1.setTerms(term1,term2);
-						parts.add(part1);
-						//getting 2nd part
-						Query.Not.Condition.Attribute a1 = c1.getAttribute().get(1);
-						part2.setOperator(op);
-						PropertyTerm term3 = new PropertyTerm(a1.getKey());
-						ValueTerm term4 = null;
-						if(a1.getOwner()!=null){
-							part2.setOwner(a1.getOwner());
-						} else
-							part2.setOwner(a1.getVertex());
-						part2.setTerms(term3,term4);
-						parts.add(part2);
-						complexProp.setParts(parts);
-						if(attr.getOwner()!=null){
-							complexProp.setOwner(attr.getOwner());
-						} else
-							complexProp.setOwner(attr.getVertex());
-						negPropConstraint.setPart(complexProp);
-						if(attr.getOwner()!=null){
-							negPropConstraint.setOwner(attr.getOwner());
-						} else
-						negPropConstraint.setOwner(attr.getVertex());
-					}
-					
-					
+					PropertyConstraint c = this.buildStandaloneConstraint(c1);				
+					negPropConstraint.setPart(c);
 					constraints.add(negPropConstraint);
 				}
 				else if (o instanceof Query.ExistsNot){
@@ -317,5 +252,38 @@ public class XMLMotifReader implements MotifReader {
 			throw new MotifReaderException("exception reading motif from xml",e);
 		}	
 				
+	}
+
+	private PropertyConstraint buildStandaloneConstraint(Condition c) throws MotifReaderException {
+		SimplePropertyConstraint constraint = new SimplePropertyConstraint();
+		if (!"equals".equals(c.getPredicate())) throw new MotifReaderException("the only opertator currently supported is equals");
+		Operator op = Operator.getInstance("="); // TODO this is hardcoded here !!
+		PropertyConstraintConjunction complexProp = new PropertyConstraintConjunction();
+		//getting condition attributes and mapping to property terms
+		if (c.getAttribute().size()!=2) throw new MotifReaderException("only two arguments in property condition comparing properties from different vertices are allowed");
+		Query.Condition.Attribute a1 = c.getAttribute().get(0);
+		Query.Condition.Attribute a2 = c.getAttribute().get(1);
+		RolePropertyTerm t1 = new RolePropertyTerm(a1.getVertex(),a1.getKey());
+		RolePropertyTerm t2 = new RolePropertyTerm(a2.getVertex(),a2.getKey());
+		constraint.setOperator(op);
+		constraint.setTerms(t1,t2);
+		return constraint;
+	}
+	// TODO: this is a clone of the overloaded method - this must be fixed in the schema !!
+	// result of dirty copy and paste in the schema - there is more of this !!
+	private PropertyConstraint buildStandaloneConstraint(Query.Not.Condition c) throws MotifReaderException {
+		SimplePropertyConstraint constraint = new SimplePropertyConstraint();
+		if (!"equals".equals(c.getPredicate())) throw new MotifReaderException("the only opertator currently supported is equals");
+		Operator op = Operator.getInstance("="); // TODO this is hardcoded here !!
+		PropertyConstraintConjunction complexProp = new PropertyConstraintConjunction();
+		//getting condition attributes and mapping to property terms
+		if (c.getAttribute().size()!=2) throw new MotifReaderException("only two arguments in property condition comparing properties from different vertices are allowed");
+		Query.Not.Condition.Attribute a1 = c.getAttribute().get(0);
+		Query.Not.Condition.Attribute a2 = c.getAttribute().get(1);
+		RolePropertyTerm t1 = new RolePropertyTerm(a1.getVertex(),a1.getKey());
+		RolePropertyTerm t2 = new RolePropertyTerm(a2.getVertex(),a2.getKey());
+		constraint.setOperator(op);
+		constraint.setTerms(t1,t2);
+		return constraint;
 	}
 }
