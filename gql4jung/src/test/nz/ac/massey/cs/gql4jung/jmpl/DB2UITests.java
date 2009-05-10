@@ -12,7 +12,7 @@ import org.junit.Test;
 public class DB2UITests extends Tests{
 
 	@Test
-	public void testCD1() throws Exception {
+	public void test1() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("dbclass","java.sql.Driver");
 		expected.put("uiclass","javax.swing.JFrame");
@@ -23,7 +23,7 @@ public class DB2UITests extends Tests{
 	}
 	
 	@Test
-	public void testCD2() throws Exception {
+	public void test() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("dbclass","org.hibernate.Transaction");
 		expected.put("uiclass","java.awt.Frame");
@@ -34,7 +34,7 @@ public class DB2UITests extends Tests{
 	}
 	
 	@Test
-	public void testCD3() throws Exception {
+	public void test3() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("dbclass","java.sql.Driver");
 		expected.put("uiclass","javax.swing.JFrame");
@@ -45,7 +45,7 @@ public class DB2UITests extends Tests{
 	}
 	
 	@Test
-	public void testCD4() throws Exception {
+	public void test4() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("dbclass","java.sql.Driver");
 		expected.put("uiclass","javax.swing.JFrame");
@@ -53,5 +53,15 @@ public class DB2UITests extends Tests{
 		expected.put("uilayerclass","org.example1.MyClass");
 		doTest("db2ui.xml","testdata-db2ui4.graphml",expected,true);
 		doTest("db2ui.xml","testdata-db2ui4.graphml",1);
+	}
+	
+	@Test
+	public void testjt400Proxy1() throws Exception {
+		Map<String,String> expected = new HashMap<String,String>();
+		expected.put("dbclass","java.sql.ParameterMetaData");
+		expected.put("uiclass","java.awt.Container");
+		expected.put("dblayerclass","com.ibm.as400.access.JDParameterMetaDataProxy");
+		expected.put("uilayerclass","com.ibm.as400.access.PasswordDialog");
+		doTest("db2ui.xml","jt400Proxy.jar.graphml",expected,true);
 	}
 }

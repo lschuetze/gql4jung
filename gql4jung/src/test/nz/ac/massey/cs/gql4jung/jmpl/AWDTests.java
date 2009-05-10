@@ -14,7 +14,7 @@ public class AWDTests extends Tests{
 
 
 	@Test
-	public void testAWDAnt1() throws Exception {
+	public void testAnt1() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("client","org.apache.tools.ant.filters.TokenFilter");
 		expected.put("service","org.apache.tools.ant.filters.TokenFilter$ChainableReaderFilter");
@@ -22,7 +22,7 @@ public class AWDTests extends Tests{
 		doTest("awd.xml","ant.jar.graphml",expected,true);
 	}
 	@Test
-	public void testAWDAnt2() throws Exception {
+	public void testAnt2() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("client","org.apache.tools.ant.filters.util.ChainReaderHelper");
 		expected.put("service","org.apache.tools.ant.filters.BaseFilterReader");
@@ -30,7 +30,7 @@ public class AWDTests extends Tests{
 		doTest("awd.xml","ant.jar.graphml",expected,true);
 	}
 	@Test
-	public void testAWD1() throws Exception {
+	public void test1() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("client","org.example.AClient");
 		expected.put("service","org.example.AService");
@@ -38,7 +38,7 @@ public class AWDTests extends Tests{
 		doTest("awd.xml","testdata-awd1.graphml",expected,true);
 	}
 	@Test
-	public void testAWD2() throws Exception {
+	public void test2() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("client","org.example.AClient");
 		expected.put("service","org.example.AService");
@@ -46,7 +46,7 @@ public class AWDTests extends Tests{
 		doTest("awd.xml","testdata-awd2.graphml",expected,true);
 	}
 	@Test
-	public void testAWD3() throws Exception {
+	public void test3() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("client","org.example.AClient");
 		expected.put("service","org.example.AService");
@@ -54,7 +54,7 @@ public class AWDTests extends Tests{
 		doTest("awd.xml","testdata-awd3.graphml",expected,true);
 	}
 	@Test
-	public void testAWD4() throws Exception {
+	public void test4() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("client","org.example.AClient");
 		expected.put("service","org.example.AService");
@@ -62,7 +62,7 @@ public class AWDTests extends Tests{
 		doTest("awd.xml","testdata-awd4.graphml",expected,true);
 	}
 	@Test
-	public void testAWD5() throws Exception {
+	public void test5() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("client","org.example.AClient");
 		expected.put("service","org.example.AService");

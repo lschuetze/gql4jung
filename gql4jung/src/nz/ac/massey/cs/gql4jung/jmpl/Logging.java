@@ -15,7 +15,7 @@ public class Logging {
 		super();
 		
 		// debugging
-		Level level = Level.DEBUG;
+		Level level = Level.ERROR;
 		// runtime
 		LOG_GQL.setLevel(level);
 		LOG_BIND.setLevel(level);
