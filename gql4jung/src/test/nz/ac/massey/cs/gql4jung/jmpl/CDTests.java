@@ -35,17 +35,16 @@ public class CDTests extends Tests{
 	
 	@Test
 	public void testCD3() throws Exception {
-		
 		doTest("cd.xml","testdata-cd3.graphml",0);
 	}
 	
 	@Test
-	public void testCDAnt1() throws Exception {
+	public void testCDAnt1() throws Exception {	
 		Map<String,String> expected = new HashMap<String,String>();
-		expected.put("inside1","org.apache.tools.ant.inputPropertyFilterInputHandler");
+		expected.put("inside1","org.apache.tools.ant.input.PropertyFileInputHandler");
 		expected.put("outside1","org.apache.tools.ant.BuildException");
 		expected.put("outside2","org.apache.tools.ant.Project");
-		expected.put("inside2","org.apache.tools.ant.input.DefaultInputHandler");
+		expected.put("inside2","org.apache.tools.ant.input.InputHandler");
 		doTest("cd.xml","ant.jar.graphml",expected,true);
 	}
 	

@@ -78,6 +78,8 @@ public abstract class Tests {
 		System.out.println("query "+motif+" on data "+data+ " took "+(t2-t1)+" millis");
 		assertTrue(shouldSucceed==check(coll.getInstances(),expected));
 	}
+	
+	
 	// check the expected number of results
 	protected void doTest(String motif, String data,int expected) throws Exception {
 		Graph g = this.loadGraph(data);
