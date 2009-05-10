@@ -34,7 +34,7 @@ import nz.ac.massey.cs.gql4jung.LinkConstraint;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.MotifInstance2Graph;
-import nz.ac.massey.cs.gql4jung.impl.GQLImpl;
+import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.QueryResultsExporter2CSV;
 import nz.ac.massey.cs.gql4jung.util.QueryResults.Cursor;
