@@ -14,7 +14,7 @@
         <property key="type" value="class"/>
     </vertex>
     <!-- minLength and maxLength are optional, defaults are 1 and  infinite-->
-    <path minLength="1" maxLength="42" from="service_impl" to="service">
+    <path minLength="1" from="service_impl" to="service">
        <!-- properties can be complex using standard boolean operators AND,OR,NOT,XOR  -->
        <or>
        		<property key="type" value="extends"/>
