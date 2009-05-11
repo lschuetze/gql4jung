@@ -8,6 +8,7 @@ public class Logging {
 	static Logger LOG_GQL = Logger.getLogger(GQLImpl.class);
 	static Logger LOG_BIND = Logger.getLogger(Bindings.class);
 	static Logger LOG_INST = Logger.getLogger(MotifInstanceImpl.class);
+	static Logger LOG_SCHED = Logger.getLogger(ConstraintScheduler.class);
 	static {
 		BasicConfigurator.configure();
 	}
@@ -15,10 +16,12 @@ public class Logging {
 		super();
 		
 		// debugging
-		Level level = Level.ERROR;
+		Level level = Level.WARN;
+		//Level level = Level.DEBUG;
 		// runtime
 		LOG_GQL.setLevel(level);
 		LOG_BIND.setLevel(level);
 		LOG_INST.setLevel(level);
+		LOG_SCHED.setLevel(level);
 	}
 }

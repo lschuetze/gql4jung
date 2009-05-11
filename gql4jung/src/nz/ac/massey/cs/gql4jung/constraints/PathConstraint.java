@@ -124,9 +124,9 @@ public class PathConstraint extends LinkConstraint<Path> {
 			}
 		};
 		NodeIterator links = new NodeIterator(source,this.minLength,this.maxLength, true, filter);
-		links.iterator();
+		// links.iterator();
 		for (List<Edge> link:links) {
-			if ((link.size()==0 && source==target) || target==link.get(link.size()-1).getEndpoints().getSecond()) {
+			if ((link.size()==0 && source==target) || (link.size()>0 && target==link.get(link.size()-1).getEndpoints().getSecond())) {
 				PathImpl pp = new PathImpl();
 				pp.setEdges(link);
 				pp.setStart(source);

@@ -42,7 +42,15 @@ public class Bindings  extends Logging {
 		keys4roles[position]= k;
 		values4roles[position] = v;
 		if (LOG_BIND.isDebugEnabled()) {
-			LOG_BIND.debug("binding "+k+" -> "+v);
+			StringBuffer b = new StringBuffer();
+			b.append("binding ");
+			b.append(k);
+			b.append(" -> ");
+			b.append(v.getUserDatum("namespace"));
+			b.append(".");
+			b.append(v.getUserDatum("name"));
+			//LOG_BIND.debug("binding "+k+" -> "+v);
+			LOG_BIND.debug(b.toString());
 		}
 	}
 	/**
