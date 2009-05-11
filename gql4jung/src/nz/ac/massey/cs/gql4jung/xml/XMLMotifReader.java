@@ -21,10 +21,8 @@ import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Vertex;
 import nz.ac.massey.cs.gql4jung.*;
 import nz.ac.massey.cs.gql4jung.constraints.EdgeConstraint;
-import nz.ac.massey.cs.gql4jung.constraints.GroupConstraint;
 import nz.ac.massey.cs.gql4jung.constraints.NegatedPropertyConstraint;
 import nz.ac.massey.cs.gql4jung.constraints.Operator;
-import nz.ac.massey.cs.gql4jung.constraints.OutGroupConstraint;
 import nz.ac.massey.cs.gql4jung.constraints.PathConstraint;
 import nz.ac.massey.cs.gql4jung.constraints.PropertyConstraintConjunction;
 import nz.ac.massey.cs.gql4jung.constraints.PropertyConstraintDisjunction;
@@ -34,13 +32,15 @@ import nz.ac.massey.cs.gql4jung.constraints.SimplePropertyConstraint;
 import nz.ac.massey.cs.gql4jung.constraints.ValueTerm;
 import nz.ac.massey.cs.gql4jung.xml.Query.Condition;
 import nz.ac.massey.cs.gql4jung.xml.Query.ExistsNot;
-import nz.ac.massey.cs.gql4jung.xml.Query.Groupby;
-import nz.ac.massey.cs.gql4jung.xml.Query.Not;
 import nz.ac.massey.cs.gql4jung.xml.Query.Groupby.Element;
 import nz.ac.massey.cs.processors.ClusterProcessor;
 import nz.ac.massey.cs.processors.Processor;
 
-
+/**
+ * Builds motifs from xml streams
+ * @deprecated - to be replaces soon (jens)
+ * @author ali
+ */
 public class XMLMotifReader implements MotifReader {
 
 	@Override
@@ -198,28 +198,7 @@ public class XMLMotifReader implements MotifReader {
 					cp.setProcessorClass(gp.getClazz());
 					graphProcessors.add(cp);
 				}
-				//getting group constraint
-				else if (o instanceof Query.Group){
-					Query.Group qg = (Query.Group)o;
-					GroupConstraint groupConstraint = new GroupConstraint();
-					if(qg!=null){
-						groupConstraint.setKey(qg.getKey());
-						groupConstraint.setSource(qg.getMember1());
-						groupConstraint.setTarget(qg.getMember2());
-					}
-					constraints.add(groupConstraint);
-				}
-				//getting outgroup constraint
-				else if (o instanceof Query.Outgroup){
-					Query.Outgroup og = (Query.Outgroup)o;
-					OutGroupConstraint outgroupConstraint = new OutGroupConstraint();
-					if(og !=null){
-						outgroupConstraint.setKey(og.getKey());
-						outgroupConstraint.setSource(og.getMember1());
-						outgroupConstraint.setTarget(og.getMember2());
-					}
-					constraints.add(outgroupConstraint);
-				}
+
 				else if (o instanceof Query.Groupby){
 					Query.Groupby groupBy = (Query.Groupby)o;
 					GroupByClause groupByClause = new GroupByClause();
