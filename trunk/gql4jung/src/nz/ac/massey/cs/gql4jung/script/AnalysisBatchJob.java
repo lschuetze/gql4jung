@@ -21,7 +21,7 @@ import edu.uci.ics.jung.io.GraphMLFile;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifReaderException;
-import nz.ac.massey.cs.gql4jung.impl.GQLImpl;
+import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.QueryResultsExporter2CSV;
 import nz.ac.massey.cs.gql4jung.util.QueryResults.QueryResultListener;
