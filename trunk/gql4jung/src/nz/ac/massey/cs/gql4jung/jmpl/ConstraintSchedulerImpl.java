@@ -1,46 +1,168 @@
 package nz.ac.massey.cs.gql4jung.jmpl;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.Vertex;
-
 import nz.ac.massey.cs.gql4jung.Constraint;
 import nz.ac.massey.cs.gql4jung.LinkConstraint;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.PropertyConstraint;
 import nz.ac.massey.cs.gql4jung.constraints.EdgeConstraint;
-import nz.ac.massey.cs.gql4jung.constraints.GroupConstraint;
-import nz.ac.massey.cs.gql4jung.constraints.OutGroupConstraint;
 import nz.ac.massey.cs.gql4jung.constraints.PathConstraint;
-import nz.ac.massey.cs.gql4jung.constraints.PropertyTerm;
-import nz.ac.massey.cs.gql4jung.constraints.Term;
-import nz.ac.massey.cs.gql4jung.constraints.ValueTerm;
 
 /**
  * Simple constraint scheduler.
  * @author jens dietrich
  */
 
-public class ConstraintSchedulerImpl implements ConstraintScheduler {
-	List <String> roles = null;
-	@Override
-	// TODO - remove
-	public List<Constraint> getConstraints(Motif motif) {
-		this.roles = motif.getRoles();
-		List<Constraint> constraints = new ArrayList<Constraint>();
-		for(Iterator itr = motif.getConstraints().iterator();itr.hasNext();){
-			Constraint nextConstraint = (Constraint) itr.next();
-			constraints.add(nextConstraint);
-		}
-		return constraints; 
-	}
+public class ConstraintSchedulerImpl extends Logging implements ConstraintScheduler {
 
 	@Override
-	public List<Constraint> prepare(Graph g, List<Constraint> constraints) {
+	public List<Constraint> getConstraints(Graph graph,Motif motif) {
+		
+		assert motif.getRoles().size()>0;
+		
+		Collection<String> bindings = new HashSet<String>(); // keep track of bound roles
+		Collection<String> roles = motif.getRoles();
+		List<Constraint> pool = prepare(motif.getConstraints());
+		List<Constraint> optimised = new ArrayList<Constraint>(pool.size());
+		
+		Constraint next = null;
+		while ((next = selectNext(graph,motif,pool,optimised,bindings))!=null) {
+			pool.remove(next);
+			optimised.add(next);
+			LOG_SCHED.debug("Added constraint: "+next);
+		}
+		assert optimised.size() == motif.getConstraints().size();
+		if (optimised.size() != motif.getConstraints().size()) {
+			LOG_SCHED.warn("Not all constraints have been scheduled");
+		}
+		return optimised; 
+
+	}
+
+	private Constraint selectNext(Graph graph, Motif motif, List<Constraint> pool,	List<Constraint> optimised, Collection<String> bindings) {
+		if (pool.size()==0) return null;
+		
+		// find initial constraint
+		if (bindings.size()==0) {	
+			for(Constraint c:pool){
+				if(c instanceof PropertyConstraint){
+					PropertyConstraint pc = (PropertyConstraint)c;
+					if (pc.getOwner()!=null && motif.getRoles().contains(pc.getOwner())) {
+						bind(bindings,pc.getOwner());
+						return pc;
+					}
+				}
+			}
+			// nothing found, just make an assertion
+			bind(bindings,motif.getRoles().get(0));
+		}
+		
+		// try to find property for role(s) already bound
+		for (Iterator<PropertyConstraint> iter = getPropertyConstraints(pool);iter.hasNext();) {
+			PropertyConstraint pc = iter.next();
+			if (bindings.containsAll(pc.getOwnerRoles())) {
+				return pc;
+			}
+		}
+		
+
+		// try to find link with both ends known
+		for (Iterator<LinkConstraint> iter = getLinkConstraints(pool);iter.hasNext();) {
+			LinkConstraint lc = iter.next();
+			if (bindings.contains(lc.getSource()) && bindings.contains(lc.getTarget())) {
+				return lc;
+			}
+		}
+		
+		// try to find link with source known
+		for (Iterator<LinkConstraint> iter = getLinkConstraints(pool);iter.hasNext();) {
+			LinkConstraint lc = iter.next();
+			if (bindings.contains(lc.getSource())) {
+				bind(bindings,lc.getTarget());
+				return lc;
+			}
+		}
+		
+		// try to find link with target known
+		for (Iterator<LinkConstraint> iter = getLinkConstraints(pool);iter.hasNext();) {
+			LinkConstraint lc = iter.next();
+			if (bindings.contains(lc.getTarget())) {
+				bind(bindings,lc.getSource());
+				return lc;
+			}
+		}
+		
+		// try to find property for (some) roles already bound - those are "inter-role" properties
+		for (Iterator<PropertyConstraint> iter = getPropertyConstraints(pool);iter.hasNext();) {
+			PropertyConstraint pc = iter.next();
+			boolean ok = false;
+			List<String> roles = pc.getOwnerRoles();
+			for (String role:roles) {
+				if (bindings.contains(role)) {
+					ok = true;
+				}
+			}
+			if (ok) {
+				// add new roles - this will be a role bound by the constraint
+				for (String role:roles) {
+					if (!bindings.contains(role)) {
+						bind(bindings,role);
+					}
+				}
+				return pc;
+			}
+		}
+		
+		LOG_SCHED.warn("None of the scheduling rules can be applied, adding first in list: "+pool.get(0));
+		return pool.get(0);
+	}
+	
+	
+	private Iterator<PropertyConstraint> getPropertyConstraints(List<Constraint> list) {
+		Predicate<Constraint> filter = new Predicate<Constraint>() {
+			@Override
+			public boolean apply(Constraint c) {
+				return c instanceof PropertyConstraint;
+			}
+		};
+		Function<Constraint,PropertyConstraint> function = new Function<Constraint,PropertyConstraint>() {
+			@Override
+			public PropertyConstraint apply(Constraint c) {
+				return (PropertyConstraint)c;
+			}
+		};
+		return  Iterators.transform(
+					Iterators.filter(list.iterator(),filter), 
+					function);
+	}
+	
+	private Iterator<LinkConstraint> getLinkConstraints(List<Constraint> list) {
+		Predicate<Constraint> filter = new Predicate<Constraint>() {
+			@Override
+			public boolean apply(Constraint c) {
+				return c instanceof LinkConstraint;
+			}
+		};
+		Function<Constraint,LinkConstraint> function = new Function<Constraint,LinkConstraint>() {
+			@Override
+			public LinkConstraint apply(Constraint c) {
+				return (LinkConstraint)c;
+			}
+		};
+		return  Iterators.transform(
+					Iterators.filter(list.iterator(),filter), 
+					function);
+	}
+	
+	private List<Constraint> prepare(List<Constraint> constraints) {
 		List<Constraint> interimConstraints = new ArrayList<Constraint>();	
 		for(Constraint c:constraints){
 			if(c instanceof PropertyConstraint){
@@ -57,21 +179,13 @@ public class ConstraintSchedulerImpl implements ConstraintScheduler {
 				interimConstraints.add(c);
 			}
 		}
-		for(Constraint c:constraints){
-			if(c instanceof GroupConstraint){
-				interimConstraints.add(c);
-			}
-		}
-		for(Constraint c:constraints){
-			if(c instanceof OutGroupConstraint){
-				interimConstraints.add(c);
-			}
-		}
-		//List<Constraint> sortedConstraints = sort(interimConstraints);
-		//return sortedConstraints;
 		return interimConstraints;
 	}
-
+	private void bind(Collection<String> bindings,String role) {
+		this.LOG_SCHED.debug("registering binding: "+role);
+		bindings.add(role);
+	}
+/*
 	private boolean hasBinding(PropertyConstraint pc,Bindings b) {
 		for (Object role:pc.getOwnerRoles()) {
 			if (null== b.lookup((String)role)) return false;
@@ -138,4 +252,5 @@ public class ConstraintSchedulerImpl implements ConstraintScheduler {
 		}
 		return 0;		
 	}
+	*/
 }

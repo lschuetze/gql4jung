@@ -44,7 +44,7 @@ public class GQLImpl extends Logging implements GQL {
     	listener.progressMade(0,S);
     	
     	// prepare constraints
-    	List<Constraint> constraints = scheduler.prepare(graph, motif.getConstraints());
+    	List<Constraint> constraints = scheduler.getConstraints(graph, motif);
     	
     	// start resolver
     	for(Vertex v:vertices){
@@ -68,8 +68,8 @@ public class GQLImpl extends Logging implements GQL {
 			return;
 		}
 		// recursion
-		bindings.gotoChildLevel();
-		Constraint nextConstraint = scheduler.selectNext(graph, constraints, bindings);
+		bindings.gotoChildLevel();  // one level down
+		Constraint nextConstraint = constraints.get(0); // take the first, has been ordered by scheduler
 		// new agenda TODO  pool agendas
 		List<Constraint> newAgenda = new ArrayList<Constraint>();
 		for (Constraint c:constraints) {
@@ -86,15 +86,35 @@ public class GQLImpl extends Logging implements GQL {
 			// constraint has owner
 			if (role!=null) {
 				Vertex v = (Vertex)bindings.lookup(role);
-				if (propertyConstraint.check(graph,v)) {
+				if (v==null) {
+					Iterator<Vertex> iter = graph.getVertices().iterator();
+					
+					// check - the constraint has already been removed!
+					resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,role);
+				}
+				else if (propertyConstraint.check(graph,v)) {
 					resolve(graph,motif,newAgenda,bindings,listener);
 				}
 			}
 			else {
 				Map<String,Vertex> map = bindings.getRoleBindingsAsMap();
-				if (propertyConstraint.check(graph,map)) {
-					resolve(graph,motif,newAgenda,bindings,listener);
-				}				
+				// check for roles without bindings
+				List<String> rolesInConstraint = propertyConstraint.getOwnerRoles();
+				if (map.keySet().containsAll(rolesInConstraint)) {
+					if (propertyConstraint.check(graph,map)) {
+						resolve(graph,motif,newAgenda,bindings,listener);
+					}	
+				}
+				else {
+					for (String roleInConstraint:rolesInConstraint) {
+						if (!map.keySet().contains(roleInConstraint)) {
+							Iterator<Vertex> iter = graph.getVertices().iterator();
+							// the constraint has already been removed! Add it back again.
+							newAgenda.add(0,propertyConstraint);
+							resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,roleInConstraint);						
+						}
+					}
+				}
 			}
 		}
 		else if (nextConstraint instanceof LinkConstraint) {
@@ -123,11 +143,23 @@ public class GQLImpl extends Logging implements GQL {
 				throw new IllegalStateException("cannot resolve linke constraints with two open slots");
 			}
 		}
-		bindings.gotoParentLevel();
+		bindings.gotoParentLevel(); // one level up
 		
 	}
 
-	private void resolveNextLevel(Graph graph, Motif motif, List<Constraint> constraints,Bindings bindings, ResultListener listener, Iterator<ConnectedVertex> iter,Vertex end1,String end2Role,LinkConstraint linkConstraint) {
+	private void resolveNextLevel(Graph graph, Motif motif,List<Constraint> constraints, Bindings bindings,
+			ResultListener listener, Iterator<Vertex> iter, String role) {
+		
+		while (iter.hasNext()) {
+			Vertex v = iter.next();
+			bindings.bind(role,v);
+			resolve(graph,motif,constraints,bindings,listener);
+		}
+	}
+
+	private void resolveNextLevel(Graph graph, Motif motif, List<Constraint> constraints,Bindings bindings, ResultListener listener, 
+			Iterator<ConnectedVertex> iter,Vertex end1,String end2Role,LinkConstraint linkConstraint) {
+		
 		while (iter.hasNext()) {
 			ConnectedVertex cv = iter.next();
 			Object link = cv.getLink();
@@ -161,11 +193,6 @@ public class GQLImpl extends Logging implements GQL {
 	private MotifInstance createInstance(Graph graph, Motif motif, Bindings bindings) {
 		//System.out.println("creating result");
 		return new MotifInstanceImpl(motif,bindings);
-	}
-
-	@Override
-	public void query(Graph graph, Motif motif, ResultListener listener,QueryOptimizer optimizer) {
-		
 	}
 
 	@Override

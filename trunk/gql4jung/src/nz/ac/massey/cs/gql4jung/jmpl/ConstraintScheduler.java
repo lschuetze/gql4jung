@@ -16,13 +16,10 @@ import nz.ac.massey.cs.gql4jung.Motif;
 public interface ConstraintScheduler {
     /**
      * Get the constraints for the motif. 
+     * @param g the graph
      * @param pattern a motif
      * @return a list of constraints
      */
-    public List<Constraint> getConstraints(Motif motif);
-    // static - only once
-    public List<Constraint> prepare (Graph g,List<Constraint> constraints); // sort, put abstract before concrete, edge before path
-    // dynamic
-    public Constraint selectNext (Graph g, List<Constraint> agenda, Bindings bindings);
+    public List<Constraint> getConstraints(Graph g,Motif motif);
 
 }
