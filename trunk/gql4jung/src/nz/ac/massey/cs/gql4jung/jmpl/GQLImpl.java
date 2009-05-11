@@ -18,6 +18,18 @@ public class GQLImpl extends Logging implements GQL {
 		super();
 	}
 
+	private ObjectPool<List<Constraint>> agendaPool = new ObjectPool<List<Constraint>>(100) {
+
+		@Override
+		public List<Constraint> createNew() {
+			return new ArrayList<Constraint>();
+		}
+		@Override
+		public void reset(List<Constraint> l) {
+			l.clear();
+		}		
+	} ;
+	
 	private boolean cancel = false;
 	private ConstraintScheduler scheduler = new ConstraintSchedulerImpl();
 
@@ -70,8 +82,9 @@ public class GQLImpl extends Logging implements GQL {
 		// recursion
 		bindings.gotoChildLevel();  // one level down
 		Constraint nextConstraint = constraints.get(0); // take the first, has been ordered by scheduler
-		// new agenda TODO  pool agendas
-		List<Constraint> newAgenda = new ArrayList<Constraint>();
+		// new agenda 
+		//List<Constraint> newAgenda = new ArrayList<Constraint>(); // no pool version
+		List<Constraint> newAgenda = this.agendaPool.borrow();
 		for (Constraint c:constraints) {
 			if (c!=nextConstraint) newAgenda.add(c);
 		} 
@@ -89,7 +102,8 @@ public class GQLImpl extends Logging implements GQL {
 				if (v==null) {
 					Iterator<Vertex> iter = graph.getVertices().iterator();
 					
-					// check - the constraint has already been removed!
+					// the constraint has already been removed! Add it back again.
+					newAgenda.add(0,propertyConstraint);
 					resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,role);
 				}
 				else if (propertyConstraint.check(graph,v)) {
@@ -144,7 +158,7 @@ public class GQLImpl extends Logging implements GQL {
 			}
 		}
 		bindings.gotoParentLevel(); // one level up
-		
+		this.agendaPool.recycle(newAgenda);
 	}
 
 	private void resolveNextLevel(Graph graph, Motif motif,List<Constraint> constraints, Bindings bindings,
