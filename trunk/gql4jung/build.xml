@@ -48,7 +48,10 @@ Author Ali
 				<pathelement path="java.class.path" />
 			</classpath>
 			<formatter type="xml" />
-			<test name="test.nz.ac.massey.cs.gpl4jung.gql.GQLTests" />
+			<test name="test.nz.ac.massey.cs.gql4jung.jmpl.AWDTests" />
+			<test name="test.nz.ac.massey.cs.gql4jung.jmpl.CDTests" />
+			<test name="test.nz.ac.massey.cs.gql4jung.jmpl.CNSTests" />
+			<test name="test.nz.ac.massey.cs.gql4jung.jmpl.DB2UITests" />
 		</junit>
 	</target>
 
