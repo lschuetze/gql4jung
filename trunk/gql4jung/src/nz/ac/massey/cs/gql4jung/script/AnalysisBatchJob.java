@@ -23,7 +23,6 @@ import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifReaderException;
 import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
-import nz.ac.massey.cs.gql4jung.util.QueryResultsExporter2CSV;
 import nz.ac.massey.cs.gql4jung.util.QueryResults.QueryResultListener;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 
@@ -49,7 +48,7 @@ public class AnalysisBatchJob {
 			Appender app1 = new FileAppender(layout,LOG_FILE); 
 			Appender app2 = new ConsoleAppender(layout,ConsoleAppender.SYSTEM_OUT);
 			LOGGER.addAppender(app1);
-			LOGGER.addAppender(app2);
+			//LOGGER.addAppender(app2);
 			LOGGER.setLevel(Level.ALL);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -86,6 +85,7 @@ public class AnalysisBatchJob {
 				log("query ",i+1,"/",queryFiles.length," ",cursorLog);
 				try {
 					analyse(queryFiles[i],dataFiles[j],cursorLog);
+					System.gc();
 				}
 				catch (Exception x) {
 					LOGGER.error("analysis error",x);
