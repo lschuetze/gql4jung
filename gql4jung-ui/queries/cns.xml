@@ -1,0 +1,20 @@
+<!-- packages with multiple clusters within the package -->
+<query name="multiple_clusters">
+    <!--  Cluster implements interface Processor with method process(Graph) -->
+	<graphprocessor class="nz.ac.massey.cs.processors.ClusterProcessor"/>
+    <vertex id="class1"><property key="type" value="class"/></vertex>
+    <vertex id="class2"><property key="type" value="class"/></vertex>
+    <not>
+	    <condition predicate="equals">
+	    	<attribute owner="class1" key="cluster"/> 
+	    	<attribute owner="class2" key="cluster"/> 
+	    </condition>
+    </not>
+    <condition predicate="equals">
+    	<attribute owner="class1" key="namespace"/> 
+    	<attribute owner="class2" key="namespace"/> 
+    </condition>    
+	<groupby>
+        <vertex id="class1" property="namespace"/>
+    </groupby>
+</query>
