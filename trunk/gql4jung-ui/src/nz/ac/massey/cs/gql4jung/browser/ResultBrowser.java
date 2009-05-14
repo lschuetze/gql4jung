@@ -173,7 +173,7 @@ public class ResultBrowser extends JFrame {
 		// load sample data
 		// TODO remove
 		this.loadData(new File("exampledata/ant.jar.graphml"));
-		this.loadQuery(new File("exampledata/abstraction_coupling.xml"));
+		this.loadQuery(new File("queries/awd.xml"));
 		
 		updateActions();
 		updateStatus();
@@ -389,10 +389,10 @@ public class ResultBrowser extends JFrame {
 	}
 	
 	private void initBuiltInQueries() {
-		initBuildInQuery("missing decoupling by abstraction","queries/abstraction_coupling.xml");
-		initBuildInQuery("circular dependencies between packages","queries/circular_dependency.xml");
-		initBuildInQuery("db 2 ui layer dependencies","queries/db2ui_dependency.xml");
-		initBuildInQuery("multiple dependency clusters in same package","queries/multiple_clusters.xml");
+		initBuildInQuery("missing decoupling by abstraction","queries/awd.xml");
+		initBuildInQuery("circular dependencies between packages","queries/cd.xml");
+		initBuildInQuery("db 2 ui layer dependencies","queries/db2ui.xml");
+		initBuildInQuery("multiple dependency clusters in same package","queries/cns.xml");
 	}
 
 	private void initBuildInQuery(String name, final String file) {
