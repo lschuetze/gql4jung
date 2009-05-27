@@ -210,7 +210,6 @@ public class AnalysisBatchJob {
         return g;
 	}
 
-
 	private static File getOutputFile(File querySource,File graphSource) {
 		String out = OUTPUT_FOLDER + '/' + querySource.getName() + '/' + graphSource.getName() + ".csv";
 		out = removeWhitespaces(out);

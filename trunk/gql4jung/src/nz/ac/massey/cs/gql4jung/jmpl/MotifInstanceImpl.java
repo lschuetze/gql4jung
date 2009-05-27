@@ -2,10 +2,10 @@ package nz.ac.massey.cs.gql4jung.jmpl;
 
 import java.util.HashMap;
 import java.util.Map;
-import edu.uci.ics.jung.graph.Vertex;
-import nz.ac.massey.cs.gql4jung.LinkConstraint;
+import nz.ac.massey.cs.gql4jung.Path;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
+import nz.ac.massey.cs.gql4jung.Vertex;
 
 /**
  * Motif instance implementation.
@@ -16,19 +16,19 @@ public class MotifInstanceImpl extends Logging implements MotifInstance {
 	
 	private Motif motif = null;
 	private Map<String,Vertex> vertexBindings = new HashMap<String, Vertex>();
-	private Map<LinkConstraint,Object> linkBindings = new HashMap<LinkConstraint,Object>();
+	private Map<String,Path> pathBindings = new HashMap<String,Path>();
 	
 	MotifInstanceImpl(Motif motif,Bindings bindings) {
 		this.motif = motif;
 		this.vertexBindings.putAll(bindings.getRoleBindingsAsMap());
-		this.linkBindings.putAll(bindings.getLinkBindingsAsMap());
+		this.pathBindings.putAll(bindings.getPathBindingsAsMap());
 		if (LOG_INST.isDebugEnabled()) {
 			LOG_INST.debug("result created: " + this);
 		}
 	}
 	
-	public Object getLink(LinkConstraint constraint) {
-		return linkBindings.get(constraint);
+	public Path getPath(String roleName) {
+		return pathBindings.get(roleName);
 	}
 		
 	@Override

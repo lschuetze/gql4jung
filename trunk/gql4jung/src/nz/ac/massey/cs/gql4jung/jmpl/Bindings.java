@@ -1,7 +1,7 @@
 package nz.ac.massey.cs.gql4jung.jmpl;
 
-import nz.ac.massey.cs.gql4jung.LinkConstraint;
-import edu.uci.ics.jung.graph.Vertex;
+import nz.ac.massey.cs.gql4jung.Path;
+import nz.ac.massey.cs.gql4jung.Vertex;
 
 /**
  * Data structure for variable bindings.
@@ -11,8 +11,8 @@ public class Bindings  extends Logging {
 	public static int SIZE = 100;
 	private String[] keys4roles = new String[SIZE];
 	private Vertex[] values4roles = new Vertex[SIZE];
-	private LinkConstraint[] keys4links = new LinkConstraint[SIZE];
-	private Object[] values4links = new Object[SIZE];
+	private String[] keys4links = new String[SIZE];
+	private Path[] values4links = new Path[SIZE];
 	
 	private int position = 0;
 
@@ -46,9 +46,7 @@ public class Bindings  extends Logging {
 			b.append("binding ");
 			b.append(k);
 			b.append(" -> ");
-			b.append(v.getUserDatum("namespace"));
-			b.append(".");
-			b.append(v.getUserDatum("name"));
+			b.append(v.toString());
 			//LOG_BIND.debug("binding "+k+" -> "+v);
 			LOG_BIND.debug(b.toString());
 		}
@@ -56,11 +54,11 @@ public class Bindings  extends Logging {
 	/**
 	 * Add a new entry.
 	 */
-	public void bind(LinkConstraint k,Object o) {
+	public void bind(String k,Path p) {
 		assert(k!=null);
-		assert(o!=null);		
+		assert(p!=null);		
 		keys4links[position]= k;
-		values4links[position] = o;
+		values4links[position] = p;
 		//System.out.println("binding "+k+" -> "+v);
 	}
 	/**
@@ -84,8 +82,8 @@ public class Bindings  extends Logging {
 		}
 		return map;
 	}
-	public java.util.Map<LinkConstraint,Object> getLinkBindingsAsMap() {
-		java.util.Map<LinkConstraint,Object> map = new java.util.Hashtable<LinkConstraint,Object>();
+	public java.util.Map<String,Path> getPathBindingsAsMap() {
+		java.util.Map<String,Path> map = new java.util.Hashtable<String,Path>();
 		for (int i=position;i>-1;i--) {
 			if (keys4links[i]!=null)
 				map.put(keys4links[i],values4links[i]);

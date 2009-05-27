@@ -1,0 +1,98 @@
+package nz.ac.massey.cs.gql4jung;
+
+import java.util.Collection;
+import java.util.HashSet;
+
+/**
+ * Custom vertex class.
+ * @author jens dietrich
+ */
+public class Vertex extends GraphElement{
+
+	// properties
+	// when making this a general purpose query language, we need to remove this
+	private String namespace = null;
+	private String name = null;
+	private boolean isAbstract = false;
+	private String type = null;
+	private String container = null;
+	private String cluster = null;
+	
+	public Vertex(String id) {
+		super(id);
+	}
+	public Vertex() {
+		super();
+	}
+	private Collection<Edge> outEdges = new HashSet<Edge>();
+	private Collection<Edge> inEdges = new HashSet<Edge>();
+	
+	public boolean isAbstract() {
+		return isAbstract;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setAbstract(boolean isAbstract) {
+		this.isAbstract = isAbstract;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getNamespace() {
+		return namespace;
+	}
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
+	public Collection<Edge> getOutEdges() {
+		return outEdges;
+	}
+	public Collection<Edge> getInEdges() {
+		return inEdges;
+	}
+	void addInEdge(Edge e) {
+		this.inEdges.add(e);
+	}
+	void addOutEdge(Edge e) {
+		this.outEdges.add(e);
+	}
+	boolean removeInEdge(Edge e) {
+		return this.inEdges.remove(e);
+	}
+	boolean removeOutEdge(Edge e) {
+		return this.outEdges.remove(e);
+	}
+	
+	public String toString() {
+		return new StringBuffer() 
+			.append(this.getId())
+			.append(':')
+			.append(this.namespace)
+			.append('.')
+			.append(this.name)
+			.toString();
+	}
+	
+	public String getContainer() {
+		return container;
+	}
+	public String getCluster() {
+		return cluster;
+	}
+	public void setContainer(String container) {
+		this.container = container;
+	}
+	public void setCluster(String cluster) {
+		this.cluster = cluster;
+	}
+}

@@ -7,6 +7,14 @@ import java.util.List;
 import nz.ac.massey.cs.processors.Processor;
 
 public class DefaultMotif implements Motif {
+	
+	private List<String> roles = new ArrayList<String>();
+	private List<String> pathRoles = new ArrayList<String>();
+
+	private Collection<GroupByClause> groupByClauses = new ArrayList<GroupByClause>();
+	private Collection<Processor> graphProcessors = new ArrayList<Processor>();
+	private List<Constraint> constraints = new ArrayList<Constraint>();
+	
 	public List<String> getRoles() {
 		return roles;
 	}
@@ -19,17 +27,13 @@ public class DefaultMotif implements Motif {
 	public void setConstraints(List<Constraint> constraints) {
 		this.constraints = constraints;
 	}
-	private List<String> roles = new ArrayList<String>();
-	private Collection<GroupByClause> groupByClasses = new ArrayList<GroupByClause>();
-	private Collection<Processor> graphProcessors = new ArrayList<Processor>();
-	
-	private List<Constraint> constraints = new ArrayList<Constraint>();
+
 	@Override
 	public Collection<GroupByClause> getGroupByClauses() {	
-		return groupByClasses;
+		return groupByClauses;
 	}
 	public void setGroupByClauses(Collection<GroupByClause> groupBy){
-		this.groupByClasses = groupBy;
+		this.groupByClauses = groupBy;
 	}
 	@Override
 	public Collection<Processor> getGraphProcessor() {
@@ -38,6 +42,11 @@ public class DefaultMotif implements Motif {
 	public void setGraphProcessor(Collection<Processor> processors){
 		this.graphProcessors = processors; 
 	}
-	
+	public List<String> getPathRoles() {
+		return pathRoles;
+	}
+	public void setPathRoles(List<String> pathRoles) {
+		this.pathRoles = pathRoles;
+	}
 
 }

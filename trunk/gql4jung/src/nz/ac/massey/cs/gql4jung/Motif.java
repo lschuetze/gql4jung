@@ -26,8 +26,8 @@ public interface Motif {
 	 * @throws JAXBException 
 	 */
 	List<String> getRoles();
+	List<String> getPathRoles();
 	List<Constraint> getConstraints();
-	void setConstraints(List<Constraint> constraints);
 	Collection<GroupByClause> getGroupByClauses(); 	
 	Collection<Processor> getGraphProcessor();
 }
