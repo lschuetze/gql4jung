@@ -10,7 +10,6 @@
 
 package nz.ac.massey.cs.gql4jung;
 
-import edu.uci.ics.jung.graph.Vertex;
 
 public interface MotifInstance {
 	/**
@@ -26,9 +25,9 @@ public interface MotifInstance {
 	 */
 	Vertex getVertex(String roleName);
 	/**
-	 * Get the edge or path found. 
-	 * @param constraint
+	 * Get the path for a given path role name.
+	 * @param roleName
 	 * @return
 	 */
-	Object getLink(LinkConstraint constraint); 
+	Path getPath(String roleName); 
 }

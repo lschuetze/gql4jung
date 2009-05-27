@@ -11,219 +11,139 @@
 package nz.ac.massey.cs.gql4jung.xml;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import edu.uci.ics.jung.graph.Edge;
-import edu.uci.ics.jung.graph.Vertex;
 import nz.ac.massey.cs.gql4jung.*;
-import nz.ac.massey.cs.gql4jung.constraints.EdgeConstraint;
-import nz.ac.massey.cs.gql4jung.constraints.NegatedPropertyConstraint;
-import nz.ac.massey.cs.gql4jung.constraints.Operator;
-import nz.ac.massey.cs.gql4jung.constraints.PathConstraint;
-import nz.ac.massey.cs.gql4jung.constraints.PropertyConstraintConjunction;
-import nz.ac.massey.cs.gql4jung.constraints.PropertyConstraintDisjunction;
-import nz.ac.massey.cs.gql4jung.constraints.PropertyTerm;
-import nz.ac.massey.cs.gql4jung.constraints.RolePropertyTerm;
-import nz.ac.massey.cs.gql4jung.constraints.SimplePropertyConstraint;
-import nz.ac.massey.cs.gql4jung.constraints.ValueTerm;
-import nz.ac.massey.cs.gql4jung.xml.Query.Condition;
-import nz.ac.massey.cs.gql4jung.xml.Query.ExistsNot;
-import nz.ac.massey.cs.gql4jung.xml.Query.Groupby.Element;
-import nz.ac.massey.cs.processors.ClusterProcessor;
+import nz.ac.massey.cs.gql4jung.mvel.CompiledPropertyConstraint;
 import nz.ac.massey.cs.processors.Processor;
 
 /**
  * Builds motifs from xml streams
- * @deprecated - to be replaces soon (jens)
- * @author ali
+ * @author jens dietrich
  */
 public class XMLMotifReader implements MotifReader {
 
 	@Override
-	public Motif read(InputStream source) throws MotifReaderException {
+	public nz.ac.massey.cs.gql4jung.Motif read(InputStream source) throws MotifReaderException {
 		try {
 			DefaultMotif motif = new DefaultMotif();
-			List<String> v_roles = new ArrayList<String>();
-			List<Constraint> constraints = new ArrayList<Constraint>();
+			List<String> vertexRoles = new ArrayList<String>();
+			List<String> pathRoles = new ArrayList<String>();
+			List<String> constraintDefs = new ArrayList<String>();
 			List<GroupByClause> groupByClauses = new ArrayList<GroupByClause>();
 			List<Processor> graphProcessors = new ArrayList<Processor>();
-			motif.setRoles(v_roles);
-			motif.setConstraints(constraints);
-			motif.setGroupByClauses(groupByClauses);
-			motif.setGraphProcessor(graphProcessors);
+			List<PathConstraint> pathConstraints = new ArrayList<PathConstraint>();
+			
+			
+			// use this list to keep track of the order of constraints
+			// this is important for scheduling them later - a scheduler may want to retain the order
+			// to give users a chance to arrange constraints manually
+			List<Object> constraintOrder = new ArrayList<Object>();
+			Map<String,PropertyConstraint> propertyConstraintMap = new HashMap<String,PropertyConstraint>();
 			
 			//unmarshalling xml query
 			JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gql4jung.xml");
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
-			Query q= (Query)unmarshaller.unmarshal(source);
+			Motif query = (Motif)unmarshaller.unmarshal(source);
 						
-			for (Object o:q.getVertexOrPathOrEdge()) {
-				//getting roles (vertex id) from query
-				if (o instanceof Query.Vertex) {
-					Query.Vertex v = (Query.Vertex)o;
-					v_roles.add(v.id); 
-					
-					//getting simple vertex property constraints
-					for(Iterator itr=v.getProperty().iterator(); itr.hasNext();){
-						Query.Vertex.Property p = (Query.Vertex.Property) itr.next();
-						PropertyTerm term1 = new PropertyTerm(p.getKey());
-						ValueTerm term2 = new ValueTerm(p.getValue());
-						SimplePropertyConstraint<Vertex> pc = new SimplePropertyConstraint<Vertex>();
-						pc.setOwner(v.id);
-						pc.setTerms(term1, term2);
-						constraints.add(pc);
-					}
-					//getting complex vertex property constraints (using or)
-					
-					Query.Vertex.Or orProp = v.getOr();
-					List<PropertyConstraint> propCon = new ArrayList<PropertyConstraint>();
-					PropertyConstraintDisjunction ComplexPropConstraint = new PropertyConstraintDisjunction();
-					if(orProp!=null){
-						for(Iterator itr = orProp.getProperty().iterator();itr.hasNext();){
-							Query.Vertex.Or.Property prp = (Query.Vertex.Or.Property) itr.next();
-							PropertyTerm term1 = new PropertyTerm(prp.getKey());
-							ValueTerm term2 = new ValueTerm(prp.getValue());
-							SimplePropertyConstraint<Vertex> spc = new SimplePropertyConstraint<Vertex>();
-							spc.setOwner(v.getId());
-							spc.setTerms(term1, term2);
-							//Operator op = Operator.getInstance("matches");
-							//spc.setOperator(op);
-							propCon.add(spc);
-						}
-						ComplexPropConstraint.setParts(propCon);
-						ComplexPropConstraint.setOwner(v.getId());
-						constraints.add(ComplexPropConstraint);
-						
-					}
-				}
-
-				//getting path constraint from query
-				else if (o instanceof Query.Path) {
-					PathConstraint pathConstraint = new PathConstraint();
-					Query.Path p = (Query.Path)o;
-					//System.out.println("path from " + p.getFrom() + " to " + p.getTo());
-					pathConstraint.setMaxLength(p.getMaxLength());
-					pathConstraint.setMinLength(p.getMinLength());
-					Query.Vertex from = (Query.Vertex) p.getFrom();
-					Query.Vertex to = (Query.Vertex) p.getTo();
-					pathConstraint.setSource(from.getId());
-					pathConstraint.setTarget(to.getId());
-					//getting simple path property constraint
-					Query.Path.Property pp = p.getProperty();
-					if(pp!=null){
-						PropertyTerm term1 = new PropertyTerm(pp.getKey());
-						ValueTerm term2 = new ValueTerm(pp.getValue());
-						SimplePropertyConstraint<Edge> pathPropConstraint = new SimplePropertyConstraint<Edge>();
-						pathPropConstraint.setOwner(pathConstraint.getID());
-						pathPropConstraint.setTerms(term1, term2);
-						//pathConstraint.setPredicate("");
-						pathConstraint.setEdgePropertyConstraint(pathPropConstraint);
-					}
-					//getting complex path property constraints (using OR operator)
-					Query.Path.Or orProp = p.getOr();
-					List<PropertyConstraint> propCon = new ArrayList<PropertyConstraint>();
-					PropertyConstraintDisjunction ComplexPropConstraint = new PropertyConstraintDisjunction();
-					if(orProp!=null){
-						for(Iterator itr = orProp.getProperty().iterator();itr.hasNext();){
-							Query.Path.Or.Property prp = (Query.Path.Or.Property) itr.next();
-							PropertyTerm term1 = new PropertyTerm(prp.getKey());
-							ValueTerm term2 = new ValueTerm(prp.getValue());
-							SimplePropertyConstraint<Vertex> pc = new SimplePropertyConstraint<Vertex>();
-							pc.setOwner(pathConstraint.getID());
-							pc.setTerms(term1, term2);
-							propCon.add(pc);
-						}
-						ComplexPropConstraint.setParts(propCon);
-						pathConstraint.setEdgePropertyConstraint(ComplexPropConstraint);
-					}
-					constraints.add(pathConstraint);
-				}
-				else if (o instanceof Query.Edge){
-					EdgeConstraint edgeConstraint = new EdgeConstraint();
-					Query.Edge e = (Query.Edge) o;
-					Query.Vertex from = (Query.Vertex) e.getFrom();
-					Query.Vertex to = (Query.Vertex) e.getTo();
-					edgeConstraint.setSource(from.getId());
-					edgeConstraint.setTarget(to.getId());
-					//getting edge properties
-					Query.Edge.Property ee = e.getProperty();
-					if(ee!=null){
-						PropertyTerm term1 = new PropertyTerm(ee.getKey());
-						ValueTerm term2 = new ValueTerm(ee.getValue());
-						SimplePropertyConstraint<Edge> edgePropConstraint = new SimplePropertyConstraint<Edge>();
-						edgePropConstraint.setTerms(term1,term2);
-						edgePropConstraint.setOwner(edgeConstraint.getID());
-						edgeConstraint.setEdgePropertyConstraint(edgePropConstraint);
-					}
-					constraints.add(edgeConstraint);
-				}
-				
-				else if (o instanceof Query.Condition) {
-					Query.Condition c = (Query.Condition)o;
-					Constraint constraint = buildStandaloneConstraint(c);
-					constraints.add(constraint);
-					
-				}
-				else if (o instanceof Query.Not){
-					Query.Not n = (Query.Not) o;
-					Query.Not.Condition c1 = n.getCondition();
-					NegatedPropertyConstraint negPropConstraint = new NegatedPropertyConstraint();
-					PropertyConstraint c = this.buildStandaloneConstraint(c1);				
-					negPropConstraint.setPart(c);
-					constraints.add(negPropConstraint);
-				}
-				else if (o instanceof Query.ExistsNot){
-					Query.ExistsNot cond = (ExistsNot) o;
-					Query.ExistsNot.Vertex v = cond.getVertex();
-					NegatedPropertyConstraint negPropConstraint = new NegatedPropertyConstraint();
-					v_roles.add(v.getId());
-					//getting vertex property
-					Query.ExistsNot.Vertex.Property p = v.getProperty();
-					PropertyTerm term1 = new PropertyTerm(p.getKey());
-					ValueTerm term2 = new ValueTerm(p.getValue());
-					SimplePropertyConstraint<Vertex> pc = new SimplePropertyConstraint<Vertex>();
-					pc.setOwner(v.getId());
-					pc.setTerms(term1, term2);
-					negPropConstraint.setPart(pc);
-					negPropConstraint.setOwner(v.getId());
-					constraints.add(negPropConstraint);
-				}
-				else if (o instanceof Query.Graphprocessor){
-					Query.Graphprocessor gp = (Query.Graphprocessor)o;
-					ClusterProcessor cp= new ClusterProcessor(); 
-					cp.setProcessorClass(gp.getClazz());
-					graphProcessors.add(cp);
-				}
-
-				else if (o instanceof Query.Groupby){
-					Query.Groupby groupBy = (Query.Groupby)o;
-					GroupByClause groupByClause = new GroupByClause();
-					List<Query.Groupby.Element> elements = groupBy.getElement();
-					if(elements!=null){
-						for(Iterator itr=elements.iterator();itr.hasNext();){
-							Query.Groupby.Element e = (Element) itr.next();
-							Query.Vertex role = (Query.Vertex)e.getVertex();
-							groupByClause.setRole(role.getId());
-							groupByClauses.add(groupByClause);
-						}
-					} 
-					List<Query.Groupby.Vertex> vertexRoles = groupBy.getVertex();
-					if(vertexRoles!=null){
-						for(Iterator itr = vertexRoles.iterator();itr.hasNext();){
-							Query.Groupby.Vertex v = (Query.Groupby.Vertex) itr.next();
-							Query.Vertex role = (Query.Vertex) v.getId();
-							groupByClause.setRole(role.getId());
-							groupByClause.setProperty(v.getProperty());
-							groupByClauses.add(groupByClause);
+			for (Object o:query.getSelectOrConstraintOrConnectedBy()) {
+				if (o instanceof Select) {
+					Select select = (Select)o;
+					vertexRoles.add(select.getRole());
+					if (select.getConstraint()!=null) {
+						String constraintDef = select.getConstraint();
+						if (constraintDef!=null) constraintDef = constraintDef.trim();
+						if (constraintDef!=null && constraintDef.length()>0) {
+							constraintDefs.add(constraintDef);
+							constraintOrder.add(constraintDef);
 						}
 					}
 				}
-				
+				else if (o instanceof ConnectedBy) {
+					ConnectedBy connectedBy = (ConnectedBy)o;
+					PathConstraint c = new PathConstraint();
+					c.setMaxLength(connectedBy.getMaxLength());
+					c.setMinLength(connectedBy.getMinLength());
+					// resolve IDREFs here
+					c.setSource(((Select)connectedBy.getFrom()).getRole());
+					c.setTarget(((Select)connectedBy.getTo()).getRole());
+					c.setRole(connectedBy.getRole());
+					pathConstraints.add(c);
+					constraintOrder.add(c);
+					pathRoles.add(connectedBy.getRole());
+					if (connectedBy.getConstraint()!=null) {
+						constraintDefs.add(connectedBy.getConstraint().trim());
+					}
+				}
+				else if (o instanceof String) {
+					String constraintDef = (String)o;
+					if (constraintDef!=null) constraintDef = constraintDef.trim();
+					if (constraintDef!=null && constraintDef.length()>0) {
+						constraintDefs.add(constraintDef);
+						constraintOrder.add(constraintDef);
+					}
+				}
+				else if (o instanceof GroupBy) {
+					GroupBy groupBy = (GroupBy)o;
+					for (Object o2:groupBy.getVertexOrAttribute()) {
+						// motif.setConstraints(constraints);						
+						if (o2 instanceof Vertex) {
+							Vertex v = (Vertex)o2;
+							GroupByClause clause = new GroupByClause();
+							clause.setRole(((Select)v.getRole()).getRole());
+							groupByClauses.add(clause);
+						}
+						else if (o2 instanceof Attribute) {
+							Attribute a = (Attribute)o2;
+							GroupByClause clause = new GroupByClause();
+							clause.setRole(((Select)a.getRole()).getRole());
+							clause.setProperty(a.getProperty());
+							groupByClauses.add(clause);
+						}
+					}
+				}
 			}
+			// build role map
+			Map<String,Class> typeInfo = new HashMap<String,Class>();
+			for (String role:vertexRoles) {
+				typeInfo.put(role,nz.ac.massey.cs.gql4jung.Vertex.class); 
+			}
+			for (String role:pathRoles) {
+				typeInfo.put(role,Edge.class); 
+			}
+			// build expressions
+			List<Constraint> constraints = new ArrayList<Constraint>();
+			for (String constraintDef:constraintDefs) {
+				PropertyConstraint constraint = buildConstraint(constraintDef,typeInfo,vertexRoles,pathRoles);
+				constraints.add(constraint);
+				propertyConstraintMap.put(constraintDef, constraint);
+			}
+			// associate property constraints with path constraints 
+			for (PathConstraint pconstraint:pathConstraints) {
+				addConstraints(pconstraint,constraints);
+				constraints.add(pconstraint);
+			}
+			// build final constraint list, arrange constraints in order
+			List<Constraint> list = new ArrayList<Constraint>();
+			for (Object o:constraintOrder) {
+				if (o instanceof Constraint) {
+					list.add((Constraint)o);
+				}
+				else if (o instanceof String) { // this is a property def
+					PropertyConstraint pc = propertyConstraintMap.get((String)o);
+					if (constraints.contains(pc)) { // it might have been removed when it was associated with a path c.
+						list.add(pc);
+					}
+				}
+			}
+			
+			motif.setRoles(vertexRoles);
+			motif.setPathRoles(pathRoles);
+			motif.setGroupByClauses(groupByClauses);
+			motif.setGraphProcessor(graphProcessors);
+			motif.setConstraints(list);
 			
 			return motif;
 		
@@ -234,36 +154,41 @@ public class XMLMotifReader implements MotifReader {
 				
 	}
 
-	private Constraint buildStandaloneConstraint(Condition c) throws MotifReaderException {
-		SimplePropertyConstraint constraint = new SimplePropertyConstraint();
-		if (!"equals".equals(c.getPredicate())) throw new MotifReaderException("the only opertator currently supported is equals");
-		Operator op = Operator.getInstance("="); // TODO this is hardcoded here !!
-		PropertyConstraintConjunction complexProp = new PropertyConstraintConjunction();
-		//getting condition attributes and mapping to property terms
-		if (c.getAttribute().size()!=2) throw new MotifReaderException("only two arguments in property condition comparing properties from different vertices are allowed");
-		Query.Condition.Attribute a1 = c.getAttribute().get(0);
-		Query.Condition.Attribute a2 = c.getAttribute().get(1);
-		RolePropertyTerm t1 = new RolePropertyTerm(a1.getVertex(),a1.getKey());
-		RolePropertyTerm t2 = new RolePropertyTerm(a2.getVertex(),a2.getKey());
-		constraint.setOperator(op);
-		constraint.setTerms(t1,t2);
+	private void addConstraints(PathConstraint pathConstraint,	List<Constraint> constraints) {
+		for (Iterator<Constraint> iter=constraints.iterator();iter.hasNext();) {
+			Constraint p = iter.next();
+			if (p instanceof PropertyConstraint) {
+				PropertyConstraint pc = (PropertyConstraint)p;
+				if (pc.getRoles().size()==1 && pc.getFirstRole().equals(pathConstraint.getRole())) {
+					// attach property constraint to path constraint - this means that it will be evaluated
+					// immediately if paths are explored
+					pathConstraint.addConstraint(pc);
+					// remove from constraint list to prevent double checking
+					iter.remove();
+				}
+			}
+		}		
+	}
+
+	private PropertyConstraint buildConstraint(String constraintDef,Map<String, Class> typeInfo,Collection<String> vRoles,Collection<String> pRoles) throws MotifReaderException {
+		CompiledPropertyConstraint constraint = null;
+		try {
+			constraint = new CompiledPropertyConstraint(constraintDef,typeInfo);
+		}
+		catch (Exception x) {
+			throw new MotifReaderException("Error compiling mvel expression "+constraintDef,x);
+		}
+		// check whether inputs are in roles
+		for (String role:constraint.getRoles()) {
+			if (!vRoles.contains(role) && !pRoles.contains(role)) {
+				throw new MotifReaderException("The expression "+constraintDef + "contains the variable " + role + " which has not been declared as a role");
+			}
+		}
+		
 		return constraint;
 	}
-	// TODO: this is a clone of the overloaded method - this must be fixed in the schema !!
-	// result of dirty copy and paste in the schema - there is more of this !!
-	private PropertyConstraint buildStandaloneConstraint(Query.Not.Condition c) throws MotifReaderException {
-		SimplePropertyConstraint constraint = new SimplePropertyConstraint();
-		if (!"equals".equals(c.getPredicate())) throw new MotifReaderException("the only opertator currently supported is equals");
-		Operator op = Operator.getInstance("="); // TODO this is hardcoded here !!
-		PropertyConstraintConjunction complexProp = new PropertyConstraintConjunction();
-		//getting condition attributes and mapping to property terms
-		if (c.getAttribute().size()!=2) throw new MotifReaderException("only two arguments in property condition comparing properties from different vertices are allowed");
-		Query.Not.Condition.Attribute a1 = c.getAttribute().get(0);
-		Query.Not.Condition.Attribute a2 = c.getAttribute().get(1);
-		RolePropertyTerm t1 = new RolePropertyTerm(a1.getVertex(),a1.getKey());
-		RolePropertyTerm t2 = new RolePropertyTerm(a2.getVertex(),a2.getKey());
-		constraint.setOperator(op);
-		constraint.setTerms(t1,t2);
-		return constraint;
-	}
+
+
+
+	
 }

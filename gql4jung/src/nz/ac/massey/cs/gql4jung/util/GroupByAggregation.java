@@ -4,7 +4,7 @@ import java.util.Collection;
 import nz.ac.massey.cs.gql4jung.GroupByClause;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
-import edu.uci.ics.jung.graph.Vertex;
+import nz.ac.massey.cs.gql4jung.Vertex;
 
 /**
  * Motif instance aggregation based on a collection of group by clauses 
@@ -30,13 +30,12 @@ public class GroupByAggregation implements MotifInstanceAggregation {
 			Vertex vertex = instance.getVertex(role);
 			if (property==null) {
 				// append full type name
-				b.append(vertex.getUserDatum("namespace"));
+				b.append(vertex.getNamespace());
 				b.append('.');
-				b.append(vertex.getUserDatum("name"));
+				b.append(vertex.getName());
 			}
 			else {
-				// append property value
-				b.append(vertex.getUserDatum(property));
+				// TODO
 			}		
 		}
 

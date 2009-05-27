@@ -2,6 +2,7 @@ package nz.ac.massey.cs.gql4jung.jmpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class GQLImpl extends Logging implements GQL {
 	} ;
 	
 	private boolean cancel = false;
-	private ConstraintScheduler scheduler = new ConstraintSchedulerImpl();
+	private ConstraintScheduler scheduler = new SimpleScheduler();
 
 	@Override
 	public void cancel() {
@@ -94,64 +95,65 @@ public class GQLImpl extends Logging implements GQL {
 		}
 		
 		if (nextConstraint instanceof PropertyConstraint) {
-			PropertyConstraint propertyConstraint = (PropertyConstraint)nextConstraint;
-			String role = propertyConstraint.getOwner();
-			// constraint has owner
-			if (role!=null) {
-				Vertex v = (Vertex)bindings.lookup(role);
-				if (v==null) {
-					Iterator<Vertex> iter = graph.getVertices().iterator();
-					
-					// the constraint has already been removed! Add it back again.
-					newAgenda.add(0,propertyConstraint);
-					resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,role);
+			PropertyConstraint constraint = (PropertyConstraint)nextConstraint;
+			boolean result = false;
+			if (constraint.isSingleRole()) {
+				Vertex v = (Vertex)bindings.lookup(constraint.getFirstRole());
+				if (v!=null) {
+					result = constraint.check(v);
 				}
-				else if (propertyConstraint.check(graph,v)) {
-					resolve(graph,motif,newAgenda,bindings,listener);
+				else {
+					LOG_GQL.warn("encountered unresolved role "+constraint.getFirstRole()+", cannot resolve: "+constraint);
 				}
 			}
 			else {
-				Map<String,Vertex> map = bindings.getRoleBindingsAsMap();
-				// check for roles without bindings
-				List<String> rolesInConstraint = propertyConstraint.getOwnerRoles();
-				if (map.keySet().containsAll(rolesInConstraint)) {
-					if (propertyConstraint.check(graph,map)) {
-						resolve(graph,motif,newAgenda,bindings,listener);
+				Map<String,GraphElement> bind = new HashMap<String,GraphElement>();
+				for (Object role:constraint.getRoles()) {
+					Vertex v = (Vertex)bindings.lookup(role.toString());
+					if (v!=null) {
+						bind.put(role.toString(),v);
+					}
+					else {
+						LOG_GQL.warn("encountered unresolved role "+constraint.getFirstRole()+", cannot resolve: "+constraint);
 					}	
 				}
-				else {
-					for (String roleInConstraint:rolesInConstraint) {
-						if (!map.keySet().contains(roleInConstraint)) {
-							Iterator<Vertex> iter = graph.getVertices().iterator();
-							// the constraint has already been removed! Add it back again.
-							newAgenda.add(0,propertyConstraint);
-							resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,roleInConstraint);						
-						}
-					}
-				}
+				result = constraint.check(bind); 
+			}
+			if (result) {
+				resolve(graph,motif,newAgenda,bindings,listener);
+			}
+
+		}
+		else if (nextConstraint instanceof LoopInstruction) {
+			// full loop - this is the only way to progress
+			LoopInstruction in = (LoopInstruction)nextConstraint; 
+			String role = in.getRole();
+			for (Vertex v:(Collection<Vertex>)graph.getVertices()) {
+				bindings.bind(role,v);
+				resolve(graph,motif,newAgenda,bindings,listener);
 			}
 		}
-		else if (nextConstraint instanceof LinkConstraint) {
-			LinkConstraint linkConstraint = (LinkConstraint)nextConstraint; 
-			String sourceRole = linkConstraint.getSource();
-			String targetRole = linkConstraint.getTarget();
+		else if (nextConstraint instanceof PathConstraint) {
+			PathConstraint constraint = (PathConstraint)nextConstraint; 
+			String sourceRole = constraint.getSource();
+			String targetRole = constraint.getTarget();
 			Vertex source = (Vertex)bindings.lookup(sourceRole);
 			Vertex target = (Vertex)bindings.lookup(targetRole);
 			if (source!=null && target!=null) {
-				Object result=linkConstraint.check(graph, source, target); // path or edge
+				Path result=constraint.check(graph, source, target); // path or edge
 				if (result!=null) {
-					bindings.bind(linkConstraint,result);
+					bindings.bind(constraint.getRole(),result);
 					resolve(graph,motif,newAgenda,bindings,listener);
 				}
 			}
 			else if (source==null && target!=null) {
-				Iterator<ConnectedVertex> iter =linkConstraint.getPossibleSources(graph,target);
-				resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,target,sourceRole,linkConstraint);
+				Iterator<Path> iter =constraint.getPossibleSources(graph,target);
+				resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,target,sourceRole,constraint);
 				
 			}
 			else if (source!=null && target==null) {
-				Iterator<ConnectedVertex> iter =linkConstraint.getPossibleTargets(graph,source);
-				resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,source,targetRole,linkConstraint);
+				Iterator<Path> iter =constraint.getPossibleTargets(graph,source);
+				resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,source,targetRole,constraint);
 			}
 			else {
 				throw new IllegalStateException("cannot resolve linke constraints with two open slots");
@@ -161,45 +163,19 @@ public class GQLImpl extends Logging implements GQL {
 		this.agendaPool.recycle(newAgenda);
 	}
 
-	private void resolveNextLevel(Graph graph, Motif motif,List<Constraint> constraints, Bindings bindings,
-			ResultListener listener, Iterator<Vertex> iter, String role) {
-		
-		while (iter.hasNext()) {
-			Vertex v = iter.next();
-			bindings.bind(role,v);
-			resolve(graph,motif,constraints,bindings,listener);
-		}
-	}
-
 	private void resolveNextLevel(Graph graph, Motif motif, List<Constraint> constraints,Bindings bindings, ResultListener listener, 
-			Iterator<ConnectedVertex> iter,Vertex end1,String end2Role,LinkConstraint linkConstraint) {
+			Iterator<Path> iter,Vertex end1,String end2Role,PathConstraint constraint) {
 		
 		while (iter.hasNext()) {
-			ConnectedVertex cv = iter.next();
-			Object link = cv.getLink();
-			if (link instanceof Path) {
-				Path path = (Path)link;
-				bindings.bind(linkConstraint,path);
-				if (path.getStart()==end1) {
-					bindings.bind(end2Role,path.getEnd());
-					resolve(graph,motif,constraints,bindings,listener);
-				}
-				else if (path.getEnd()==end1) {
-					bindings.bind(end2Role,path.getStart());
-					resolve(graph,motif,constraints,bindings,listener);
-				}
+			Path path = iter.next();
+			bindings.bind(constraint.getRole(),path);
+			if (path.getStart()==end1) {
+				bindings.bind(end2Role,path.getEnd());
+				resolve(graph,motif,constraints,bindings,listener);
 			}
-			else if (link instanceof Edge) {
-				Edge edge = (Edge)link;
-				bindings.bind(linkConstraint,edge);
-				if (edge.getEndpoints().getFirst()==end1) {
-					bindings.bind(end2Role,(Vertex)edge.getEndpoints().getSecond());
-					resolve(graph,motif,constraints,bindings,listener);
-				}
-				else if (edge.getEndpoints().getSecond()==end1) {
-					bindings.bind(end2Role,(Vertex)edge.getEndpoints().getFirst());
-					resolve(graph,motif,constraints,bindings,listener);
-				}
+			else if (path.getEnd()==end1) {
+				bindings.bind(end2Role,path.getStart());
+				resolve(graph,motif,constraints,bindings,listener);
 			}
 		}
 	}

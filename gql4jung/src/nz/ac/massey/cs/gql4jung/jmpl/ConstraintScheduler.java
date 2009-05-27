@@ -9,7 +9,7 @@ import nz.ac.massey.cs.gql4jung.Motif;
 /**
  * Scheduler for constraints. Scheduling constraints means listing them in an
  * optimizes fashion. 
- * @author <a href="http://www-ist.massey.ac.nz/JBDietrich" target="_top">Jens Dietrich </a>
+ * @author jens dietrich
  * 
  */
 
