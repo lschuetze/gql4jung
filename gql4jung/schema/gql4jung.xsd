@@ -1,246 +1,58 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="query">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <!--'vertex' element definition-->
-          <xs:element name="vertex" maxOccurs="unbounded" >
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="property" minOccurs="0" maxOccurs="unbounded" >
-                  <xs:complexType>
-                    <xs:attribute name="key" type="xs:string" use="required" />
-                    <xs:attribute name="value" type="xs:string" use="required" />
-                  </xs:complexType>
-                </xs:element>
-                <xs:element name="or" minOccurs="0" >
-                  <xs:complexType>
-                    <xs:sequence>
-                      <xs:element name="condition" minOccurs="0" maxOccurs="unbounded" >
-                        <xs:complexType>
-                          <xs:sequence>
-                            <xs:element name="attribute">
-                              <xs:complexType>
-                                <xs:attribute name="vertex" type="xs:string" use="required" />
-                                <xs:attribute name="key" type="xs:string" use="required" />
-                              </xs:complexType>
-                            </xs:element>
-                            <xs:element name="value" type="xs:string" minOccurs="0"/>
-                          </xs:sequence>
-                          <xs:attribute name="predicate" type="xs:string" use="required" />
-                        </xs:complexType>
-                      </xs:element>
-                      <xs:element name="property" minOccurs="0" maxOccurs="unbounded" >
-                        <xs:complexType>
-                          <xs:attribute name="key" type="xs:string" use="required" />
-                          <xs:attribute name="value" type="xs:string" use="required" />
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-              <xs:attribute name="id" type="xs:ID" use="required" />
-              <xs:attribute name="type" type="xs:string" use="optional" />
-            </xs:complexType>
-          </xs:element>
-          <!--'path' element definition-->
-          <xs:element name="path" maxOccurs="unbounded" >
-            <xs:complexType>
-              <xs:sequence minOccurs="0">
-                <xs:element name="property" minOccurs="0" >
-                  <xs:complexType>
-                    <xs:attribute name="key" type="xs:string" use="required" />
-                    <xs:attribute name="value" type="xs:string" use="required" />
-                  </xs:complexType>
-                </xs:element>
-                <xs:element name="or" minOccurs="0" >
-                  <xs:complexType>
-                    <xs:sequence>
-                      <xs:element name="property" maxOccurs="unbounded" >
-                        <xs:complexType>
-                          <xs:attribute name="key" type="xs:string" use="required" />
-                          <xs:attribute name="value" type="xs:string" use="required" />
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                  </xs:complexType>
-                </xs:element>
-                <!--Added AND operator -->
-                <xs:element name="and" minOccurs="0" >
-                  <xs:complexType>
-                    <xs:sequence>
-                      <xs:element name="property" maxOccurs="unbounded" >
-                        <xs:complexType>
-                          <xs:attribute name="key" type="xs:string" use="required" />
-                          <xs:attribute name="value" type="xs:string" use="required" />
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                  </xs:complexType>
-                </xs:element>
-                <!--Added XOR operator -->
-                <xs:element name="xor" minOccurs="0" >
-                  <xs:complexType>
-                    <xs:sequence>
-                      <xs:element name="property" maxOccurs="unbounded" >
-                        <xs:complexType>
-                          <xs:attribute name="key" type="xs:string" use="required" />
-                          <xs:attribute name="value" type="xs:string" use="required" />
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                  </xs:complexType>
-                </xs:element>
-                <!--Added NAND operator -->
-                <xs:element name="not" minOccurs="0">
-                <xs:complexType>
-                  <xs:sequence>
-                    <xs:element name="and">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element maxOccurs="unbounded" name="property">
-                            <xs:complexType>
-                              <xs:attribute name="key" type="xs:string" use="required" />
-                              <xs:attribute name="value" type="xs:string" use="required" />
-                            </xs:complexType>
-                          </xs:element>
-                        </xs:sequence>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:sequence>
-                </xs:complexType>
-              </xs:element>
-              </xs:sequence>
-              <xs:attribute name="minLength" type="xs:positiveInteger" use="optional" />
-              <xs:attribute name="maxLength" type="xs:positiveInteger" use="optional" />
-              <xs:attribute name="from" type="xs:IDREF" use="required" />
-              <xs:attribute name="to" type="xs:IDREF" use="required" />
-            </xs:complexType>
-          </xs:element>
-          <!--'edge' element definition-->
-          <xs:element name="edge" maxOccurs="unbounded" minOccurs="0">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="property">
-                  <xs:complexType>
-                    <xs:attribute name="key" type="xs:string" use="required" />
-                    <xs:attribute name="value" type="xs:string" use="required" />
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-              <xs:attribute name="source" type="xs:IDREF" use="optional" />
-              <xs:attribute name="target" type="xs:IDREF" use="optional" />
-			  <xs:attribute name="from" type="xs:IDREF" use="required" />
-			  <xs:attribute name="to" type="xs:IDREF" use="required" />
-            </xs:complexType>
-          </xs:element>
-          <!--'condition' element definition-->
-          <xs:element name="condition">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="attribute" maxOccurs="unbounded" >
-                  <xs:complexType>
-                    <xs:attribute name="vertex" type="xs:string" use="required" />
-                    <xs:attribute name="key" type="xs:string" use="required" />
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-              <xs:attribute name="predicate" type="xs:string" use="required" />
-            </xs:complexType>
-          </xs:element>
-          <!--'not' element definition-->
-          <xs:element name="not">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="condition" minOccurs="0">
-                  <xs:complexType>
-                    <xs:sequence>
-                      <xs:element name="attribute" maxOccurs="unbounded" >
-                        <xs:complexType>
-                          <xs:attribute name="owner" type="xs:string" use="optional" />
-                          <xs:attribute name="key" type="xs:string" use="required" />
-                          <xs:attribute name="vertex" type="xs:string" use="optional" />
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute name="predicate" type="xs:string" use="required" />
-                  </xs:complexType>
-                </xs:element>
-				  <xs:element name="group" minOccurs="0">
-					  <xs:complexType>
-						  <xs:attribute name="key" type="xs:string" use="required"/>
-						  <xs:attribute name="member1" type="xs:string" use="required"/>
-						  <xs:attribute name="member2" type="xs:string" use="required"/>
-					  </xs:complexType>
-				  </xs:element>
-			  </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-          <!--'exists_not' element definition-->
-          <xs:element name="exists_not">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element name="vertex">
-                  <xs:complexType>
-                    <xs:sequence>
-                      <xs:element name="property">
-                        <xs:complexType>
-                          <xs:attribute name="key" type="xs:string" use="required" />
-                          <xs:attribute name="value" type="xs:string" use="required" />
-                        </xs:complexType>
-                      </xs:element>
-                    </xs:sequence>
-                    <xs:attribute name="id" type="xs:string" use="required" />
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-		  <!--'graphprocessor element definition-->
-		  <xs:element name="graphprocessor">
-			<xs:complexType>
-				<xs:attribute name="class" type="xs:string" use="required"/>
-		    </xs:complexType>		
-		  </xs:element>	 
-		  <!--'group' element definition -->
-		  <xs:element name="group">
-				<xs:complexType>
-					<xs:attribute name="key" type="xs:string" use="required"/>
-					<xs:attribute name="member1" type="xs:string" use="required"/>
-					<xs:attribute name="member2" type="xs:string" use="required"/>
-				</xs:complexType>
-			</xs:element>
-		  <!--'outgroup' element definition -->
-		  <xs:element name="outgroup">
-				<xs:complexType>
-					<xs:attribute name="key" type="xs:string" use="required"/>
-					<xs:attribute name="member1" type="xs:string" use="required"/>
-					<xs:attribute name="member2" type="xs:string" use="required"/>
-				</xs:complexType>
-			</xs:element>
-		  <!--'groupby definition-->
-		  <xs:element name="groupby">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="element" maxOccurs="unbounded">
-							<xs:complexType>
-								<xs:attribute name="vertex" type="xs:IDREF" use="required" />
-							</xs:complexType>
-						</xs:element>
-						<xs:element name="vertex" maxOccurs="unbounded">
-							<xs:complexType>
-								<xs:attribute name="id" type="xs:IDREF" use="required" />
-								<xs:attribute name="property" type="xs:string" use="optional" />
-							</xs:complexType>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:choice>
-      </xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="optional" />
+    <xs:element name="motif">
+    	<xs:complexType>
+    		<xs:sequence maxOccurs="unbounded" minOccurs="0">
+    			<xs:choice>
+    				<xs:element name="select" type="select"></xs:element>
+    				<xs:element name="constraint" type="xs:string"></xs:element>
+    				<xs:element name="connectedBy" type="connectedBy"></xs:element>
+    				<xs:element name="groupBy" type="groupBy"></xs:element>
+    			</xs:choice>
+    		</xs:sequence>
+    		<xs:attribute name="name" type="xs:string"></xs:attribute>
+    	</xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="select">
+    	<xs:sequence>
+    		<xs:element name="constraint" type="xs:string"></xs:element>
+    	</xs:sequence>    	
+    	<xs:attribute name="role" type="xs:ID"></xs:attribute>
     </xs:complexType>
-  </xs:element>
+
+
+    <xs:complexType name="connectedBy">
+        <xs:sequence>
+    		<xs:element name="constraint" type="xs:string"></xs:element>
+    	</xs:sequence>   
+        <xs:attribute name="role" type="xs:ID"></xs:attribute>
+        <xs:attribute name="from" type="xs:IDREF"></xs:attribute>
+    	<xs:attribute name="to" type="xs:IDREF"></xs:attribute>
+    	<xs:attribute name="minLength" type="xs:int" form="qualified"
+    		use="optional" default="1">
+    	</xs:attribute>
+    	<xs:attribute name="maxLength" type="xs:int" default="-1"
+    		use="optional">
+    	</xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="groupBy">
+    		<xs:sequence maxOccurs="unbounded" minOccurs="0">
+    			<xs:choice>
+    				<xs:element name="vertex" type="vertex"></xs:element>
+    				<xs:element name="attribute" type="attribute"></xs:element>
+    			</xs:choice>
+    		</xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="vertex">
+    	<xs:attribute name="role" type="xs:IDREF"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="attribute">
+    	<xs:attribute name="role" type="xs:IDREF"></xs:attribute>
+    	<xs:attribute name="property" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
 </xs:schema>
