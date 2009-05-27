@@ -15,6 +15,10 @@ import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.*;
+
+import nz.ac.massey.cs.gql4jung.Motif;
+import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,106 +29,31 @@ import org.junit.Test;
  */
 public class ValidationTests {
 	
-	public static String SCHEMA = "xml/gql4jung.xsd";
+	public static String SCHEMA = "schema/gql4jung.xsd";
 	
-	private void test(String xml, boolean shouldFail) throws Exception {
+	private Motif test(String name, boolean shouldFail) throws Exception {
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = factory.newSchema(new File(SCHEMA));
         Validator validator = schema.newValidator();
-        Source source = new StreamSource(new File(xml));
-        try {
-        	validator.validate(source);
-        	Assert.assertTrue(!shouldFail);
-        }
-        catch (Throwable t) {
-        	t.printStackTrace();
-        	Assert.assertTrue(shouldFail);
-        	
-        }
+        
+        String src = "/test/nz/ac/massey/cs/gql4jung/jmpl/queries/"+name;
+        InputStream in = this.getClass().getResourceAsStream(src);
+        
+        Source source = new StreamSource(in);
+        validator.validate(source);
+        in.close();
+        in = this.getClass().getResourceAsStream(src);
+        return new XMLMotifReader().read(in);
+ 
 	}
 	
 	@Test
 	public void test1() throws Exception {
-		test("xml/query1.xml",false);
+		Motif motif = test("awd.xml",false);
+		System.out.println(motif);
 
 	} 
 	
-	@Test
-	public void test2() throws Exception {
-		test("xml/query2.xml",false);
-
-	} 
-	
-	@Test
-	public void test3() throws Exception {
-		test("xml/query3.xml",false);
-
-	} 
-	
-	@Test
-	public void test4() throws Exception {
-		test("xml/query4.xml",false);
-	}
-	
-	@Test
-	public void test_empty_query() throws Exception {
-		test("xml/testdata/test_empty_query.xml",false);		
-	}
-	
-	@Test
-	public void test_query1_1() throws Exception {
-		test("xml/testdata/test_query1_1.xml",false);
-	}
-	
-	@Test
-	public void test_query1_2() throws Exception {
-		test("xml/testdata/test_query1_2.xml",true);	
-	}
-	
-	@Test
-	public void test_query1_3() throws Exception {			
-		test("xml/testdata/test_query1_3.xml",false);
-	}
-
-	@Test
-	public void test_query1_4() throws Exception {
-		test("xml/testdata/test_query1_4.xml",false);	
-	}
-
-	@Test
-	public void test_query1_5() throws Exception {
-		test("xml/testdata/test_query1_5.xml",false);		
-	}
-	
-	@Test
-	public void test_query1_6() throws Exception {
-		test("xml/testdata/test_query1_6.xml",false);		
-	}
-	
-	@Test
-	public void test_query1_7() throws Exception {
-		test("xml/testdata/test_query1_7.xml",true);		
-	}
-	
-	@Test
-	public void test_query2_1() throws Exception {
-		test("xml/testdata/test_query2_1.xml",false);
-	}
-	
-	@Test
-	public void test_query3_1() throws Exception {
-		test("xml/testdata/test_query3_1.xml",false);	
-	}
-	
-	@Test
-	public void test_query3_2() throws Exception {			
-		test("xml/testdata/test_query3_2.xml",false);
-	}
-
-	@Test
-	public void test_query4_1() throws Exception {
-		test("xml/testdata/test_query4_1.xml",false);	
-	}
 	
 	
 } 

@@ -19,7 +19,7 @@ public class CDTests extends Tests{
 		expected.put("outside2","org.example2.Outside2");
 		expected.put("inside2","org.example1.Inside2");
 		doTest("cd.xml","testdata-cd1.graphml",expected,true);
-		doTest("cd.xml","testdata-cd1.graphml",1);
+		doTestExpectedVariants("cd.xml","testdata-cd1.graphml",1);
 	}
 	
 	@Test
@@ -30,12 +30,12 @@ public class CDTests extends Tests{
 		expected.put("outside2","org.example2.Outside");
 		expected.put("inside2","org.example1.Inside2");
 		doTest("cd.xml","testdata-cd2.graphml",expected,true);
-		doTest("cd.xml","testdata-cd2.graphml",1);
+		doTestExpectedVariants("cd.xml","testdata-cd2.graphml",1);
 	}
 	
 	@Test
 	public void test3() throws Exception {
-		doTest("cd.xml","testdata-cd3.graphml",0);
+		doTestExpectedVariants("cd.xml","testdata-cd3.graphml",0);
 	}
 	
 	@Test

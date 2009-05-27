@@ -5,18 +5,20 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;
+import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
+import nz.ac.massey.cs.gql4jung.Vertex;
+import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
 import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
+import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
-import edu.uci.ics.jung.io.GraphMLFile;
 
 /**
  * Abstract superclass for tests for the new (jmpl) query engine implementation.
@@ -37,18 +39,17 @@ public abstract class Tests {
 	public void tearDown() throws Exception {
 	}
 	
-	protected Graph loadGraph(String name) throws Exception {
-		GraphMLFile input = new GraphMLFile();
+	static DirectedGraph<Vertex, Edge> loadGraph(String name) throws Exception {
         String src = "/test/nz/ac/massey/cs/gql4jung/jmpl/data/"+name;
-        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream(src));
-        Graph g = new DirectedSparseGraph();
-        g =	input.load(reader);
-        reader.close();
+        Reader reader = new InputStreamReader(Tests.class.getResourceAsStream(src));
+        GraphMLReader greader = new GraphMLReader(reader);
+        DirectedGraph<Vertex, Edge> g = greader.readGraph();
+        greader.close();
         return g;
 	}
-	protected Motif loadQuery(String name) throws Exception {
+	static Motif loadQuery(String name) throws Exception {
 		String src = "/test/nz/ac/massey/cs/gql4jung/jmpl/queries/"+name;
-        return new XMLMotifReader().read(this.getClass().getResourceAsStream(src));
+        return new XMLMotifReader().read(Tests.class.getResourceAsStream(src));
 	}
 	// expected associates roles with full class names
 	protected boolean check(List<MotifInstance> instances,Map<String,String> expected) {
@@ -57,7 +58,7 @@ public abstract class Tests {
 			for (String role:expected.keySet()) {
 				Vertex v = inst.getVertex(role);
 				if (result) {
-					String classname = ""+v.getUserDatum("namespace")+'.'+v.getUserDatum("name");
+					String classname = ""+v.getNamespace()+'.'+v.getName();
 					result = result && classname.equals(expected.get(role));
 				}
 			}
@@ -80,8 +81,8 @@ public abstract class Tests {
 	}
 	
 	
-	// check the expected number of results
-	protected void doTest(String motif, String data,int expected) throws Exception {
+	// check the expected number of variants (different results, no aggregation)
+	protected void doTestExpectedVariants(String motif, String data,int expected) throws Exception {
 		Graph g = this.loadGraph(data);
 		Motif m = this.loadQuery(motif);
 		ResultCollector coll = new ResultCollector();
@@ -89,8 +90,21 @@ public abstract class Tests {
 		long t1 = System.currentTimeMillis();
 		engine.query(g,m,coll);
 		long t2 = System.currentTimeMillis();
-		System.out.println("query "+motif+" on data "+data+ " returned "+coll.getInstances().size()+" results");
+		System.out.println("query "+motif+" on data "+data+ " returned "+coll.getInstances().size()+" variants");
 		System.out.println("query "+motif+" on data "+data+ " took "+(t2-t1)+" millis");
 		assertEquals(expected,coll.getInstances().size());
+	}
+	// check the expected number of variants (different results, no aggregation)
+	protected void doTestExpectedInstances(String motif, String data,int expected) throws Exception {
+		Graph g = this.loadGraph(data);
+		Motif m = this.loadQuery(motif);
+		QueryResults coll = new QueryResults();
+		GQL engine = new GQLImpl();
+		long t1 = System.currentTimeMillis();
+		engine.query(g,m,coll);
+		long t2 = System.currentTimeMillis();
+		System.out.println("query "+motif+" on data "+data+ " returned "+coll.getNumberOfGroups()+" instances");
+		System.out.println("query "+motif+" on data "+data+ " took "+(t2-t1)+" millis");
+		assertEquals(expected,coll.getNumberOfGroups());
 	}
 }
