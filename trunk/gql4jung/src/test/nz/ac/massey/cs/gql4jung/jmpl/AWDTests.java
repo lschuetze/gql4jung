@@ -29,6 +29,34 @@ public class AWDTests extends Tests{
 		expected.put("service_impl","org.apache.tools.ant.filters.LineContains");		
 		doTest("awd.xml","ant.jar.graphml",expected,true);
 	}
+	/** 
+	 * This was a false negative in 0.2, manually verified by inspecting the graph file.
+	 * @throws Exception
+	 */
+	@Test
+	public void testAnt3() throws Exception {
+		Map<String,String> expected = new HashMap<String,String>();
+		expected.put("client","org.apache.tools.ant.taskdefs.VerifyJar");
+		expected.put("service","org.apache.tools.ant.filters.ChainableReader");
+		expected.put("service_impl","org.apache.tools.ant.filters.ClassConstants");		
+		doTest("awd.xml","ant.jar.graphml",expected,true);
+	}
+	/** 
+	 * This was a false negative in 0.2, manually verified by inspecting the graph file.
+	 * @throws Exception
+	 */
+	@Test
+	public void testAnt4() throws Exception {
+		Map<String,String> expected = new HashMap<String,String>();
+		expected.put("client","org.apache.tools.ant.taskdefs.Get");
+		expected.put("service","org.apache.tools.ant.taskdefs.Get$DownloadProgress");
+		expected.put("service_impl","org.apache.tools.ant.taskdefs.Get$NullProgress");		
+		doTest("awd.xml","ant.jar.graphml",expected,true);
+	}
+	@Test
+	public void testAntCountAll() throws Exception {
+		this.doTestExpectedInstances("awd.xml","ant.jar.graphml", 12);
+	}
 	@Test
 	public void test1() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
