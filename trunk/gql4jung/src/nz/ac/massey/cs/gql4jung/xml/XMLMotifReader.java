@@ -48,7 +48,7 @@ public class XMLMotifReader implements MotifReader {
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			Motif query = (Motif)unmarshaller.unmarshal(source);
 						
-			for (Object o:query.getSelectOrConstraintOrConnectedBy()) {
+			for (Object o:query.getAnnotateOrSelectOrConstraint()) {
 				if (o instanceof Annotate) {
 					Annotate ann = (Annotate)o;
 					String clazzName = ann.getClazz();

@@ -1,20 +1,16 @@
 <!-- packages with multiple clusters within the package -->
-<query name="multiple_clusters">
+<motif name="multiple clusters in package">
     <!--  Cluster implements interface Processor with method process(Graph) -->
-	<graphprocessor class="nz.ac.massey.cs.processors.ClusterProcessor"/>
-    <vertex id="class1"><property key="type" value="class"/></vertex>
-    <vertex id="class2"><property key="type" value="class"/></vertex>
-    <not>
-	    <condition predicate="equals">
-	    	<attribute vertex="class1" key="cluster"/> 
-	    	<attribute vertex="class2" key="cluster"/> 
-	    </condition>
-    </not>
-    <condition predicate="equals">
-    	<attribute vertex="class1" key="namespace"/> 
-    	<attribute vertex="class2" key="namespace"/> 
-    </condition>    
+	<annotate class="nz.ac.massey.cs.processors.Clusterer"/>
+    <select role="class1"/>
+    <select role="class2"/>
+    <constraint>
+    	class1.namespace==class2.namespace
+    </constraint>
+    <constraint>
+    	class1.cluster!=class2.cluster
+    </constraint>
 	<groupby>
-        <vertex id="class1" property="namespace"/>
+        <element>class1.namespace</element>
     </groupby>
-</query>
+</motif>
