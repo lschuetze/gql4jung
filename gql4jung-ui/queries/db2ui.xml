@@ -1,32 +1,22 @@
 <!-- no class should depend on UI and DB classes (and therefore the respective layers) at the same time -->
 
-<query name="db2ui_dependency">
-    <vertex id="uiclass">
-    	<property key="type" value="class"/>
-    	<or>
-    		<property key="namespace" value="javax.swing"/>
-    		<property key="namespace" value="java.awt"/>
-    	</or>
-   	</vertex>
-   	<vertex id="uilayerclass">
-    	<property key="type" value="class"/>
-   	</vertex>
-   	<vertex id="dblayerclass">
-    	<property key="type" value="class"/>
-   	</vertex>
-    <vertex id="dbclass">
-    	<property key="type" value="class"/>    	
-    	<or>
-    		<property key="namespace" value="java.sql"/>
-    		<property key="namespace" value="org.hibernate"/>
-    	</or>
-   	</vertex>
-    <path from="dblayerclass" to="uilayerclass" minLength="0"></path>
-    <edge from="dblayerclass" to="dbclass"></edge>
-    <edge from="uilayerclass" to="uiclass"></edge>
+<motif name="db to ui layer dependencies">
+	<select role="uiclass"/>
+	<select role="uilayerclass"/>
+	<select role="dbclass"/>
+	<select role="dblayerclass"/>
+	<constraint>
+		uiclass.namespace=='javax.swing' || uiclass.namespace=='java.awt'
+    </constraint>
+   	<constraint>
+    	dbclass.namespace=='java.sql' || dbclass.namespace=='org.hibernate'
+    </constraint>
+   	<connectedBy role="db2ui" from="dblayerclass" to="uilayerclass" minLength="0"/>
+   	<connectedBy role="db link" from="dblayerclass" to="dbclass" maxLength="1"/>
+   	<connectedBy role="ui link" from="uilayerclass" to="uiclass" maxLength="1"/>
     <groupby>
-        <vertex id="dblayerclass" property="namespace"/>
-        <vertex id="uilayerclass" property="namespace"/>
+        <element>dblayerclass.namespace</element>
+        <element>uilayerclass.namespace</element>
     </groupby>
     
-</query>
+</motif>

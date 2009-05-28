@@ -17,6 +17,6 @@
     </constraint>
     <connectedBy role="path" from="outside1" to="outside2" minLength="0"/>
     <groupBy>
-        <attribute role="inside1" property="namespace"/>
+        <element>inside1.namespace</element>
     </groupBy>    
 </motif>
