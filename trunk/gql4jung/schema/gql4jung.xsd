@@ -21,6 +21,9 @@
     	<xs:attribute name="role" type="xs:ID"></xs:attribute>
     </xs:complexType>
 
+    <xs:complexType name="annotate">
+    	<xs:attribute name="class" type="xs:string"></xs:attribute>
+    </xs:complexType>
 
     <xs:complexType name="connectedBy">
         <xs:sequence>
