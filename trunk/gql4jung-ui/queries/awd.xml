@@ -1,24 +1,34 @@
-<motif name="abstraction without decoupling">
-    <select role="client">
-    	<constraint>!client.abstract</constraint>
-    </select>
-    <select role="service">
-   		<constraint>service.abstract</constraint>
-    </select>
-    <select role="service_impl">
-    	<constraint>!service_impl.abstract</constraint>
-    </select>
-    <connectedBy role="inherits" from="service_impl" to="service">
-    	<constraint>inherits.type=='extends' || inherits.type=='implements'</constraint>
-    </connectedBy>
-    <connectedBy role="service_invocation" from="client" to="service" minLength="1" maxLength="1">
-    	<constraint>service_invocation.type=='uses'</constraint>    
-    </connectedBy>
-    <connectedBy role="implementation_dependency" from="client" to="service_impl">
-		<constraint>implementation_dependency.type=='uses'</constraint>    
-	</connectedBy>
-    <groupBy>
-        <vertex role="client"/>
-        <vertex role="service"/>
-    </groupBy>
-</motif>
+<!--  no decoupling through abstraction -->
+<!-- for properties, see edu.uci.ics.jung.utils.UserDataContainer - these are general purpose key-value annotations key-datum-->
+<query name="abstraction_coupling">
+	<!-- ids are of type ID, references in path and edge of type IDREF -->
+    <vertex id="client">
+		<property key="type" value="class"/>
+    </vertex>
+    <vertex id="service">    
+        <property key="isAbstract" value="true"/>
+        <property key="type" value="class"/>
+    </vertex>
+    <vertex id="service_impl">
+        <property key="isAbstract" value="false"/>
+        <property key="type" value="class"/>
+    </vertex>
+    <!-- minLength and maxLength are optional, defaults are 1 and  infinite-->
+    <path from="service_impl" to="service">
+       <!-- properties can be complex using standard boolean operators AND,OR,NOT,XOR  -->
+       <or>
+       		<property key="type" value="extends"/>
+       		<property key="type" value="implements"/>
+       </or>
+    </path>
+    <edge from="client" to="service">
+        <property key="type" value="uses"/>
+    </edge>
+    <path from="client" to="service_impl">
+       <property key="type" value="uses"/>
+    </path>
+    <groupby>
+        <element>service</element>
+        <element>client</element>
+    </groupby>
+</query>

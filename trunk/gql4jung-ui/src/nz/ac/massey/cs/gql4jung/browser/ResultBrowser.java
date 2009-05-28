@@ -50,7 +50,6 @@ import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
@@ -718,7 +717,9 @@ public class ResultBrowser extends JFrame {
 		        	case 1: return "name";
 		        	case 2: return "namespace";
 		        	case 3: return "container";
-		        	case 4: return "cluster";
+		        	case 4: return "is abstract";
+		        	case 5: return "type";
+		        	case 6: return "cluster";
 		        	default: return null;
 		        }
 		    }
@@ -726,7 +727,7 @@ public class ResultBrowser extends JFrame {
 		    	return roles.size(); 
 		    }
 		    public int getColumnCount() { 
-		    	return 5; 
+		    	return 7; 
 		    }
 		    public Object getValueAt(int row, int col) {
 		    	String role = roles.get(row);
@@ -738,8 +739,10 @@ public class ResultBrowser extends JFrame {
 	        		case 0: return role;
 	        		case 1: return v.getName();
 	        		case 2: return v.getNamespace();
-	        		case 3: return "TODO";
-	        		case 4: return cluster;
+	        		case 3: return v.getContainer();
+	        		case 4: return v.isAbstract();
+	        		case 5: return v.getType();
+	        		case 6: return v.getCluster();
 	        		default: return null;
 		        }
 		    }
@@ -786,12 +789,14 @@ public class ResultBrowser extends JFrame {
 				public String transform(Vertex v) {
 					String role = revMap.get(v);
 					StringBuffer b = new StringBuffer()
-						.append("<html>")
-						.append("&lt;&lt;")
+						.append("<html>");
+					if (role!=null) {
+						b.append("&lt;&lt;")
 						.append(role==null?"?":role)
 						.append("&gt;&gt")
-						.append("<br/>")
-						.append(v.getNamespace())
+						.append("<br/>");					
+					}
+					b.append(v.getNamespace())
 						.append('.')
 						.append(v.getName())
 						.append("</html>");
@@ -819,10 +824,8 @@ public class ResultBrowser extends JFrame {
 				}
 			}
 		);
-		float dash[] = {10.0f};
 		final Stroke strokeUses = new BasicStroke(1);
-		final Stroke strokeInherits = new BasicStroke(2);
-		
+		final Stroke strokeInherits = new BasicStroke(2);		
 		context.setEdgeStrokeTransformer(
 			new Transformer<Edge, Stroke>() {
 				public Stroke transform(Edge e) {
@@ -831,6 +834,38 @@ public class ResultBrowser extends JFrame {
 				}
 			}
 		);	
+		context.setVertexIconTransformer(
+			new Transformer<Vertex,Icon>() {
+				@Override
+				public Icon transform(Vertex v) {
+					boolean hasRole = revMap.containsKey(v);
+					if (v.isAbstract()) {
+						return hasRole?GraphRenderer.ICON_INTERFACE_C:GraphRenderer.ICON_INTERFACE_BW;
+					}
+					else {
+						return hasRole?GraphRenderer.ICON_CLASS_C:GraphRenderer.ICON_CLASS_BW;
+					}
+				}
+			}
+		);
+		context.setVertexFontTransformer(
+			new Transformer<Vertex,Font>(){
+				@Override
+				public Font transform(Vertex v) {
+					boolean hasRole = revMap.containsKey(v);
+					return hasRole?GraphRenderer.CORE:GraphRenderer.NON_CORE;
+				}
+			}
+		);
+		context.setEdgeFontTransformer(
+			new Transformer<Edge,Font>(){
+				@Override
+				public Font transform(Edge e) {
+					return GraphRenderer.CORE;
+				}
+			}
+		);
+		
 	}
 	
 
