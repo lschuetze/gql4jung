@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import nz.ac.massey.cs.gql4jung.*;
+import nz.ac.massey.cs.gql4jung.mvel.CompiledGroupByClause;
 import nz.ac.massey.cs.gql4jung.mvel.CompiledPropertyConstraint;
 import nz.ac.massey.cs.processors.Processor;
 
@@ -87,21 +88,14 @@ public class XMLMotifReader implements MotifReader {
 				}
 				else if (o instanceof GroupBy) {
 					GroupBy groupBy = (GroupBy)o;
-					for (Object o2:groupBy.getVertexOrAttribute()) {
-						// motif.setConstraints(constraints);						
-						if (o2 instanceof Vertex) {
-							Vertex v = (Vertex)o2;
-							GroupByClause clause = new GroupByClause();
-							clause.setRole(((Select)v.getRole()).getRole());
-							groupByClauses.add(clause);
+					for (String e:groupBy.getElement()) {
+						GroupByClause clause = new CompiledGroupByClause(e);
+						// TODO we could check roles here
+						String role = clause.getRole();
+						if (!vertexRoles.contains(role)) {
+							throw new MotifReaderException("Group by clause " + e + " does contain an input that has not been declared as a role");
 						}
-						else if (o2 instanceof Attribute) {
-							Attribute a = (Attribute)o2;
-							GroupByClause clause = new GroupByClause();
-							clause.setRole(((Select)a.getRole()).getRole());
-							clause.setProperty(a.getProperty());
-							groupByClauses.add(clause);
-						}
+						groupByClauses.add(clause);
 					}
 				}
 			}

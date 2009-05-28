@@ -30,12 +30,10 @@ public class CompiledPropertyConstraint implements PropertyConstraint  {
 
 	private void parseExpression(Map<String, Class> roleTypes) {
 		ParserContext ctx = new ParserContext();
-		// ctx.setStrongTyping(true); 
 		for (Map.Entry<String,Class> t:roleTypes.entrySet()) {
 			if (!(GraphElement.class.isAssignableFrom(t.getValue()))) {
 				throw new IllegalArgumentException("Illegal role type for role " + t.getKey()+", only vertices and edges are allowed here");
 			}
-			//ctx.addInput(t.getKey(),t.getValue());
 		}
 		// compile
 		this.compiledExpression = new ExpressionCompiler(expression).compile(ctx);

@@ -15,20 +15,26 @@ import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.impl.DirectedSparseGraph;
-import edu.uci.ics.jung.io.GraphMLFile;
+import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifReaderException;
+import nz.ac.massey.cs.gql4jung.Vertex;
+import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
 import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.QueryResults.QueryResultListener;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 
+/**
+ * Utility to batch process input files.
+ * @author jens dietrich
+ */
 public class AnalysisBatchJob {
 	public static final String ROOT = "batch/";
-	public static final String INPUT_DATA_FOLDER = "/media/disk-3/input";
+	public static final String INPUT_DATA_FOLDER = "/media/disk-3/gql4jung/input";
 	public static final String QUERY_FOLDER = ROOT+"queries";
 	public static final String OUTPUT_FOLDER = ROOT+"output";
 	public static final String SUMMARY = ROOT+"summary.csv";
@@ -95,8 +101,8 @@ public class AnalysisBatchJob {
 	}
 	
 	
-	public static void analyse (File querySource,final File graphSource,final String cursorLog) throws IOException, MotifReaderException {
-		Graph graph = loadGraph(graphSource);
+	public static void analyse (File querySource,final File graphSource,final String cursorLog) throws Exception {
+		DirectedGraph<Vertex,Edge> graph = loadGraph(graphSource);
 		Motif motif = loadMotif(querySource);
 		
 		if (graph.getVertices()==null) {
@@ -200,12 +206,11 @@ public class AnalysisBatchJob {
 	}
 
 
-	private static Graph loadGraph(File file) throws IOException {
-		GraphMLFile input = new GraphMLFile();
-        Reader reader = new FileReader(file);
-        Graph g = new DirectedSparseGraph();
+	private static DirectedGraph<Vertex,Edge> loadGraph(File file) throws Exception {
+		Reader reader = new FileReader(file);
+		GraphMLReader input = new GraphMLReader(reader);
         log("Loading graphml file ",file.getAbsolutePath());
-        g =	input.load(reader);
+        DirectedGraph<Vertex,Edge> g =	input.readGraph();
         reader.close();
         return g;
 	}
