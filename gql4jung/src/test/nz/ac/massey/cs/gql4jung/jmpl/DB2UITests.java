@@ -64,4 +64,20 @@ public class DB2UITests extends Tests{
 		expected.put("uilayerclass","com.ibm.as400.access.PasswordDialog");
 		doTest("db2ui.xml","jt400Proxy.jar.graphml",expected,true);
 	}
+	/**
+	 * Number of instances unchanged from 0.2 o 0.3, one instance manually verified.
+	 * @throws Exception
+	 */
+	@Test
+	public void testjt400Proxy2() throws Exception {
+		this.doTestExpectedInstances("db2ui.xml", "jt400Proxy.jar.graphml", 1);
+	}
+	/**
+	 * Number of variants unchanged from 0.2 o 0.3, one instance manually verified.
+	 * @throws Exception
+	 */
+	@Test
+	public void testjt400Proxy3() throws Exception {
+		this.doTestExpectedVariants("db2ui.xml", "jt400Proxy.jar.graphml", 4103);
+	}
 }
