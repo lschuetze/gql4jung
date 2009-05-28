@@ -13,7 +13,6 @@ package nz.ac.massey.cs.gql4jung;
 import java.util.Collection;
 import java.util.List;
 
-import nz.ac.massey.cs.processors.Processor;
 
 /**
  * This is the type for queries. Queries are usually build from query language expressions (query DSL, XML, ..).

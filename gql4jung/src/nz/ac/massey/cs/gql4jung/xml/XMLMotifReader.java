@@ -18,7 +18,6 @@ import javax.xml.bind.Unmarshaller;
 import nz.ac.massey.cs.gql4jung.*;
 import nz.ac.massey.cs.gql4jung.mvel.CompiledGroupByClause;
 import nz.ac.massey.cs.gql4jung.mvel.CompiledPropertyConstraint;
-import nz.ac.massey.cs.processors.Processor;
 
 /**
  * Builds motifs from xml streams

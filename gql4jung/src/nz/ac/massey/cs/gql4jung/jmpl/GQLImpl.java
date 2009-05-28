@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import edu.uci.ics.jung.graph.*;
 import nz.ac.massey.cs.gql4jung.*;
-import nz.ac.massey.cs.processors.Processor;
 
 /**
  * Improved graph query engine.
