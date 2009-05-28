@@ -12,7 +12,7 @@ import edu.uci.ics.jung.graph.Graph;
  * Implementation class for processing clusters in graph.
  * @author jens dietrich
  */
-public class ClusterProcessor implements Processor {
+public class Clusterer implements Processor {
 	
 	@Override
 	public void process(Graph<Vertex, Edge> g){

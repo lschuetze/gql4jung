@@ -49,6 +49,17 @@ public class XMLMotifReader implements MotifReader {
 			Motif query = (Motif)unmarshaller.unmarshal(source);
 						
 			for (Object o:query.getSelectOrConstraintOrConnectedBy()) {
+				if (o instanceof Annotate) {
+					Annotate ann = (Annotate)o;
+					String clazzName = ann.getClazz();
+					try {
+						Processor processor = (Processor)Class.forName(clazzName).newInstance();
+						graphProcessors.add(processor);
+					}
+					catch (Exception x) {
+						throw new MotifReaderException("The processor class " + clazzName + " cannot be found or instantiated",x);
+					}
+				}
 				if (o instanceof Select) {
 					Select select = (Select)o;
 					vertexRoles.add(select.getRole());
