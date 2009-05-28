@@ -39,20 +39,8 @@
 
     <xs:complexType name="groupBy">
     		<xs:sequence maxOccurs="unbounded" minOccurs="0">
-    			<xs:choice>
-    				<xs:element name="vertex" type="vertex"></xs:element>
-    				<xs:element name="attribute" type="attribute"></xs:element>
-    			</xs:choice>
+    			<xs:element name="element" type="xs:string"></xs:element>
     		</xs:sequence>
-    </xs:complexType>
-    
-    <xs:complexType name="vertex">
-    	<xs:attribute name="role" type="xs:IDREF"></xs:attribute>
-    </xs:complexType>
-
-    <xs:complexType name="attribute">
-    	<xs:attribute name="role" type="xs:IDREF"></xs:attribute>
-    	<xs:attribute name="property" type="xs:string"></xs:attribute>
     </xs:complexType>
 
 </xs:schema>
