@@ -3,15 +3,18 @@ package test.nz.ac.massey.cs.gql4jung.jmpl;
 import static junit.framework.Assert.assertEquals;
 
 import java.io.File;
-import java.io.IOException;
-
+import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
+import nz.ac.massey.cs.gql4jung.Vertex;
 import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.QueryResultsExporter2CSV;
-import edu.uci.ics.jung.graph.Graph;
-
+import edu.uci.ics.jung.graph.DirectedGraph;
+/**
+ * Utility to save query results for investigation.
+ * @author jens dietrich
+ */
 public class UtilSaveAWDQueryResults {
 
 	/**
@@ -19,7 +22,7 @@ public class UtilSaveAWDQueryResults {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		Graph g = Tests.loadGraph("ant.jar.graphml");
+		DirectedGraph<Vertex,Edge> g = Tests.loadGraph("ant.jar.graphml");
 		Motif m = Tests.loadQuery("awd.xml");
 		QueryResults coll = new QueryResults();
 		GQL engine = new GQLImpl();

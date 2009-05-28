@@ -8,6 +8,8 @@ import nz.ac.massey.cs.gql4jung.Vertex;
 
 import com.google.common.base.Predicate;
 
+import edu.uci.ics.jung.graph.DirectedGraph;
+
 /**
  * Utility to find paths in graphs.
  * @author jens dietrich
@@ -15,9 +17,13 @@ import com.google.common.base.Predicate;
 public class PathFinder {
 	
 
-	public static Iterator<Path> findLinks(Vertex start, int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter) {
+	public static Iterator<Path> findLinks(DirectedGraph<Vertex,Edge> g,Vertex start, int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter) {
+		// try cache first
+		Collection<Path> coll = PathCache.INSTANCE.get(g, start, minLength, maxLength, outgoing, filter);
+		if (coll!=null) return coll.iterator();
+		
 		// we pre init the iterator, this should be done on demand
-		Collection<Path> coll = new ArrayList<Path> ();
+		coll = new ArrayList<Path> ();
 		Map<Vertex,Object> visited = new IdentityHashMap<Vertex,Object>();
 		Collection<Path> layer = new ArrayList<Path>();
 		
@@ -29,6 +35,9 @@ public class PathFinder {
 		}
 		
 		collectPaths(1,coll,visited,layer,start,minLength,maxLength,outgoing,filter);
+		// cache
+		PathCache.INSTANCE.put(g, start, minLength, maxLength, outgoing, filter, coll);
+		
 		return coll.iterator();
 		
 	}

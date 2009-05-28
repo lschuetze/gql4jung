@@ -11,13 +11,13 @@
 package nz.ac.massey.cs.gql4jung;
 
 
-import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.DirectedGraph;
 /**
  * Interface for engines processing queries.
  * @author jens.dietrich@gmail.com
  */
 public interface GQL {
-	void query(Graph graph,Motif motif,ResultListener listener);
+	void query(DirectedGraph<Vertex,Edge> graph,Motif motif,ResultListener listener);
 	// cancels the current computation
 	void cancel() ;
 	// reset the state of the engine

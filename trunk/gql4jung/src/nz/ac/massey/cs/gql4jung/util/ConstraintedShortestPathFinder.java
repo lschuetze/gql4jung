@@ -2,7 +2,10 @@ package nz.ac.massey.cs.gql4jung.util;
 
 import java.util.*;
 import nz.ac.massey.cs.gql4jung.*;
+
 import com.google.common.base.Predicate;
+
+import edu.uci.ics.jung.graph.DirectedGraph;
 
 /**
  * Utility to find the shortest path satisfying certain constraints (length and predicates on edges)
@@ -10,7 +13,7 @@ import com.google.common.base.Predicate;
  */
 public class ConstraintedShortestPathFinder  {
 	
-	public static Path findLink(Vertex start, Vertex target, int minLength, int maxLength, Predicate<Edge> filter) {
+	public static Path findLink(DirectedGraph<Vertex,Edge> g,Vertex start, Vertex target, int minLength, int maxLength, Predicate<Edge> filter) {
 		Map<Vertex,Object> visited = new IdentityHashMap<Vertex,Object>();
 		Collection<Path> layer = new ArrayList<Path>();
 		
