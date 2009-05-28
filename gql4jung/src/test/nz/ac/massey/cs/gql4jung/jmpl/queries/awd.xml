@@ -18,7 +18,7 @@
 		<constraint>implementation_dependency.type=='uses'</constraint>    
 	</connectedBy>
     <groupBy>
-        <vertex role="client"/>
-        <vertex role="service"/>
+        <element>client</element>
+        <element>service</element>
     </groupBy>
 </motif>

@@ -28,7 +28,7 @@
        <property key="type" value="uses"/>
     </path>
     <groupby>
-        <element vertex="service"/>
-        <element vertex="client"/>
+        <element>service</element>
+        <element>client</element>
     </groupby>
 </query>

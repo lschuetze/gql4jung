@@ -39,6 +39,12 @@ public class CDTests extends Tests{
 	}
 	
 	@Test
+	public void test4() throws Exception {
+		doTestExpectedVariants("cd.xml","testdata-cd4.graphml",2);
+		doTestExpectedInstances("cd.xml","testdata-cd4.graphml",2);
+	}
+	
+	@Test
 	public void testAnt1() throws Exception {	
 		Map<String,String> expected = new HashMap<String,String>();
 		expected.put("inside1","org.apache.tools.ant.input.PropertyFileInputHandler");
@@ -46,6 +52,15 @@ public class CDTests extends Tests{
 		expected.put("outside2","org.apache.tools.ant.Project");
 		expected.put("inside2","org.apache.tools.ant.input.InputHandler");
 		doTest("cd.xml","ant.jar.graphml",expected,true);
+	}
+	/**
+	 * The number of instances found in 0.2 and o3 is the same, they have been manually verified.
+	 * The number of variants has slightly increased.
+	 * @throws Exception
+	 */
+	@Test
+	public void testAnt2() throws Exception {
+		doTestExpectedInstances("cd.xml","ant.jar.graphml",17);
 	}
 	
 }

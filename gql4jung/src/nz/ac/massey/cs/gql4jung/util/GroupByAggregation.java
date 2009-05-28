@@ -1,6 +1,9 @@
 package nz.ac.massey.cs.gql4jung.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
 import nz.ac.massey.cs.gql4jung.GroupByClause;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
@@ -17,31 +20,16 @@ public class GroupByAggregation implements MotifInstanceAggregation {
 	public Object getGroupIdentifier (MotifInstance instance) {
 		final Motif motif = instance.getMotif();
 		Collection<GroupByClause> clauses = motif.getGroupByClauses();
-		
-		StringBuffer b = new StringBuffer(); 
-		String SEP = "___";
-		boolean first = true;
-		for (GroupByClause clause:clauses) {
-			if (first) first=false;
-			else b.append(SEP);
-			
-			String role = clause.getRole();
-			String property = clause.getProperty();
-			Vertex vertex = instance.getVertex(role);
-			if (property==null) {
-				// append full type name
-				b.append(vertex.getNamespace());
-				b.append('.');
-				b.append(vertex.getName());
-			}
-			else {
-				// TODO
-			}		
+		List identifier = new ArrayList();
+		for (GroupByClause c:clauses) {
+			String role = c.getRole();
+			Vertex v = instance.getVertex(role);
+			Object value = c.getGroup(v);
+			if (clauses.size()==1) return value;
+			else identifier.add(value);
 		}
 
-
-		//System.out.println("key: " + instance + " -> " + b);
-		return b.toString();
+		return identifier;
 	}
 
 }
