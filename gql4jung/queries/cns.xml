@@ -5,7 +5,7 @@
     <select role="class1"/>
     <select role="class2"/>
     <constraint>
-    	class1.namespace=class2.namespace
+    	class1.namespace==class2.namespace
     </constraint>
     <constraint>
     	class1.cluster!=class2.cluster

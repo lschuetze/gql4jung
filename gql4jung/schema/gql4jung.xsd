@@ -4,6 +4,7 @@
     	<xs:complexType>
     		<xs:sequence maxOccurs="unbounded" minOccurs="0">
     			<xs:choice>
+    				<xs:element name="annotate" type="annotate"></xs:element>
     				<xs:element name="select" type="select"></xs:element>
     				<xs:element name="constraint" type="xs:string"></xs:element>
     				<xs:element name="connectedBy" type="connectedBy"></xs:element>
