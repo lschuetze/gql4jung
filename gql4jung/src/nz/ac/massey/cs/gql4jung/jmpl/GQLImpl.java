@@ -39,7 +39,7 @@ public class GQLImpl extends Logging implements GQL {
 	}
 
 	@Override
-	public void query(Graph graph, Motif motif, ResultListener listener) {
+	public void query(DirectedGraph<Vertex,Edge> graph, Motif motif, ResultListener listener) {
 		
 		if(motif.getGraphProcessor().size()!=0){
 			for(Processor processor:motif.getGraphProcessor()){
@@ -70,7 +70,7 @@ public class GQLImpl extends Logging implements GQL {
 	    }
 	}
 
-	private void resolve(Graph graph, Motif motif, List<Constraint> constraints,Bindings bindings, ResultListener listener) {
+	private void resolve(DirectedGraph<Vertex,Edge> graph, Motif motif, List<Constraint> constraints,Bindings bindings, ResultListener listener) {
 		if (cancel) return;
 
 		// check for termination
@@ -162,7 +162,7 @@ public class GQLImpl extends Logging implements GQL {
 		this.agendaPool.recycle(newAgenda);
 	}
 
-	private void resolveNextLevel(Graph graph, Motif motif, List<Constraint> constraints,Bindings bindings, ResultListener listener, 
+	private void resolveNextLevel(DirectedGraph<Vertex,Edge> graph, Motif motif, List<Constraint> constraints,Bindings bindings, ResultListener listener, 
 			Iterator<Path> iter,Vertex end1,String end2Role,PathConstraint constraint) {
 		
 		while (iter.hasNext()) {

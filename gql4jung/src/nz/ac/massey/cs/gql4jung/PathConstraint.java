@@ -16,11 +16,10 @@ import java.util.List;
 import com.google.common.base.Predicate;
 import nz.ac.massey.cs.gql4jung.util.ConstraintedShortestPathFinder;
 import nz.ac.massey.cs.gql4jung.util.PathFinder;
-import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.DirectedGraph;
 /**
  * Constraint to check the existence of paths between nodes.
- * @author jens.dietrich@gmail.com
- *
+ * @author jens dietrich
  */
 public class PathConstraint implements Constraint {
 	
@@ -47,15 +46,15 @@ public class PathConstraint implements Constraint {
 		super();
 	}
 		
-	public Iterator<Path> getPossibleSources(final Graph g,final Vertex target) {
-		return PathFinder.findLinks(target,this.minLength,this.maxLength, false,filter);
+	public Iterator<Path> getPossibleSources(final DirectedGraph<Vertex,Edge> g,final Vertex target) {
+		return PathFinder.findLinks(g,target,this.minLength,this.maxLength, false,filter);
 	}
-	public Iterator<Path>  getPossibleTargets(final Graph g, final Vertex source){
-		return PathFinder.findLinks(source,this.minLength,this.maxLength, true, filter);
+	public Iterator<Path>  getPossibleTargets(final DirectedGraph<Vertex,Edge> g, final Vertex source){
+		return PathFinder.findLinks(g,source,this.minLength,this.maxLength, true, filter);
 	}
 
-	public Path check(final Graph g, final Vertex source, final Vertex target){
-		return ConstraintedShortestPathFinder.findLink(source,target,minLength,maxLength,filter);
+	public Path check(final DirectedGraph<Vertex,Edge> g, final Vertex source, final Vertex target){
+		return ConstraintedShortestPathFinder.findLink(g,source,target,minLength,maxLength,filter);
 	}
 
 

@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.Path;
 import nz.ac.massey.cs.gql4jung.Vertex;
@@ -22,7 +21,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.google.common.base.Predicate;
-
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.Graph;
 
@@ -74,9 +72,9 @@ public class Tests {
 	}
 
 	private void doTestLinks(String data,Collection<String[]> expectedPaths,boolean isOutgouing,String startHere,int minLength,int maxLength, Predicate<Edge> filter) throws Exception {
-		Graph g = this.loadGraph(data);
+		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Vertex v = getVertex(g,startHere);
-		Iterator<Path> iter = PathFinder.findLinks(v, minLength, maxLength, isOutgouing, filter);
+		Iterator<Path> iter = PathFinder.findLinks(g,v, minLength, maxLength, isOutgouing, filter);
 		Collection<String[]> expected = new HashSet<String[]>();
 		expected.addAll(expectedPaths);
 		while (iter.hasNext()) {
@@ -105,10 +103,10 @@ public class Tests {
 	
 	// check the shortest paths between nodes
 	private void doTestShortestPath(String data,String[] expected,String start,String end,int minLength,int maxLength, Predicate<Edge> filter) throws Exception {
-		Graph g = this.loadGraph(data);
+		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Vertex source = getVertex(g,start);
 		Vertex target = getVertex(g,end);
-		Path path = ConstraintedShortestPathFinder.findLink(source, target, minLength, maxLength, filter);
+		Path path = ConstraintedShortestPathFinder.findLink(g,source, target, minLength, maxLength, filter);
 		String[] arr = path==null?null:toArray(path);
 		Assert.assertArrayEquals("this path was not expected: " + this.toString(arr),expected,arr);
 	}

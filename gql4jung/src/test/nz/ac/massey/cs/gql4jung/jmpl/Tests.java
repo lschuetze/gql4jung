@@ -18,7 +18,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.Graph;
 
 /**
  * Abstract superclass for tests for the new (jmpl) query engine implementation.
@@ -68,7 +67,7 @@ public abstract class Tests {
 	} 
 	// check whether a result specified as map is or is not in the result set
 	protected void doTest(String motif, String data,Map<String, String> expected,boolean shouldSucceed) throws Exception {
-		Graph g = this.loadGraph(data);
+		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Motif m = this.loadQuery(motif);
 		ResultCollector coll = new ResultCollector();
 		GQL engine = new GQLImpl();
@@ -83,7 +82,7 @@ public abstract class Tests {
 	
 	// check the expected number of variants (different results, no aggregation)
 	protected void doTestExpectedVariants(String motif, String data,int expected) throws Exception {
-		Graph g = this.loadGraph(data);
+		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Motif m = this.loadQuery(motif);
 		ResultCollector coll = new ResultCollector();
 		GQL engine = new GQLImpl();
@@ -96,7 +95,7 @@ public abstract class Tests {
 	}
 	// check the expected number of variants (different results, no aggregation)
 	protected void doTestExpectedInstances(String motif, String data,int expected) throws Exception {
-		Graph g = this.loadGraph(data);
+		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Motif m = this.loadQuery(motif);
 		QueryResults coll = new QueryResults();
 		GQL engine = new GQLImpl();
