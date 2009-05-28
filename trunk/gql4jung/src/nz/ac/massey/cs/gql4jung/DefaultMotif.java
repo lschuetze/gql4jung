@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import nz.ac.massey.cs.processors.Processor;
 
 public class DefaultMotif implements Motif {
 	

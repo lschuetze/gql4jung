@@ -2,39 +2,31 @@ package nz.ac.massey.cs.processors;
 
 import java.util.Set;
 
-import edu.uci.ics.jung.algorithms.cluster.ClusterSet;
+import nz.ac.massey.cs.gql4jung.Edge;
+import nz.ac.massey.cs.gql4jung.Processor;
+import nz.ac.massey.cs.gql4jung.Vertex;
 import edu.uci.ics.jung.algorithms.cluster.EdgeBetweennessClusterer;
 import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.Vertex;
-import edu.uci.ics.jung.utils.UserData;
 
 /**
  * Implementation class for processing clusters in graph.
- * @author Ali
- *
+ * @author jens dietrich
  */
 public class ClusterProcessor implements Processor {
 	
-	String processorClass; 
-	
 	@Override
-	public Graph process(Graph g) {
+	public void process(Graph<Vertex, Edge> g){
 		EdgeBetweennessClusterer clusterer = new EdgeBetweennessClusterer(0);
-		ClusterSet cset = clusterer.extract(g); 
-		for(int i=0; i<cset.size();i++){
-			String l = "cluster-"+i;
-			Set cluster = cset.getCluster(i);
-			for(Object o: cluster){
-				Vertex v =  (Vertex) o;
-				v.addUserDatum("cluster",l, UserData.SHARED);
+		Set<Set<Vertex>> clusters = clusterer.transform(g);  
+		int counter = 1;
+		for (Set<Vertex> cluster:clusters) {
+			String label = "cluster-"+counter;
+			counter=counter+1;
+			for (Vertex v:cluster) {
+				v.setCluster(label);
 			}
 		}
-		return g;
 	}
-	public String getProcessorClass() {
-		return processorClass;
-	}
-	public void setProcessorClass(String processorClass) {
-		this.processorClass = processorClass;
-	}
+
+
 }
