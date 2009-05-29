@@ -19,6 +19,7 @@ public class GQLImpl extends Logging implements GQL {
 		super();
 	}
 
+	/*
 	private ObjectPool<List<Constraint>> agendaPool = new ObjectPool<List<Constraint>>(100) {
 
 		@Override
@@ -30,6 +31,7 @@ public class GQLImpl extends Logging implements GQL {
 			l.clear();
 		}		
 	} ;
+	*/
 	
 	private boolean cancel = false;
 	private ConstraintScheduler scheduler = new SimpleScheduler();
@@ -62,13 +64,14 @@ public class GQLImpl extends Logging implements GQL {
     	
     	// prepare constraints
     	List<Constraint> constraints = scheduler.getConstraints(graph, motif);
+    	Agenda agenda = new Agenda(constraints);
     	
     	// start resolver
     	for(Vertex v:vertices){
     		Bindings bindings = new Bindings();
     		bindings.bind(role, v);
     		counter = counter+1;
-    		resolve(graph, motif, constraints, bindings, listener);
+    		resolve(graph, motif, agenda, bindings, listener);
     		if (counter%stepSize==0) {
     			listener.progressMade(counter,S);
     		}
@@ -77,24 +80,18 @@ public class GQLImpl extends Logging implements GQL {
     	PathCache.switchCachingOff();
 	}
 
-	private void resolve(DirectedGraph<Vertex,Edge> graph, Motif motif, List<Constraint> constraints,Bindings bindings, ResultListener listener) {
+	private void resolve(DirectedGraph<Vertex,Edge> graph, Motif motif, Agenda agenda,Bindings bindings, ResultListener listener) {
 		if (cancel) return;
 
 		// check for termination
-		if (constraints.isEmpty()) {
+		if (agenda.isDone()) {
 			MotifInstance instance = createInstance(graph,motif,bindings);
 			listener.found(instance);
 			return;
 		}
 		// recursion
-		bindings.gotoChildLevel();  // one level down
-		Constraint nextConstraint = constraints.get(0); // take the first, has been ordered by scheduler
-		// new agenda 
-		//List<Constraint> newAgenda = new ArrayList<Constraint>(); // no pool version
-		List<Constraint> newAgenda = this.agendaPool.borrow();
-		for (Constraint c:constraints) {
-			if (c!=nextConstraint) newAgenda.add(c);
-		} 
+		bindings.gotoNextLevel();  // one level down
+		Constraint nextConstraint = agenda.next(); // take the first, has been ordered by scheduler
 		
 		if (LOG_GQL.isDebugEnabled()) {
 			LOG_GQL.debug("recursion level "+bindings.getPosition()+", resolving: "+nextConstraint);
@@ -126,7 +123,7 @@ public class GQLImpl extends Logging implements GQL {
 				result = constraint.check(bind); 
 			}
 			if (result) {
-				resolve(graph,motif,newAgenda,bindings,listener);
+				resolve(graph,motif,agenda,bindings,listener);
 			}
 
 		}
@@ -136,7 +133,7 @@ public class GQLImpl extends Logging implements GQL {
 			String role = in.getRole();
 			for (Vertex v:(Collection<Vertex>)graph.getVertices()) {
 				bindings.bind(role,v);
-				resolve(graph,motif,newAgenda,bindings,listener);
+				resolve(graph,motif,agenda,bindings,listener);
 			}
 		}
 		else if (nextConstraint instanceof PathConstraint) {
@@ -149,27 +146,27 @@ public class GQLImpl extends Logging implements GQL {
 				Path result=constraint.check(graph, source, target); // path or edge
 				if (result!=null) {
 					bindings.bind(constraint.getRole(),result);
-					resolve(graph,motif,newAgenda,bindings,listener);
+					resolve(graph,motif,agenda,bindings,listener);
 				}
 			}
 			else if (source==null && target!=null) {
 				Iterator<Path> iter =constraint.getPossibleSources(graph,target);
-				resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,target,sourceRole,constraint);
+				resolveNextLevel(graph,motif,agenda,bindings,listener,iter,target,sourceRole,constraint);
 				
 			}
 			else if (source!=null && target==null) {
 				Iterator<Path> iter =constraint.getPossibleTargets(graph,source);
-				resolveNextLevel(graph,motif,newAgenda,bindings,listener,iter,source,targetRole,constraint);
+				resolveNextLevel(graph,motif,agenda,bindings,listener,iter,source,targetRole,constraint);
 			}
 			else {
 				throw new IllegalStateException("cannot resolve linke constraints with two open slots");
 			}
 		}
-		bindings.gotoParentLevel(); // one level up
-		this.agendaPool.recycle(newAgenda);
+		bindings.backtrack(); // one level up
+		agenda.backtrack();
 	}
 
-	private void resolveNextLevel(DirectedGraph<Vertex,Edge> graph, Motif motif, List<Constraint> constraints,Bindings bindings, ResultListener listener, 
+	private void resolveNextLevel(DirectedGraph<Vertex,Edge> graph, Motif motif, Agenda agenda,Bindings bindings, ResultListener listener, 
 			Iterator<Path> iter,Vertex end1,String end2Role,PathConstraint constraint) {
 		
 		while (iter.hasNext()) {
@@ -177,11 +174,11 @@ public class GQLImpl extends Logging implements GQL {
 			bindings.bind(constraint.getRole(),path);
 			if (path.getStart()==end1) {
 				bindings.bind(end2Role,path.getEnd());
-				resolve(graph,motif,constraints,bindings,listener);
+				resolve(graph,motif,agenda,bindings,listener);
 			}
 			else if (path.getEnd()==end1) {
 				bindings.bind(end2Role,path.getStart());
-				resolve(graph,motif,constraints,bindings,listener);
+				resolve(graph,motif,agenda,bindings,listener);
 			}
 		}
 	}

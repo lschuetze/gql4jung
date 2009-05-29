@@ -7,7 +7,7 @@ import nz.ac.massey.cs.gql4jung.Vertex;
  * Data structure for variable bindings.
  * @author jens dietrich
  */
-public class Bindings  extends Logging {
+class Bindings  extends Logging {
 	public static int SIZE = 100;
 	private String[] keys4roles = new String[SIZE];
 	private Vertex[] values4roles = new Vertex[SIZE];
@@ -93,13 +93,13 @@ public class Bindings  extends Logging {
 	/**
 	 * Goes one level down.
 	 */
-	public void gotoChildLevel() {
+	public void gotoNextLevel() {
 		position = position+1;
 	}
 	/**
 	 * Goes one level up.
 	 */
-	public void gotoParentLevel() {
+	public void backtrack() {
 		this.keys4roles[position]=null;
 		this.values4roles[position]=null;
 		this.keys4links[position]=null;
