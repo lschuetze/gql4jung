@@ -16,16 +16,26 @@ import edu.uci.ics.jung.graph.DirectedGraph;
  */
 public class PathFinder {
 	
-
+	/**
+	 * Find the links starting // ending at a vertex.
+	 * The iterator will return the paths ordered, shorter paths are visited first.
+	 * @param g
+	 * @param start
+	 * @param minLength
+	 * @param maxLength
+	 * @param outgoing the direction
+	 * @param filter
+	 * @return
+	 */
 	public static Iterator<Path> findLinks(DirectedGraph<Vertex,Edge> g,Vertex start, int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter) {
 		// try cache first
-		Collection<Path> coll = PathCache.INSTANCE.get(g, start, minLength, maxLength, outgoing, filter);
+		List<Path> coll = PathCache.INSTANCE.get(g, start, minLength, maxLength, outgoing, filter);
 		if (coll!=null) return coll.iterator();
 		
 		// we pre init the iterator, this should be done on demand
 		coll = new ArrayList<Path> ();
 		Map<Vertex,Object> visited = new IdentityHashMap<Vertex,Object>();
-		Collection<Path> layer = new ArrayList<Path>();
+		List<Path> layer = new ArrayList<Path>();
 		
 		Path initialPath = new Path(start);
 		layer.add(initialPath);
@@ -36,7 +46,7 @@ public class PathFinder {
 		
 		collectPaths(1,coll,visited,layer,start,minLength,maxLength,outgoing,filter);
 		// cache
-		PathCache.INSTANCE.put(g, start, minLength, maxLength, outgoing, filter, coll);
+		PathCache.INSTANCE.put(g,start, minLength, maxLength, outgoing, filter, coll);
 		
 		return coll.iterator();
 		

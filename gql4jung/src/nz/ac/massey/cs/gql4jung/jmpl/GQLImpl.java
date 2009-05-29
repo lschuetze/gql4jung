@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import edu.uci.ics.jung.graph.*;
 import nz.ac.massey.cs.gql4jung.*;
+import nz.ac.massey.cs.gql4jung.util.PathCache;
 
 /**
  * Improved graph query engine.
@@ -36,16 +37,20 @@ public class GQLImpl extends Logging implements GQL {
 	@Override
 	public void cancel() {
 		cancel = true;
+		PathCache.switchCachingOff();
 	}
 
 	@Override
 	public void query(DirectedGraph<Vertex,Edge> graph, Motif motif, ResultListener listener) {
-		
+		// process graph
 		if(motif.getGraphProcessor().size()!=0){
 			for(Processor processor:motif.getGraphProcessor()){
 				processor.process(graph);
 			}
 		}
+		// set up caching
+		new LRUCache(graph,1000).install();
+		
 		// initial binding bindings.gotoChildLevel();
 		assert !motif.getRoles().isEmpty();
     	String role = motif.getRoles().get(0);  
@@ -68,6 +73,8 @@ public class GQLImpl extends Logging implements GQL {
     			listener.progressMade(counter,S);
     		}
 	    }
+    	// reset caching
+    	PathCache.switchCachingOff();
 	}
 
 	private void resolve(DirectedGraph<Vertex,Edge> graph, Motif motif, List<Constraint> constraints,Bindings bindings, ResultListener listener) {

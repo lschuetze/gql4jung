@@ -1,13 +1,10 @@
 package nz.ac.massey.cs.gql4jung.util;
 
-import java.util.Collection;
-
+import java.util.List;
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.Path;
 import nz.ac.massey.cs.gql4jung.Vertex;
-
 import com.google.common.base.Predicate;
-
 import edu.uci.ics.jung.graph.DirectedGraph;
 /**
  * Simple structure  used to cache paths data. 
@@ -18,11 +15,11 @@ public abstract class PathCache {
 	
 	private static PathCache NO_CACHE = new PathCache() {
 		@Override
-		public Collection<Path> get(DirectedGraph<Vertex, Edge> g, Vertex v,int minLength, int maxLength, boolean outgoing,Predicate<Edge> filter) {
+		public List<Path> get(DirectedGraph<Vertex, Edge> g, Vertex v,int minLength, int maxLength, boolean outgoing,Predicate<Edge> filter) {
 			return null;
 		}
 		@Override
-		public void put(DirectedGraph<Vertex, Edge> g, Vertex v, int minLength,int maxLength, boolean outgoing, Predicate<Edge> filter,Collection<Path> path) {
+		public void put(DirectedGraph<Vertex, Edge> g, Vertex v, int minLength,int maxLength, boolean outgoing, Predicate<Edge> filter,List<Path> paths) {
 			
 		}
 	};
@@ -40,7 +37,7 @@ public abstract class PathCache {
 	 * @param filter
 	 * @return
 	 */
-	public abstract Collection<Path> get(DirectedGraph<Vertex,Edge> g,Vertex v,int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter);
+	public abstract List<Path> get(DirectedGraph<Vertex,Edge> g,Vertex v,int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter);
 	/**
 	 * Set a list of paths.
 	 * @param v
@@ -50,5 +47,12 @@ public abstract class PathCache {
 	 * @param filter
 	 * @return
 	 */
-	public abstract void put(DirectedGraph<Vertex,Edge> g,Vertex v,int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter,Collection<Path> path);
+	public abstract void put(DirectedGraph<Vertex,Edge> g,Vertex v,int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter,List<Path> path);
+	
+	/**
+	 *  Install this as default instance.
+	 */
+	public void install() {
+		INSTANCE = this;
+	}
 }
