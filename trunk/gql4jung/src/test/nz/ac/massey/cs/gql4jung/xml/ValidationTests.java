@@ -1,5 +1,5 @@
 /**
- * Copyright 2008 Jens Dietrich Licensed under the Apache License, Version 2.0 (the "License"); 
+ * Copyright 2009 Jens Dietrich Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License. 
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
  * Unless required by applicable law or agreed to in writing, software distributed under the 
@@ -8,6 +8,7 @@
  * and limitations under the License.
  */
 
+
 package test.nz.ac.massey.cs.gql4jung.xml;
 
 import java.io.*;
@@ -15,11 +16,8 @@ import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.*;
-
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
-
-import org.junit.Assert;
 import org.junit.Test;
 
 /**

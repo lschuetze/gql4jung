@@ -11,24 +11,15 @@
 
 package nz.ac.massey.cs.gql4jung;
 
+
+
+
 /**
- * Abstract superclass for custom vertex and edge classes.
- * @author jens dietrich
+ * Definition of how to identify motif instances. 
+ * Identification is done by computing a unique group identifier. 
+ * Instances with the same identifier are considered equal. 
+ * @author Jens Dietrich
  */
-public class GraphElement {
-	private String id = null;
-	
-	public GraphElement() {
-		super();
-	}
-	public GraphElement(String id) {
-		super();
-		this.id = id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getId() {
-		return id;
-	}
+public interface MotifInstanceAggregation {
+	public Object getGroupIdentifier (MotifInstance instance) ;
 }
