@@ -128,6 +128,7 @@ public class ODEMReader implements GraphReader<DirectedGraph<Vertex,Edge>, Verte
 					Vertex target = getOrCreateVertex(targetName,vertices);
 					String edgeId = "edge"+edges.size();
 					Edge edge = new Edge(edgeId,source,target);
+					edge.setType(depType);
 					edges.add(edge);
 				}
 			}

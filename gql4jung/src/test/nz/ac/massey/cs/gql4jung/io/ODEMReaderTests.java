@@ -16,7 +16,7 @@ import java.io.Reader;
 import org.junit.Test;
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.Vertex;
-import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
+import nz.ac.massey.cs.gql4jung.io.ODEMReader;
 import edu.uci.ics.jung.graph.DirectedGraph;
 
 /**
@@ -24,106 +24,100 @@ import edu.uci.ics.jung.graph.DirectedGraph;
  * @author jens dietrich
  */
 
-public class GraphMLReaderTests extends AbstractReaderTests {
+public class ODEMReaderTests extends AbstractReaderTests {
 
 	protected DirectedGraph<Vertex, Edge> loadGraph(String name) throws Exception {
         String src = "/test/nz/ac/massey/cs/gql4jung/io/data/"+name;
         Reader reader = new InputStreamReader(this.getClass().getResourceAsStream(src));
-        GraphMLReader greader = new GraphMLReader(reader);
+        ODEMReader greader = new ODEMReader(reader);
         DirectedGraph<Vertex, Edge> g = greader.readGraph();
         greader.close();
         return g;
 	}
 	
 	
-	
 	@Test
 	public void testVertices1() throws Exception {
-		DirectedGraph<Vertex, Edge> g = loadGraph("graph1.graphml");
 		doTestVertices(
-				"graph1.graphml",
-				1,
-				"1",
-				"v1",
-				"test1",
-				true,
-				"interface"
+				"small.odem",
+				5,
+				null,
+				null,
+				null,
+				false,
+				null
 				);
 	}
+	
 	@Test
 	public void testVertices2() throws Exception {
 		doTestVertices(
-				"graph1.graphml",
-				0,
-				"1",
-				"v1",
-				"test1",
+				"small.odem",
+				4,
+				null,
+				null,
+				null,
 				false,
-				"interface"
+				"class"  // outside class java.lang.Object is not classified
 				);
 	}
+	
 	@Test
 	public void testVertices3() throws Exception {
 		doTestVertices(
-				"graph1.graphml",
-				4,
+				"small.odem",
+				3,
 				null,
 				null,
-				"test1",
+				"com.example1",
+				false,
+				"class"
+				);
+	}
+	
+	@Test
+	public void testVertices4() throws Exception {
+		doTestVertices(
+				"small.odem",
+				1,
+				null,
+				"Class11",
+				"com.example1",
+				false,
+				"class"
+				);
+	}
+	// test for referenced outside class
+	@Test
+	public void testVertices5() throws Exception {
+		doTestVertices(
+				"small.odem",
+				1,
+				null,
+				"Object",
+				"java.lang",
 				false,
 				null
 				);
 	}
+	// test how ids are assigned
 	@Test
-	public void testVertices4() throws Exception {
+	public void testVertices6() throws Exception {
 		doTestVertices(
-				"graph1.graphml",
-				4,
-				null,
-				null,
-				"test1",
-				true,
-				null
+				"small.odem",
+				1,
+				"v0",
+				"Class11",
+				"com.example1",
+				false,
+				"class"
 				);
 	}
 	
 	@Test
 	public void testEdges1() throws Exception {
 		doTestEdges(
-				"graph1.graphml",
-				1,
-				"edge-1-2",
-				"1",
-				"2",
-				"uses"
-				);
-	}
-	@Test
-	public void testEdges2() throws Exception {
-		doTestEdges(
-				"graph1.graphml",
-				0,
-				"edge-1-2",
-				"1",
-				"2",
-				"extends"
-				);
-	}
-	@Test
-	public void testEdges3() throws Exception {
-		doTestEdges(
-				"graph1.graphml",
-				2,
-				null,
-				null,
-				null,
-				"extends"
-				);
-	}
-	@Test
-	public void testEdges4() throws Exception {
-		doTestEdges(
-				"graph1.graphml",
+				"small.odem",
 				7,
 				null,
 				null,
@@ -131,15 +125,40 @@ public class GraphMLReaderTests extends AbstractReaderTests {
 				null
 				);
 	}
+	
 	@Test
-	public void testEdges5() throws Exception {
+	public void testEdges2() throws Exception {
 		doTestEdges(
-				"graph1.graphml",
-				2,
+				"small.odem",
+				4,
 				null,
-				"1",
 				null,
-				null
+				null,
+				"extends"
+				);
+	}
+	
+	@Test
+	public void testEdges3() throws Exception {
+		doTestEdges(
+				"small.odem",
+				3,
+				null,
+				null,
+				null,
+				"uses"
+				);
+	}
+	
+	@Test
+	public void testEdges4() throws Exception {
+		doTestEdges(
+				"small.odem",
+				0,
+				null,
+				"v0",
+				"v1",
+				"uses"
 				);
 	}
 	
