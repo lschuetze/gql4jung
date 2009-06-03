@@ -34,7 +34,6 @@ import nz.ac.massey.cs.gql4jung.Vertex;
 public class ODEMReader implements GraphReader<DirectedGraph<Vertex,Edge>, Vertex, Edge> {
 
 	private Reader reader = null;
-	private String targetType;
 
 	public ODEMReader(Reader reader) {
 		super();
@@ -120,27 +119,19 @@ public class ODEMReader implements GraphReader<DirectedGraph<Vertex,Edge>, Verte
 		for (Element eType:eTypes) {
 			String sourceType = eType.getAttributeValue("name");
 			Vertex source = getOrCreateVertex(sourceType,vertices);
-			Element eDependencies = e.getChild("dependencies");
+			Element eDependencies = eType.getChild("dependencies");
 			if (eDependencies!=null) {
-				List<Element> eDependsOns = e.getChildren("depends-on");
+				List<Element> eDependsOns = eDependencies.getChildren("depends-on");
 				for (Element eDependsOn:eDependsOns) {
 					String depType = eDependsOn.getAttributeValue("classification");
 					String targetName = eDependsOn.getAttributeValue("name");
-					Vertex target = getOrCreateVertex(targetType,vertices);
+					Vertex target = getOrCreateVertex(targetName,vertices);
 					String edgeId = "edge"+edges.size();
 					Edge edge = new Edge(edgeId,source,target);
 					edges.add(edge);
 				}
 			}
-			
-			String name = eType.getAttributeValue("name");
-			String type = eType.getAttributeValue("classification");
-			Vertex vertex = new Vertex();
-			vertex.setType(type);
-			vertex.setContainer(container);
-			vertex.setNamespace(namespace);
-			vertex.setName(this.getLocalName(name));
-			vertices.put(name,vertex);
+
 		}
 	}
 	private Vertex getOrCreateVertex(String name,Map<String, Vertex> vertices) {
@@ -159,7 +150,7 @@ public class ODEMReader implements GraphReader<DirectedGraph<Vertex,Edge>, Verte
 		if (fullClassName==null) return null;
 		int lastDot = fullClassName.lastIndexOf('.');
 		if (lastDot==-1) return fullClassName;
-		else return fullClassName.substring(lastDot);
+		else return fullClassName.substring(lastDot+1);
 	}
 	private String getPackageName(String fullClassName) {
 		if (fullClassName==null) return null;
