@@ -16,7 +16,7 @@ import java.util.List;
 
 
 /**
- * This is the type for queries. Queries are usually build from query language expressions (query DSL, XML, ..).
+ * This is the type for queries. Queries are usually built from query language expressions (query DSL, XML, ..).
  * @author jens.dietrich@gmail.com
  */
 public interface Motif {
