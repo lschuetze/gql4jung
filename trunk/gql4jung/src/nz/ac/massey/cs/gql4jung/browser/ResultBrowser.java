@@ -72,6 +72,7 @@ import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
  * @author Jens Dietrich
  */
 public class ResultBrowser extends JFrame {
+	private static final String TITLE = "Architectural smells explorer";
 	// model
 	private DirectedGraph<Vertex,Edge> data = null;
 	private Motif query = null;
@@ -106,6 +107,7 @@ public class ResultBrowser extends JFrame {
 	private AbstractAction actNextMajorInstance;
 	private AbstractAction actPreviousMajorInstance;
 	private AbstractAction actExport2CSV;
+	private AbstractAction actAbout;
 	private List<AbstractAction> actLoadBuiltInQueries = new ArrayList<AbstractAction>();
 	
 	private enum Status {
@@ -138,7 +140,7 @@ public class ResultBrowser extends JFrame {
 		init();
 	}
 	private void init() {
-		this.setTitle("Architectural smells explorer");
+		this.setTitle(TITLE);
 				
 		mainPanel = new JPanel(new BorderLayout(5,5));
 		this.tabbedPane = new JTabbedPane();
@@ -223,7 +225,10 @@ public class ResultBrowser extends JFrame {
 		menu.add(actPreviousMinorInstance);
 		menu.add(actNextMinorInstance);
 		menuBar.add(menu);
-		
+		menu = new JMenu("Help");
+		menu.setMnemonic(KeyEvent.VK_H);
+		menu.add(this.actAbout);
+		menuBar.add(menu);
 	}
 
 	private void initStatusBar() {
@@ -397,6 +402,19 @@ public class ResultBrowser extends JFrame {
 		};	
 		actNextMajorInstance.putValue(Action.SHORT_DESCRIPTION, "show the next instance");
 		
+		actAbout = new AbstractAction("about") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String msg = 
+					"<html><b>"+TITLE+"</b><br/><br/>" +
+					"Copyright 2009 Jens Dietrich<br/>" + 
+					"Massey University, NZ<br/>" + 
+					"Licensed under the Apache License, Version 2.0</html>";
+				JOptionPane.showMessageDialog(ResultBrowser.this,msg);
+			}
+		};	
+		actAbout.putValue(Action.SHORT_DESCRIPTION, "about this software");
+		
 		initBuiltInQueries();
 	}
 	
@@ -563,7 +581,7 @@ public class ResultBrowser extends JFrame {
 
 	private void actLoadQuery() {
 		JFileChooser fc = new JFileChooser();
-		fc.setCurrentDirectory(new File("."));
+		fc.setCurrentDirectory(new File("./queries"));
 		fc.setDialogTitle("Load query");
 		int returnVal = fc.showOpenDialog(this);
 		FileFilter filter = new FileFilter() {
@@ -589,7 +607,7 @@ public class ResultBrowser extends JFrame {
 	}
 	private void actLoadData() {
 		JFileChooser fc = new JFileChooser();
-		fc.setCurrentDirectory(new File("."));
+		fc.setCurrentDirectory(new File("./exampledata"));
 		fc.setDialogTitle("Load graph");
 		int returnVal = fc.showOpenDialog(this);
 
