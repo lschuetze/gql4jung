@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="motif">
+    	<xs:complexType>
+    		<xs:sequence maxOccurs="unbounded" minOccurs="0">
+    			<xs:choice>
+    				<xs:element name="annotate" type="annotate"></xs:element>
+    				<xs:element name="select" type="select"></xs:element>
+    				<xs:element name="constraint" type="xs:string"></xs:element>
+    				<xs:element name="connectedBy" type="connectedBy"></xs:element>
+    				<xs:element name="groupBy" type="groupBy"></xs:element>
+    			</xs:choice>
+    		</xs:sequence>
+    		<xs:attribute name="name" type="xs:string"></xs:attribute>
+    	</xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="select">
+    	<xs:sequence>
+    		<xs:element name="constraint" type="xs:string"></xs:element>
+    	</xs:sequence>    	
+    	<xs:attribute name="role" type="xs:ID"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="annotate">
+    	<xs:attribute name="class" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="connectedBy">
+        <xs:sequence>
+    		<xs:element name="constraint" type="xs:string"></xs:element>
+    	</xs:sequence>   
+        <xs:attribute name="role" type="xs:ID"></xs:attribute>
+        <xs:attribute name="from" type="xs:IDREF"></xs:attribute>
+    	<xs:attribute name="to" type="xs:IDREF"></xs:attribute>
+    	<xs:attribute name="minLength" type="xs:int" form="qualified"
+    		use="optional" default="1">
+    	</xs:attribute>
+    	<xs:attribute name="maxLength" type="xs:int" default="-1"
+    		use="optional">
+    	</xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="groupBy">
+    		<xs:sequence maxOccurs="unbounded" minOccurs="0">
+    			<xs:element name="element" type="xs:string"></xs:element>
+    		</xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
