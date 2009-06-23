@@ -18,7 +18,7 @@ import edu.uci.ics.jung.graph.DirectedGraph;
  * @author jens.dietrich@gmail.com
  */
 public interface GQL {
-	void query(DirectedGraph<Vertex,Edge> graph,Motif motif,ResultListener listener);
+	void query(DirectedGraph<Vertex,Edge> graph,Motif motif,ResultListener listener,boolean ignoreVariants);
 	// cancels the current computation
 	void cancel() ;
 	// reset the state of the engine

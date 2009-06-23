@@ -35,7 +35,7 @@ public class UtilSaveAWDQueryResults {
 		QueryResults coll = new QueryResults();
 		GQL engine = new GQLImpl();
 		long t1 = System.currentTimeMillis();
-		engine.query(g,m,coll);
+		engine.query(g,m,coll,false);
 		long t2 = System.currentTimeMillis();
 		QueryResultsExporter2CSV exporter = new QueryResultsExporter2CSV();
 		File file = new File("awd-results.txt");

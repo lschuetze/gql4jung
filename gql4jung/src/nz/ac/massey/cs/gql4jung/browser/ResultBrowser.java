@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
@@ -80,6 +82,7 @@ public class ResultBrowser extends JFrame {
 	private GQL engine = new GQLImpl();
 	private Thread queryThread = null;
 	private long computationStarted = -1;
+	private boolean computeVariants = false;
 	
 	// parts
 	private JToolBar toolbar;
@@ -212,11 +215,13 @@ public class ResultBrowser extends JFrame {
 		menu.addSeparator();
 		menu.add(actExit);
 		menuBar.add(menu);
+		
 		menu = new JMenu("Query");
 		menu.setMnemonic(KeyEvent.VK_Q);
 		menu.add(actRunQuery);
 		menu.add(actCancelQuery);
 		menuBar.add(menu);
+		
 		menu = new JMenu("Explore");
 		menu.setMnemonic(KeyEvent.VK_X);
 		menu.add(actPreviousMajorInstance);	
@@ -225,6 +230,18 @@ public class ResultBrowser extends JFrame {
 		menu.add(actPreviousMinorInstance);
 		menu.add(actNextMinorInstance);
 		menuBar.add(menu);
+		
+		menu = new JMenu("Options");
+		final JCheckBoxMenuItem chkVariants = new JCheckBoxMenuItem("compute all variants (slower)");
+		chkVariants.setSelected(this.computeVariants);
+		chkVariants.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				computeVariants = chkVariants.isSelected();
+			}});
+		menu.add(chkVariants);
+		menuBar.add(menu);
+		
 		menu = new JMenu("Help");
 		menu.setMnemonic(KeyEvent.VK_H);
 		menu.add(this.actAbout);
@@ -564,7 +581,7 @@ public class ResultBrowser extends JFrame {
 				engine.reset();
 				results.reset();
 				display(null);
-				engine.query(data,query,results);
+				engine.query(data,query,results,!computeVariants);
 				queryThread = null;
 				status = Status.finished;
 				updateComputationTime();

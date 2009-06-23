@@ -141,7 +141,7 @@ public class AnalysisBatchJob {
 		// query
 		GQL engine = new GQLImpl();
 		long before = System.currentTimeMillis();
-		engine.query(graph, motif, results);
+		engine.query(graph, motif, results,false);
 		long after = System.currentTimeMillis();
 		log("Query finished, this took ",""+(after-before)," ms");
 		

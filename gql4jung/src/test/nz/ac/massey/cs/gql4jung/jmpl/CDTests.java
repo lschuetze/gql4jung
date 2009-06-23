@@ -52,7 +52,8 @@ public class CDTests extends Tests{
 	@Test
 	public void test4() throws Exception {
 		doTestExpectedVariants("cd.xml","testdata-cd4.graphml",2);
-		doTestExpectedInstances("cd.xml","testdata-cd4.graphml",2);
+		doTestExpectedInstances("cd.xml","testdata-cd4.graphml",2,true);
+		doTestExpectedInstances("cd.xml","testdata-cd4.graphml",2,false);
 	}
 	
 	@Test
@@ -70,8 +71,17 @@ public class CDTests extends Tests{
 	 * @throws Exception
 	 */
 	@Test
-	public void testAnt2() throws Exception {
-		doTestExpectedInstances("cd.xml","ant.jar.graphml",17);
+	public void testAnt2IgnoreVariants() throws Exception {
+		doTestExpectedInstances("cd.xml","ant.jar.graphml",17,true);
+	}
+	/**
+	 * The number of instances found in 0.2 and o3 is the same, they have been manually verified.
+	 * The number of variants has slightly increased.
+	 * @throws Exception
+	 */
+	@Test
+	public void testAnt3ComputeVariants() throws Exception {
+		doTestExpectedInstances("cd.xml","ant.jar.graphml",17,false);
 	}
 	
 }
