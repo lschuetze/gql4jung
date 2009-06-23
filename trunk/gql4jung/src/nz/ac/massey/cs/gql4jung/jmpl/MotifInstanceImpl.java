@@ -29,7 +29,7 @@ public class MotifInstanceImpl extends Logging implements MotifInstance {
 	private Map<String,Vertex> vertexBindings = new HashMap<String, Vertex>();
 	private Map<String,Path> pathBindings = new HashMap<String,Path>();
 	
-	MotifInstanceImpl(Motif motif,Bindings bindings) {
+	MotifInstanceImpl(Motif motif,Controller bindings) {
 		this.motif = motif;
 		this.vertexBindings.putAll(bindings.getRoleBindingsAsMap());
 		this.pathBindings.putAll(bindings.getPathBindingsAsMap());

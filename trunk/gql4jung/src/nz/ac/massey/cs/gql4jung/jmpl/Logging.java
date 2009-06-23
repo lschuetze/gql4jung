@@ -17,7 +17,8 @@ import org.apache.log4j.Logger;
 
 public class Logging {
 	static Logger LOG_GQL = Logger.getLogger(GQLImpl.class);
-	static Logger LOG_BIND = Logger.getLogger(Bindings.class);
+	static Logger LOG_BIND = Logger.getLogger(""+Controller.class+":binding");
+	static Logger LOG_BACKJUMP = Logger.getLogger(""+Controller.class+":backjump");
 	static Logger LOG_INST = Logger.getLogger(MotifInstanceImpl.class);
 	static Logger LOG_SCHED = Logger.getLogger(ConstraintScheduler.class);
 	static Logger LOG_CACHE = Logger.getLogger(LRUCache.class);
@@ -33,6 +34,7 @@ public class Logging {
 		// runtime
 		LOG_GQL.setLevel(level);
 		LOG_BIND.setLevel(level);
+		LOG_BACKJUMP.setLevel(level);
 		LOG_INST.setLevel(level);
 		LOG_SCHED.setLevel(level);
 		LOG_CACHE.setLevel(level);

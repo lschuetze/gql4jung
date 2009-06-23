@@ -82,7 +82,7 @@ public abstract class Tests {
 		ResultCollector coll = new ResultCollector();
 		GQL engine = new GQLImpl();
 		long t1 = System.currentTimeMillis();
-		engine.query(g,m,coll);
+		engine.query(g,m,coll,false);
 		long t2 = System.currentTimeMillis();
 		System.out.println("query "+motif+" on data "+data+ " returned "+coll.getInstances().size()+" results");
 		System.out.println("query "+motif+" on data "+data+ " took "+(t2-t1)+" millis");
@@ -97,23 +97,24 @@ public abstract class Tests {
 		ResultCollector coll = new ResultCollector();
 		GQL engine = new GQLImpl();
 		long t1 = System.currentTimeMillis();
-		engine.query(g,m,coll);
+		engine.query(g,m,coll,false);
 		long t2 = System.currentTimeMillis();
 		System.out.println("query "+motif+" on data "+data+ " returned "+coll.getInstances().size()+" variants");
 		System.out.println("query "+motif+" on data "+data+ " took "+(t2-t1)+" millis");
 		assertEquals(expected,coll.getInstances().size());
 	}
 	// check the expected number of variants (different results, no aggregation)
-	protected void doTestExpectedInstances(String motif, String data,int expected) throws Exception {
+	protected void doTestExpectedInstances(String motif, String data,int expected,boolean ignoreVariants) throws Exception {
 		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Motif m = this.loadQuery(motif);
 		QueryResults coll = new QueryResults();
 		GQL engine = new GQLImpl();
 		long t1 = System.currentTimeMillis();
-		engine.query(g,m,coll);
+		engine.query(g,m,coll,ignoreVariants);
 		long t2 = System.currentTimeMillis();
 		System.out.println("query "+motif+" on data "+data+ " returned "+coll.getNumberOfGroups()+" instances");
 		System.out.println("query "+motif+" on data "+data+ " took "+(t2-t1)+" millis");
 		assertEquals(expected,coll.getNumberOfGroups());
 	}
+
 }

@@ -79,8 +79,16 @@ public class DB2UITests extends Tests{
 	 * @throws Exception
 	 */
 	@Test
-	public void testjt400Proxy2() throws Exception {
-		this.doTestExpectedInstances("db2ui.xml", "jt400Proxy.jar.graphml", 1);
+	public void testjt400ProxyCountAllComputeAllVariants() throws Exception {
+		this.doTestExpectedInstances("db2ui.xml", "jt400Proxy.jar.graphml", 1,false);
+	}
+	/**
+	 * Number of instances unchanged from 0.2 o 0.3, one instance manually verified.
+	 * @throws Exception
+	 */
+	@Test
+	public void testjt400ProxyCountAllIgnoreVariants() throws Exception {
+		this.doTestExpectedInstances("db2ui.xml", "jt400Proxy.jar.graphml", 1,true);
 	}
 	/**
 	 * Number of variants unchanged from 0.2 o 0.3, one instance manually verified.

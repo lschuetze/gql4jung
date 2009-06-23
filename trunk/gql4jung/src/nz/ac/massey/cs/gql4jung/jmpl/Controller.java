@@ -11,6 +11,13 @@
 
 package nz.ac.massey.cs.gql4jung.jmpl;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
+import nz.ac.massey.cs.gql4jung.Constraint;
+import nz.ac.massey.cs.gql4jung.GroupByClause;
+import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.Path;
 import nz.ac.massey.cs.gql4jung.Vertex;
 
@@ -18,21 +25,37 @@ import nz.ac.massey.cs.gql4jung.Vertex;
  * Data structure for variable bindings.
  * @author jens dietrich
  */
-class Bindings  extends Logging {
+class Controller  extends Logging {
 	public static int SIZE = 100;
 	private String[] keys4roles = new String[SIZE];
 	private Vertex[] values4roles = new Vertex[SIZE];
 	private String[] keys4links = new String[SIZE];
 	private Path[] values4links = new Path[SIZE];
+	private int jumpBackPosition = -1; // jump back for aggregation mode
+	private boolean jumpBackMode = false; // jump back for aggregation mode
+	private Collection<String> aggregationRoles = null;
+	private List<Constraint> constraints = null;
 	
 	private int position = 0;
 
 	/**
 	 * Constructor.
-	 * @param parent
+	 * @param motif Bindings are in aggregation mode iff motif!=null.
 	 */
-	public Bindings() {
+	public Controller(Motif motif,List<Constraint> constraints,boolean jumpBackMode) {
 		super();
+		this.constraints = constraints;
+		
+		if (jumpBackMode) {
+			aggregationRoles = new HashSet<String>();
+			for (GroupByClause gb:motif.getGroupByClauses()) {
+				aggregationRoles.add(gb.getRole());
+			}
+		}
+		
+	}
+	private boolean isInAggregationMode() {
+		return aggregationRoles!=null;
 	}
 	/**
 	 * Lookup the binding for a given key.
@@ -61,6 +84,23 @@ class Bindings  extends Logging {
 			//LOG_BIND.debug("binding "+k+" -> "+v);
 			LOG_BIND.debug(b.toString());
 		}
+		if (jumpBackPosition==-1&&isInAggregationMode()) {
+			// initial check 
+			// backjump to 1 - at least one aggregation attribute must be different
+			if (this.aggregationRoles.size()==0) {
+				setBackjumpPosition(this.getPosition());
+			}
+			this.aggregationRoles.remove(k);
+			if (this.aggregationRoles.size()==0) {
+				setBackjumpPosition(this.getPosition());
+			}
+		}
+	}
+	private void setBackjumpPosition(int pos) {
+		this.jumpBackPosition = pos;
+		if (LOG_BACKJUMP.isDebugEnabled()) {
+			LOG_BACKJUMP.debug("jump back position set to " + pos);
+		}		
 	}
 	/**
 	 * Add a new entry.
@@ -101,12 +141,7 @@ class Bindings  extends Logging {
 		}
 		return map;
 	}
-	/**
-	 * Goes one level down.
-	 */
-	public void gotoNextLevel() {
-		position = position+1;
-	}
+
 	/**
 	 * Goes one level up.
 	 */
@@ -116,8 +151,17 @@ class Bindings  extends Logging {
 		this.keys4links[position]=null;
 		this.values4links[position]=null;
 		position = position-1;
+		if (LOG_BIND.isDebugEnabled()) {
+			LOG_BIND.debug("backtracking to "+position);
+		}		
+		if (this.jumpBackMode && this.position==this.jumpBackPosition) {
+			this.jumpBackMode=false;
+			if (LOG_BIND.isDebugEnabled()) {
+				LOG_BIND.debug("leaving jump back mode at position "+position);
+			}
+		}
 	}
-
+	
 	/**
 	 * Get the value at a certain position.
 	 * Useful for debugging.
@@ -149,4 +193,23 @@ class Bindings  extends Logging {
 	 public int getPosition() {
 		 return this.position;
 	 }
+	 
+	boolean isDone() {
+		boolean done =  position==constraints.size();
+		if (done && isInAggregationMode()) {
+			this.jumpBackMode = true;
+		}
+		return done;
+	}
+	public Constraint next() {
+		Constraint c = constraints.get(position);
+		position=position+1;
+		return c;
+	}
+	public boolean isInJumpBackMode() {
+		return jumpBackMode;
+	}
+	public int getJumpBackPosition() {
+		return this.jumpBackPosition;
+	}
 }

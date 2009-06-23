@@ -53,7 +53,7 @@ public class GQLImpl extends Logging implements GQL {
 	}
 
 	@Override
-	public void query(DirectedGraph<Vertex,Edge> graph, Motif motif, ResultListener listener) {
+	public void query(DirectedGraph<Vertex,Edge> graph, Motif motif, ResultListener listener,boolean ignoreVariants) {
 		// process graph
 		if(motif.getGraphProcessor().size()!=0){
 			for(Processor processor:motif.getGraphProcessor()){
@@ -74,14 +74,13 @@ public class GQLImpl extends Logging implements GQL {
     	
     	// prepare constraints
     	List<Constraint> constraints = scheduler.getConstraints(graph, motif);
-    	Agenda agenda = new Agenda(constraints);
     	
     	// start resolver
     	for(Vertex v:vertices){
-    		Bindings bindings = new Bindings();
-    		bindings.bind(role, v);
+    		Controller controller = new Controller(motif,constraints,ignoreVariants);
+    		controller.bind(role, v);
     		counter = counter+1;
-    		resolve(graph, motif, agenda, bindings, listener);
+    		resolve(graph, motif, controller, listener);
     		if (counter%stepSize==0) {
     			listener.progressMade(counter,S);
     		}
@@ -90,28 +89,34 @@ public class GQLImpl extends Logging implements GQL {
     	PathCache.switchCachingOff();
 	}
 
-	private void resolve(DirectedGraph<Vertex,Edge> graph, Motif motif, Agenda agenda,Bindings bindings, ResultListener listener) {
+	private void resolve(DirectedGraph<Vertex,Edge> graph, Motif motif, Controller controller, ResultListener listener) {
 		if (cancel) return;
 
 		// check for termination
-		if (agenda.isDone()) {
-			MotifInstance instance = createInstance(graph,motif,bindings);
+		if (controller.isDone()) {
+			MotifInstance instance = createInstance(graph,motif,controller);
 			listener.found(instance);
 			return;
 		}
+		
+		// back jumping
+		if (controller.isInJumpBackMode()) {
+			return;
+		}
+		
 		// recursion
-		bindings.gotoNextLevel();  // one level down
-		Constraint nextConstraint = agenda.next(); // take the first, has been ordered by scheduler
+		Constraint nextConstraint = controller.next();  // one level down
+		
 		
 		if (LOG_GQL.isDebugEnabled()) {
-			LOG_GQL.debug("recursion level "+bindings.getPosition()+", resolving: "+nextConstraint);
+			LOG_GQL.debug("recursion level "+controller.getPosition()+", resolving: "+nextConstraint);
 		}
 		
 		if (nextConstraint instanceof PropertyConstraint) {
 			PropertyConstraint constraint = (PropertyConstraint)nextConstraint;
 			boolean result = false;
 			if (constraint.isSingleRole()) {
-				Vertex v = (Vertex)bindings.lookup(constraint.getFirstRole());
+				Vertex v = (Vertex)controller.lookup(constraint.getFirstRole());
 				if (v!=null) {
 					result = constraint.check(v);
 				}
@@ -122,7 +127,7 @@ public class GQLImpl extends Logging implements GQL {
 			else {
 				Map<String,GraphElement> bind = new HashMap<String,GraphElement>();
 				for (Object role:constraint.getRoles()) {
-					Vertex v = (Vertex)bindings.lookup(role.toString());
+					Vertex v = (Vertex)controller.lookup(role.toString());
 					if (v!=null) {
 						bind.put(role.toString(),v);
 					}
@@ -133,7 +138,7 @@ public class GQLImpl extends Logging implements GQL {
 				result = constraint.check(bind); 
 			}
 			if (result) {
-				resolve(graph,motif,agenda,bindings,listener);
+				resolve(graph,motif,controller,listener);
 			}
 
 		}
@@ -142,58 +147,58 @@ public class GQLImpl extends Logging implements GQL {
 			LoopInstruction in = (LoopInstruction)nextConstraint; 
 			String role = in.getRole();
 			for (Vertex v:(Collection<Vertex>)graph.getVertices()) {
-				bindings.bind(role,v);
-				resolve(graph,motif,agenda,bindings,listener);
+				controller.bind(role,v);
+				resolve(graph,motif,controller,listener);
 			}
 		}
 		else if (nextConstraint instanceof PathConstraint) {
 			PathConstraint constraint = (PathConstraint)nextConstraint; 
 			String sourceRole = constraint.getSource();
 			String targetRole = constraint.getTarget();
-			Vertex source = (Vertex)bindings.lookup(sourceRole);
-			Vertex target = (Vertex)bindings.lookup(targetRole);
+			Vertex source = (Vertex)controller.lookup(sourceRole);
+			Vertex target = (Vertex)controller.lookup(targetRole);
 			if (source!=null && target!=null) {
 				Path result=constraint.check(graph, source, target); // path or edge
 				if (result!=null) {
-					bindings.bind(constraint.getRole(),result);
-					resolve(graph,motif,agenda,bindings,listener);
+					controller.bind(constraint.getRole(),result);
+					resolve(graph,motif,controller,listener);
 				}
 			}
 			else if (source==null && target!=null) {
 				Iterator<Path> iter =constraint.getPossibleSources(graph,target);
-				resolveNextLevel(graph,motif,agenda,bindings,listener,iter,target,sourceRole,constraint);
+				resolveNextLevel(graph,motif,controller,listener,iter,target,sourceRole,constraint);
 				
 			}
 			else if (source!=null && target==null) {
 				Iterator<Path> iter =constraint.getPossibleTargets(graph,source);
-				resolveNextLevel(graph,motif,agenda,bindings,listener,iter,source,targetRole,constraint);
+				resolveNextLevel(graph,motif,controller,listener,iter,source,targetRole,constraint);
 			}
 			else {
 				throw new IllegalStateException("cannot resolve linke constraints with two open slots");
 			}
 		}
-		bindings.backtrack(); // one level up
-		agenda.backtrack();
+		controller.backtrack(); // one level up
+
 	}
 
-	private void resolveNextLevel(DirectedGraph<Vertex,Edge> graph, Motif motif, Agenda agenda,Bindings bindings, ResultListener listener, 
+	private void resolveNextLevel(DirectedGraph<Vertex,Edge> graph, Motif motif, Controller controller, ResultListener listener, 
 			Iterator<Path> iter,Vertex end1,String end2Role,PathConstraint constraint) {
 		
 		while (iter.hasNext()) {
 			Path path = iter.next();
-			bindings.bind(constraint.getRole(),path);
+			controller.bind(constraint.getRole(),path);
 			if (path.getStart()==end1) {
-				bindings.bind(end2Role,path.getEnd());
-				resolve(graph,motif,agenda,bindings,listener);
+				controller.bind(end2Role,path.getEnd());
+				resolve(graph,motif,controller,listener);
 			}
 			else if (path.getEnd()==end1) {
-				bindings.bind(end2Role,path.getStart());
-				resolve(graph,motif,agenda,bindings,listener);
+				controller.bind(end2Role,path.getStart());
+				resolve(graph,motif,controller,listener);
 			}
 		}
 	}
 
-	private MotifInstance createInstance(Graph graph, Motif motif, Bindings bindings) {
+	private MotifInstance createInstance(Graph graph, Motif motif, Controller bindings) {
 		//System.out.println("creating result");
 		return new MotifInstanceImpl(motif,bindings);
 	}

@@ -65,8 +65,12 @@ public class AWDTests extends Tests{
 		doTest("awd.xml","ant.jar.graphml",expected,true);
 	}
 	@Test
-	public void testAntCountAll() throws Exception {
-		this.doTestExpectedInstances("awd.xml","ant.jar.graphml", 12);
+	public void testAntCountAllComputeVariants() throws Exception {
+		this.doTestExpectedInstances("awd.xml","ant.jar.graphml", 12,false);
+	}
+	@Test
+	public void testAntCountAllIgnoreVariants() throws Exception {
+		this.doTestExpectedInstances("awd.xml","ant.jar.graphml", 12,true);
 	}
 	@Test
 	public void test1() throws Exception {
