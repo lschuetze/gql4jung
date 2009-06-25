@@ -29,7 +29,7 @@ public class DB2UITests extends Tests{
 		expected.put("dblayerclass","org.example1.MyDB");
 		expected.put("uilayerclass","org.example1.MyFrame");
 		doTest("db2ui.xml","testdata-db2ui1.graphml",expected,true);
-		doTestExpectedVariants("db2ui.xml","testdata-db2ui1.graphml",1);
+		doTestExpectedVariants("db2ui.xml","testdata-db2ui1.graphml",1,false);
 	}
 	
 	@Test
@@ -40,7 +40,7 @@ public class DB2UITests extends Tests{
 		expected.put("dblayerclass","org.example1.MyDB");
 		expected.put("uilayerclass","org.example1.MyFrame");
 		doTest("db2ui.xml","testdata-db2ui2.graphml",expected,true);
-		doTestExpectedVariants("db2ui.xml","testdata-db2ui2.graphml",1);
+		doTestExpectedVariants("db2ui.xml","testdata-db2ui2.graphml",1,false);
 	}
 	
 	@Test
@@ -51,7 +51,7 @@ public class DB2UITests extends Tests{
 		expected.put("dblayerclass","org.example1.MyDB");
 		expected.put("uilayerclass","org.example1.MyFrame");
 		doTest("db2ui.xml","testdata-db2ui3.graphml",expected,true);
-		doTestExpectedVariants("db2ui.xml","testdata-db2ui3.graphml",1);
+		doTestExpectedVariants("db2ui.xml","testdata-db2ui3.graphml",1,false);
 	}
 	
 	@Test
@@ -62,7 +62,7 @@ public class DB2UITests extends Tests{
 		expected.put("dblayerclass","org.example1.MyClass");
 		expected.put("uilayerclass","org.example1.MyClass");
 		doTest("db2ui.xml","testdata-db2ui4.graphml",expected,true);
-		doTestExpectedVariants("db2ui.xml","testdata-db2ui4.graphml",1);
+		doTestExpectedVariants("db2ui.xml","testdata-db2ui4.graphml",1,false);
 	}
 	
 	@Test
@@ -96,6 +96,6 @@ public class DB2UITests extends Tests{
 	 */
 	@Test
 	public void testjt400Proxy3() throws Exception {
-		this.doTestExpectedVariants("db2ui.xml", "jt400Proxy.jar.graphml", 4103);
+		this.doTestExpectedVariants("db2ui.xml", "jt400Proxy.jar.graphml", 4103,false);
 	}
 }
