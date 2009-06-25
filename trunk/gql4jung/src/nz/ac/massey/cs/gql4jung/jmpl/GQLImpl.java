@@ -76,7 +76,7 @@ public class GQLImpl extends Logging implements GQL {
     	List<Constraint> constraints = scheduler.getConstraints(graph, motif);
     	
     	// start resolver
-    	Controller controller = new Controller(motif,constraints,ignoreVariants);
+    	Controller controller = ignoreVariants?new BackJumpingController(motif,constraints):new Controller(motif,constraints);
     	for(Vertex v:vertices){
     		controller.bind(role, v);
     		counter = counter+1;

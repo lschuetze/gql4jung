@@ -23,7 +23,7 @@ import nz.ac.massey.cs.gql4jung.Path;
 import nz.ac.massey.cs.gql4jung.Vertex;
 
 /**
- * Data structure for variable bindings.
+ * Utility class to control backtracking.
  * @author jens dietrich
  */
 class Controller  extends Logging {
@@ -32,37 +32,19 @@ class Controller  extends Logging {
 	private Vertex[] values4roles = new Vertex[SIZE];
 	private String[] keys4links = new String[SIZE];
 	private Path[] values4links = new Path[SIZE];
-	private int jumpBackPosition = -1; // jump back for aggregation mode
-	private boolean jumpBackMode = false; // jump back for aggregation mode
-	private Collection<String> aggregationRoles = null;
-	private List<Constraint> constraints = null;
-	private List<GroupByClause> groupByClauses = null;
-	private Collection<Object> resultCores = null; // used to check aggregation
-	
-	private int position = 0;
+	protected List<Constraint> constraints = null;
+	protected int position = 0;
 
 	/**
 	 * Constructor.
-	 * @param motif Bindings are in aggregation mode iff motif!=null.
+	 * @param motif the query
+	 * @param constraints the constraints (perhaps already arranged by an optimizer)
 	 */
-	public Controller(Motif motif,List<Constraint> constraints,boolean jumpBackMode) {
+	public Controller(Motif motif,List<Constraint> constraints) {
 		super();
 		this.constraints = constraints;
-		
-		if (jumpBackMode) {
-			aggregationRoles = new HashSet<String>();
-			groupByClauses = new ArrayList<GroupByClause>();
-			resultCores = new HashSet<Object>();
-			for (GroupByClause gb:motif.getGroupByClauses()) {
-				aggregationRoles.add(gb.getRole());
-				groupByClauses.add(gb);
-			}
-		}
-		
 	}
-	private boolean isInAggregationMode() {
-		return aggregationRoles!=null;
-	}
+
 	/**
 	 * Lookup the binding for a given key.
 	 */
@@ -90,30 +72,8 @@ class Controller  extends Logging {
 			//LOG_BIND.debug("binding "+k+" -> "+v);
 			LOG_BIND.debug(b.toString());
 		}
-		// compute initial jumpback position
-		if (jumpBackPosition==-1&&isInAggregationMode()) {
-			this.aggregationRoles.remove(k);
-			if (this.aggregationRoles.size()==0) {
-				setBackjumpPosition(this.getPosition());
-			}
-		}
-		// check if we have to back into jumpback mode
-		if (isInAggregationMode()&&this.position==jumpBackPosition) {
-			Object core = this.createResultCore();
-			if (core!=null && this.resultCores.contains(core)) {
-				this.jumpBackMode=true;
-				if (LOG_BIND.isDebugEnabled()) {
-					LOG_BIND.debug("going back into jumpback mode at position "+position);
-				}
-			}
-		}
 	}
-	private void setBackjumpPosition(int pos) {
-		this.jumpBackPosition = pos;
-		if (LOG_BACKJUMP.isDebugEnabled()) {
-			LOG_BACKJUMP.debug("jump back position set to " + pos);
-		}		
-	}
+
 	/**
 	 * Add a new entry.
 	 */
@@ -126,6 +86,7 @@ class Controller  extends Logging {
 	}
 	/**
 	 * Indicates whether the values contain a given value.
+	 * @deprecated
 	 */
 	public boolean containsValue(String role) {
 		for (int i=position;i>-1;i--) {
@@ -166,19 +127,6 @@ class Controller  extends Logging {
 		if (LOG_BIND.isDebugEnabled()) {
 			LOG_BIND.debug("backtracking to "+position);
 		}		
-		if (this.jumpBackMode && this.position<=this.jumpBackPosition) {
-			this.jumpBackMode=false;
-			/**
-			// also check existing solutions here
-			List<Object> core = this.createResultCore();
-			if (core==null || !this.resultCores.contains(core)) {
-				this.jumpBackMode=false;
-				if (LOG_BIND.isDebugEnabled()) {
-					LOG_BIND.debug("leaving jump back mode at position "+position);
-				}
-			}
-			*/
-		}
 	}
 	public void reset() {
 		keys4roles = new String[SIZE];
@@ -186,7 +134,6 @@ class Controller  extends Logging {
 		keys4links = new String[SIZE];
 		values4links = new Path[SIZE];
 		position = 0;
-		this.jumpBackMode = false;
 	}
 	
 	/**
@@ -221,41 +168,17 @@ class Controller  extends Logging {
 		 return this.position;
 	 }
 	 
-	boolean isDone() {
-		boolean done =  position==constraints.size();
-		if (done && isInAggregationMode()) {
-			// build new result core
-			Object core = this.createResultCore();
-			this.resultCores.add(core);
-			this.jumpBackMode = true;
-		}
-		return done;
+	public boolean isDone() {
+		return position==constraints.size();
 	}
-	private Object createResultCore() {
-		if (groupByClauses.size()==1) {
-			GroupByClause gb = groupByClauses.get(0);
-			Vertex v = this.lookup(gb.getRole());
-			if (v==null) return null; // not enough bindings to build core
-			return gb.getGroup(v);
-		}
-		List<Object> core = new ArrayList<Object>(groupByClauses.size());
-		for (GroupByClause gb:groupByClauses) {
-			Vertex v = this.lookup(gb.getRole());
-			if (v==null) return null; // not enough bindings to build core
-			Object group = gb.getGroup(v);
-			core.add(group);
-		}
-		return core;
-	}
+
 	public Constraint next() {
 		Constraint c = constraints.get(position);
 		position=position+1;
 		return c;
 	}
+
 	public boolean isInJumpBackMode() {
-		return jumpBackMode;
-	}
-	public int getJumpBackPosition() {
-		return this.jumpBackPosition;
+		return false;
 	}
 }
