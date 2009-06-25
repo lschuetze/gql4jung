@@ -76,14 +76,15 @@ public class GQLImpl extends Logging implements GQL {
     	List<Constraint> constraints = scheduler.getConstraints(graph, motif);
     	
     	// start resolver
+    	Controller controller = new Controller(motif,constraints,ignoreVariants);
     	for(Vertex v:vertices){
-    		Controller controller = new Controller(motif,constraints,ignoreVariants);
     		controller.bind(role, v);
     		counter = counter+1;
     		resolve(graph, motif, controller, listener);
     		if (counter%stepSize==0) {
     			listener.progressMade(counter,S);
     		}
+    		controller.reset();
 	    }
     	// reset caching
     	PathCache.switchCachingOff();
