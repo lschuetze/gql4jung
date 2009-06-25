@@ -91,13 +91,13 @@ public abstract class Tests {
 	
 	
 	// check the expected number of variants (different results, no aggregation)
-	protected void doTestExpectedVariants(String motif, String data,int expected) throws Exception {
+	protected void doTestExpectedVariants(String motif, String data,int expected,boolean ignoreVariants) throws Exception {
 		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Motif m = this.loadQuery(motif);
 		ResultCollector coll = new ResultCollector();
 		GQL engine = new GQLImpl();
 		long t1 = System.currentTimeMillis();
-		engine.query(g,m,coll,false);
+		engine.query(g,m,coll,ignoreVariants);
 		long t2 = System.currentTimeMillis();
 		System.out.println("query "+motif+" on data "+data+ " returned "+coll.getInstances().size()+" variants");
 		System.out.println("query "+motif+" on data "+data+ " took "+(t2-t1)+" millis");

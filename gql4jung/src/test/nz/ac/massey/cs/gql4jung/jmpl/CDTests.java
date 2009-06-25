@@ -30,7 +30,7 @@ public class CDTests extends Tests{
 		expected.put("outside2","org.example2.Outside2");
 		expected.put("inside2","org.example1.Inside2");
 		doTest("cd.xml","testdata-cd1.graphml",expected,true);
-		doTestExpectedVariants("cd.xml","testdata-cd1.graphml",1);
+		doTestExpectedVariants("cd.xml","testdata-cd1.graphml",1,false);
 	}
 	
 	@Test
@@ -41,17 +41,17 @@ public class CDTests extends Tests{
 		expected.put("outside2","org.example2.Outside");
 		expected.put("inside2","org.example1.Inside2");
 		doTest("cd.xml","testdata-cd2.graphml",expected,true);
-		doTestExpectedVariants("cd.xml","testdata-cd2.graphml",1);
+		doTestExpectedVariants("cd.xml","testdata-cd2.graphml",1,false);
 	}
 	
 	@Test
 	public void test3() throws Exception {
-		doTestExpectedVariants("cd.xml","testdata-cd3.graphml",0);
+		doTestExpectedVariants("cd.xml","testdata-cd3.graphml",0,false);
 	}
 	
 	@Test
 	public void test4() throws Exception {
-		doTestExpectedVariants("cd.xml","testdata-cd4.graphml",2);
+		doTestExpectedVariants("cd.xml","testdata-cd4.graphml",2,false);
 		doTestExpectedInstances("cd.xml","testdata-cd4.graphml",2,true);
 		doTestExpectedInstances("cd.xml","testdata-cd4.graphml",2,false);
 	}
@@ -82,6 +82,23 @@ public class CDTests extends Tests{
 	@Test
 	public void testAnt3ComputeVariants() throws Exception {
 		doTestExpectedInstances("cd.xml","ant.jar.graphml",17,false);
+	}
+	
+	@Test
+	public void testVariants1() throws Exception {
+		doTestExpectedInstances("cd.xml","testdata-cd5.graphml",1,true);
+	}
+	@Test
+	public void testVariants2() throws Exception {
+		doTestExpectedInstances("cd.xml","testdata-cd5.graphml",1,false);
+	}
+	@Test
+	public void testVariants3() throws Exception {
+		doTestExpectedVariants("cd.xml","testdata-cd5.graphml",2,false);
+	}
+	@Test
+	public void testVariants4() throws Exception {
+		doTestExpectedVariants("cd.xml","testdata-cd5.graphml",1,true);
 	}
 	
 }
