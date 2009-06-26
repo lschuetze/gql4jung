@@ -13,14 +13,25 @@ package test.nz.ac.massey.cs.gql4jung.jmpl;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import nz.ac.massey.cs.gql4jung.GQL;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Tests for the new (jmpl) query engine implementation.
  * @author jens dietrich
  */
 
+@RunWith(Parameterized.class)
 public class CNSTests extends Tests{
+
+	
+	public CNSTests(GQL engine) {
+		super(engine);
+	}
 
 	@Test
 	public void test1() throws Exception {
