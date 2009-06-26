@@ -13,6 +13,8 @@ package test.nz.ac.massey.cs.gql4jung.jmpl;
 import static junit.framework.Assert.*;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import nz.ac.massey.cs.gql4jung.Edge;
@@ -27,6 +29,9 @@ import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runner.RunWith;
 import edu.uci.ics.jung.graph.DirectedGraph;
 
 /**
@@ -34,7 +39,23 @@ import edu.uci.ics.jung.graph.DirectedGraph;
  * @author jens dietrich
  */
 
+@RunWith(Parameterized.class)
 public abstract class Tests {
+	 GQL engine = null;
+	
+	
+	 public Tests(GQL engine) {
+		super();
+		this.engine = engine;
+	}
+
+	@Parameters
+	 public static Collection engines() {
+	  return Arrays.asList(
+			  new GQL[][] {
+					  {new GQLImpl()}
+			  });
+	 }
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -46,6 +67,7 @@ public abstract class Tests {
 
 	@After
 	public void tearDown() throws Exception {
+		this.engine.reset();
 	}
 	
 	static DirectedGraph<Vertex, Edge> loadGraph(String name) throws Exception {
@@ -80,7 +102,6 @@ public abstract class Tests {
 		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Motif m = this.loadQuery(motif);
 		ResultCollector coll = new ResultCollector();
-		GQL engine = new GQLImpl();
 		long t1 = System.currentTimeMillis();
 		engine.query(g,m,coll,false);
 		long t2 = System.currentTimeMillis();
@@ -95,7 +116,6 @@ public abstract class Tests {
 		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Motif m = this.loadQuery(motif);
 		ResultCollector coll = new ResultCollector();
-		GQL engine = new GQLImpl();
 		long t1 = System.currentTimeMillis();
 		engine.query(g,m,coll,ignoreVariants);
 		long t2 = System.currentTimeMillis();
@@ -108,7 +128,6 @@ public abstract class Tests {
 		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Motif m = this.loadQuery(motif);
 		QueryResults coll = new QueryResults();
-		GQL engine = new GQLImpl();
 		long t1 = System.currentTimeMillis();
 		engine.query(g,m,coll,ignoreVariants);
 		long t2 = System.currentTimeMillis();

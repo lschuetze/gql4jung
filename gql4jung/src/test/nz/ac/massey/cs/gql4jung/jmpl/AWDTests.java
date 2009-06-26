@@ -13,7 +13,12 @@ package test.nz.ac.massey.cs.gql4jung.jmpl;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import nz.ac.massey.cs.gql4jung.GQL;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 
 /**
@@ -21,9 +26,14 @@ import org.junit.Test;
  * @author jens dietrich
  */
 
+@RunWith(Parameterized.class)
 public class AWDTests extends Tests{
 
 
+	public AWDTests(GQL engine) {
+		super(engine);
+	}
+	
 	@Test
 	public void testAnt1() throws Exception {
 		Map<String,String> expected = new HashMap<String,String>();
