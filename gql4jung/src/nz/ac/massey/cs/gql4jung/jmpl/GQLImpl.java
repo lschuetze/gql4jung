@@ -29,14 +29,7 @@ public class GQLImpl extends GQLImplCore {
 
 	@Override
 	public void query(DirectedGraph<Vertex,Edge> graph, Motif motif, ResultListener listener,boolean ignoreVariants) {
-		// process graph
-		if(motif.getGraphProcessor().size()!=0){
-			for(Processor processor:motif.getGraphProcessor()){
-				processor.process(graph);
-			}
-		}
-		// set up caching
-		new LRUCache(graph,1000).install();
+		prepareGraph(graph,motif);
 		
 		// initial binding bindings.gotoChildLevel();
 		assert !motif.getRoles().isEmpty();
@@ -51,7 +44,8 @@ public class GQLImpl extends GQLImplCore {
     	List<Constraint> constraints = scheduler.getConstraints(graph, motif);
     	
     	// start resolver
-    	Controller controller = ignoreVariants?new BackJumpingController(motif,constraints):new Controller(motif,constraints);
+    	Controller controller = createController(motif,constraints,ignoreVariants);
+    	
     	for(Vertex v:vertices){
     		controller.bind(role, v);
     		counter = counter+1;
@@ -64,5 +58,6 @@ public class GQLImpl extends GQLImplCore {
     	// reset caching
     	PathCache.switchCachingOff();
 	}
+
 
 }

@@ -11,13 +11,8 @@
 
 package nz.ac.massey.cs.gql4jung.jmpl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-
 import nz.ac.massey.cs.gql4jung.Constraint;
-import nz.ac.massey.cs.gql4jung.GroupByClause;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.Path;
 import nz.ac.massey.cs.gql4jung.Vertex;
