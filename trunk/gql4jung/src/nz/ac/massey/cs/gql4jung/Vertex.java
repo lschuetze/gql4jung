@@ -22,8 +22,8 @@ public class Vertex extends GraphElement{
 
 	// properties
 	// when making this a general purpose query language, we need to remove this
-	private String namespace = null;
-	private String name = null;
+	private String namespace = "";
+	private String name = "";
 	private boolean isAbstract = false;
 	private String type = null;
 	private String container = null;
@@ -105,5 +105,10 @@ public class Vertex extends GraphElement{
 	}
 	public void setCluster(String cluster) {
 		this.cluster = cluster;
+	}
+	// checks for inner class relationships
+	public boolean isPartOf(Vertex v) {
+		if (!this.namespace.equals(v.namespace)) return false;
+		else return (this.name.startsWith(v.name+'$'));
 	}
 }
