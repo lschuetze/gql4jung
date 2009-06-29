@@ -14,6 +14,7 @@ package nz.ac.massey.cs.gql4jung.jmpl;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import edu.uci.ics.jung.graph.*;
 import nz.ac.massey.cs.gql4jung.*;
@@ -157,4 +158,18 @@ public abstract class GQLImplCore extends Logging implements GQL {
 		PathCache.switchCachingOff();
 	}
 
+	protected Controller createController(Motif motif,List<Constraint> constraints,boolean ignoreVariants) {
+		return ignoreVariants?new BackJumpingController(motif,constraints):new Controller(motif,constraints);
+	}
+	
+	protected void prepareGraph(DirectedGraph<Vertex,Edge> graph,Motif motif) {
+		// process graph
+		if(motif.getGraphProcessor().size()!=0){
+			for(Processor processor:motif.getGraphProcessor()){
+				processor.process(graph);
+			}
+		}
+		// set up caching
+		new LRUCache(graph,1000).install();
+	}
 }
