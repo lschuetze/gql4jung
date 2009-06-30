@@ -1,7 +1,7 @@
 <motif name="degenerated inheritance">
     <select role="type"/>
     <select role="supertype">
-    	<constraint>supertype.namespace!='java.lang' || supertype.name!='Object'</constraint>
+    	<constraint>supertype.fullname!='java.lang.Object'</constraint>
     </select>
     <connectedBy role="inherits1" from="type" to="supertype">
     	<constraint>inherits1.type=='extends' || inherits1.type=='implements'</constraint>
