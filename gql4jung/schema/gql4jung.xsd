@@ -27,18 +27,20 @@
     </xs:complexType>
 
     <xs:complexType name="connectedBy">
-        <xs:sequence>
+    	<xs:sequence>
     		<xs:element name="constraint" type="xs:string"></xs:element>
-    	</xs:sequence>   
-        <xs:attribute name="role" type="xs:ID"></xs:attribute>
-        <xs:attribute name="from" type="xs:IDREF"></xs:attribute>
+    	</xs:sequence>
+    	<xs:attribute name="role" type="xs:ID"></xs:attribute>
+    	<xs:attribute name="from" type="xs:IDREF"></xs:attribute>
     	<xs:attribute name="to" type="xs:IDREF"></xs:attribute>
     	<xs:attribute name="minLength" type="xs:int" form="qualified"
     		use="optional" default="1">
     	</xs:attribute>
     	<xs:attribute name="maxLength" type="xs:int" default="-1"
     		use="optional">
-    	</xs:attribute>
+    	</xs:attribute>
+
+    	<xs:attribute name="computeAll" type="xs:boolean" default="false" use="optional"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="groupBy">
