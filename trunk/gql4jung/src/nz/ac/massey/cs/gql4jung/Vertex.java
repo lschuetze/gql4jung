@@ -28,6 +28,7 @@ public class Vertex extends GraphElement{
 	private String type = null;
 	private String container = null;
 	private String cluster = null;
+	private String fullName = null;
 	
 	public Vertex(String id) {
 		super(id);
@@ -58,12 +59,25 @@ public class Vertex extends GraphElement{
 	}
 	public void setName(String name) {
 		this.name = name;
+		this.fullName = null;
 	}
 	public String getNamespace() {
 		return namespace;
 	}
 	public void setNamespace(String namespace) {
 		this.namespace = namespace;
+		this.fullName = null;
+	}
+	public String getFullname() {
+		if (this.fullName==null) {
+			if (this.namespace==null||this.namespace.length()==0) {
+				this.fullName = name;
+			}
+			else {
+				this.fullName = namespace+'.'+name;
+			}
+		}
+		return fullName;
 	}
 	public Collection<Edge> getOutEdges() {
 		return outEdges;
