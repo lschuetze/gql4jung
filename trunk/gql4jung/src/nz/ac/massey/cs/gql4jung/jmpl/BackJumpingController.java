@@ -98,13 +98,13 @@ public class BackJumpingController extends Controller {
 	private Object createResultCore() {
 		if (groupByClauses.size()==1) {
 			GroupByClause gb = groupByClauses.get(0);
-			Vertex v = this.lookup(gb.getRole());
+			Vertex v = this.lookupVertex(gb.getRole());
 			if (v==null) return null; // not enough bindings to build core
 			return gb.getGroup(v);
 		}
 		List<Object> core = new ArrayList<Object>(groupByClauses.size());
 		for (GroupByClause gb:groupByClauses) {
-			Vertex v = this.lookup(gb.getRole());
+			Vertex v = this.lookupVertex(gb.getRole());
 			if (v==null) return null; // not enough bindings to build core
 			Object group = gb.getGroup(v);
 			core.add(group);

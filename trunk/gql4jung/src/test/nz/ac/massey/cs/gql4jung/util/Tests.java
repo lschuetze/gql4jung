@@ -84,7 +84,7 @@ public class Tests {
 	private void doTestLinks(String data,Collection<String[]> expectedPaths,boolean isOutgouing,String startHere,int minLength,int maxLength, Predicate<Edge> filter) throws Exception {
 		DirectedGraph<Vertex,Edge> g = this.loadGraph(data);
 		Vertex v = getVertex(g,startHere);
-		Iterator<Path> iter = PathFinder.findLinks(g,v, minLength, maxLength, isOutgouing, filter);
+		Iterator<Path> iter = PathFinder.findLinks(g,v, minLength, maxLength, isOutgouing, filter,false);
 		Collection<String[]> expected = new HashSet<String[]>();
 		expected.addAll(expectedPaths);
 		while (iter.hasNext()) {

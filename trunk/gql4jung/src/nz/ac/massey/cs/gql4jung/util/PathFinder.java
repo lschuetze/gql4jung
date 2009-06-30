@@ -23,6 +23,7 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 
 /**
  * Utility to find paths in graphs.
+ * TODO: check for infinite loops if computeAll is set to true
  * @author jens dietrich
  */
 public class PathFinder {
@@ -38,7 +39,7 @@ public class PathFinder {
 	 * @param filter
 	 * @return
 	 */
-	public static Iterator<Path> findLinks(DirectedGraph<Vertex,Edge> g,Vertex start, int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter) {
+	public static Iterator<Path> findLinks(DirectedGraph<Vertex,Edge> g,Vertex start, int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter,boolean computeAll) {
 		// try cache first
 		List<Path> coll = PathCache.INSTANCE.get(g, start, minLength, maxLength, outgoing, filter);
 		if (coll!=null) return coll.iterator();
@@ -55,14 +56,14 @@ public class PathFinder {
 			visited.put(start,null);
 		}
 		
-		collectPaths(1,coll,visited,layer,start,minLength,maxLength,outgoing,filter);
+		collectPaths(1,coll,visited,layer,start,minLength,maxLength,outgoing,filter,computeAll);
 		// cache
 		PathCache.INSTANCE.put(g,start, minLength, maxLength, outgoing, filter, coll);
 		
 		return coll.iterator();
 		
 	}
-	private static void collectPaths(int i, Collection<Path> coll,Map<Vertex, Object> visited, Collection<Path> lastLayer,Vertex start, int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter) {
+	private static void collectPaths(int i, Collection<Path> coll,Map<Vertex, Object> visited, Collection<Path> lastLayer,Vertex start, int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter,boolean computeAll) {
 		if (maxLength!=-1 && i>maxLength) return ; // do not continue
 		Collection<Path> nextLayer = new ArrayList<Path>();
 		boolean hasNewVertices = false;
@@ -72,7 +73,7 @@ public class PathFinder {
 			for (Edge edge:edges1) {
 				if (filter==null || filter.apply(edge)) {
 					Vertex newEnd = getEndPoint(edge,outgoing);
-					if (!visited.containsKey(newEnd)) {
+					if (computeAll || !visited.containsKey(newEnd)) {
 						// new node, not yet seen
 						hasNewVertices = true;
 						visited.put(newEnd, null);
@@ -87,7 +88,7 @@ public class PathFinder {
 			}
 		}
 		if (hasNewVertices) {
-			collectPaths(i+1, coll, visited, nextLayer,start,minLength,maxLength,outgoing,filter);
+			collectPaths(i+1, coll, visited, nextLayer,start,minLength,maxLength,outgoing,filter,computeAll);
 		}
 
 	}

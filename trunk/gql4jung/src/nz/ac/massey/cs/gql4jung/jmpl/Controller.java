@@ -43,13 +43,32 @@ class Controller  extends Logging {
 	/**
 	 * Lookup the binding for a given key.
 	 */
-	public Vertex lookup(String k) {
+	public Vertex lookupVertex(String k) {
 		for (int i=position;i>-1;i--) {
 			if (k.equals(keys4roles[i])) 
 				return values4roles[i];
 		}
 		return null;
 	}
+	/**
+	 * Lookup the binding for a given key.
+	 */
+	public Path lookupPath(String k) {
+		for (int i=position;i>-1;i--) {
+			if (k.equals(keys4links[i])) 
+				return values4links[i];
+		}
+		return null;
+	}
+	/**
+	 * Lookup the binding for a given key, return a vertex or a path
+	 */
+	public Object lookupAny(String k) {
+		Object o = this.lookupVertex(k);
+		if (o!=null) return o;
+		else return this.lookupPath(k);
+	}
+
 	/**
 	 * Add a new entry.
 	 */

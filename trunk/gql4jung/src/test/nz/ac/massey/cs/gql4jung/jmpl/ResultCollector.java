@@ -10,9 +10,8 @@
 
 package test.nz.ac.massey.cs.gql4jung.jmpl;
 
-import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Vector;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.ResultListener;
 
@@ -20,7 +19,7 @@ public class ResultCollector implements ResultListener {
 
 	private long creationTime = System.currentTimeMillis();
 	private boolean logProgress = false;
-	private List<MotifInstance> instances = new ArrayList<MotifInstance>();
+	private List<MotifInstance> instances = new Vector<MotifInstance>();
 	
 	public List<MotifInstance> getInstances() {
 		return instances;
