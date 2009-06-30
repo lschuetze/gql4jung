@@ -78,6 +78,7 @@ public class XMLMotifReader implements MotifReader {
 					PathConstraint c = new PathConstraint();
 					c.setMaxLength(connectedBy.getMaxLength());
 					c.setMinLength(connectedBy.getMinLength());
+					c.setComputeAll(connectedBy.isComputeAll());
 					// resolve IDREFs here
 					c.setSource(((Select)connectedBy.getFrom()).getRole());
 					c.setTarget(((Select)connectedBy.getTo()).getRole());

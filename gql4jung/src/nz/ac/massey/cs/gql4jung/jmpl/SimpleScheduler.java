@@ -60,6 +60,7 @@ public class SimpleScheduler extends Logging implements ConstraintScheduler {
 			if (boundRoles.contains(pc.getSource()) && boundRoles.contains(pc.getTarget())) {
 				newList.add(pc);
 				oldList.remove(pc);
+				boundRoles.add(pc.getRole()); // could be a parallel path
 				LOG_SCHED.debug("Scheduling " + pc);
 				return;
 			}
@@ -72,6 +73,7 @@ public class SimpleScheduler extends Logging implements ConstraintScheduler {
 					oldList.remove(pc);
 					// add new role
 					boundRoles.add(pc.getTarget());
+					boundRoles.add(pc.getRole());
 					LOG_SCHED.debug("Scheduling " + pc);
 					return;
 				}
@@ -80,6 +82,7 @@ public class SimpleScheduler extends Logging implements ConstraintScheduler {
 					oldList.remove(pc);
 					// add new role
 					boundRoles.add(pc.getSource());
+					boundRoles.add(pc.getRole());
 					LOG_SCHED.debug("Scheduling " + pc);
 					return;
 				}

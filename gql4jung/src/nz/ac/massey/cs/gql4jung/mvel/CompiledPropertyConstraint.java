@@ -63,17 +63,18 @@ public class CompiledPropertyConstraint implements PropertyConstraint  {
 	}
 
 	@Override
-	public boolean check(GraphElement eov) {
+	public boolean check(Object vertexOrEdgeOrPath) {
+		// TODO - reuse singleton map (pool)
 		try {
 			assert this.roleNames.size()==1;
-			Map<String,GraphElement> map = new HashMap<String,GraphElement>(1);
-			map.put(this.roleNames.get(0),eov);
+			Map<String,Object> map = new HashMap<String,Object>(1);
+			map.put(this.roleNames.get(0),vertexOrEdgeOrPath);
 			Object result = MVEL.executeExpression(this.compiledExpression,map);
 			return (Boolean)result;
-			//return MVEL.evalToBoolean(this.expression,eov);
+			//return MVEL.evalToBoolean(this.expression,vertexOrEdgeOrPath);
 		}
 		catch (Exception x) {
-			throw new IllegalArgumentException("Cannot evaluate " + this.expression + " for parameter " + eov,x);
+			throw new IllegalArgumentException("Cannot evaluate " + this.expression + " for parameter " + vertexOrEdgeOrPath,x);
 		}
 	}
 	@Override

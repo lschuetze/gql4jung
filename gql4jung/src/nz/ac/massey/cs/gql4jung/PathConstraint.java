@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
+
 import nz.ac.massey.cs.gql4jung.util.ConstraintedShortestPathFinder;
 import nz.ac.massey.cs.gql4jung.util.PathFinder;
 import edu.uci.ics.jung.graph.DirectedGraph;
@@ -39,6 +41,9 @@ public class PathConstraint implements Constraint {
 	private String role = null;
 	private String source = null;
 	private String target = null;
+	private boolean computeAll = false; // whether to compute only one instance or all
+
+
 	private List<PropertyConstraint> constraints = new ArrayList<PropertyConstraint>();
 	
 
@@ -48,14 +53,32 @@ public class PathConstraint implements Constraint {
 	}
 		
 	public Iterator<Path> getPossibleSources(final DirectedGraph<Vertex,Edge> g,final Vertex target) {
-		return PathFinder.findLinks(g,target,this.minLength,this.maxLength, false,filter);
+		return PathFinder.findLinks(g,target,this.minLength,this.maxLength, false,filter,computeAll);
 	}
 	public Iterator<Path>  getPossibleTargets(final DirectedGraph<Vertex,Edge> g, final Vertex source){
-		return PathFinder.findLinks(g,source,this.minLength,this.maxLength, true, filter);
+		return PathFinder.findLinks(g,source,this.minLength,this.maxLength, true, filter,computeAll);
 	}
 
-	public Path check(final DirectedGraph<Vertex,Edge> g, final Vertex source, final Vertex target){
-		return ConstraintedShortestPathFinder.findLink(g,source,target,minLength,maxLength,filter);
+	public Iterator<Path> check(final DirectedGraph<Vertex,Edge> g, final Vertex source, final Vertex target){
+		if (this.computeAll) {
+			Iterator<Path> allOutgoing = PathFinder.findLinks(g,source,this.minLength,this.maxLength, true, filter,computeAll);
+			Predicate<Path> connectToTargetFilter = new Predicate<Path> () {
+				@Override
+				public boolean apply(Path p) {
+					return p.getEnd()==target;
+				}
+			};
+			return Iterators.filter(allOutgoing, connectToTargetFilter);
+		}
+		else {
+			Path path = ConstraintedShortestPathFinder.findLink(g,source,target,minLength,maxLength,filter);
+			if (path==null) {
+				return Iterators.emptyIterator();
+			}
+			else {
+				return Iterators.singletonIterator(path); 
+			}
+		}
 	}
 
 
@@ -113,6 +136,13 @@ public class PathConstraint implements Constraint {
 		this.constraints.add(constraint);
 	}
 
+	public boolean isComputeAll() {
+		return computeAll;
+	}
+
+	public void setComputeAll(boolean computeAll) {
+		this.computeAll = computeAll;
+	}
 
 }
 

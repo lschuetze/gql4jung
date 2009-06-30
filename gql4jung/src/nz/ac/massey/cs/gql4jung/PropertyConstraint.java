@@ -21,8 +21,8 @@ public interface PropertyConstraint extends Constraint {
 	public List<String> getRoles() ;
 	public String getFirstRole() ;
 	public String getExpression();
-	public boolean check(GraphElement edgeOrVertex);
-	public boolean check(Map<String,GraphElement> bindings);
+	public boolean check(Object edgeOrVertexOrPath);
+	public boolean check(Map<String,Object> bindings);
 	public boolean isSingleRole();
 
 }

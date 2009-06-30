@@ -62,20 +62,20 @@ public abstract class GQLImplCore extends Logging implements GQL {
 			PropertyConstraint constraint = (PropertyConstraint)nextConstraint;
 			boolean result = false;
 			if (constraint.isSingleRole()) {
-				Vertex v = (Vertex)controller.lookup(constraint.getFirstRole());
-				if (v!=null) {
-					result = constraint.check(v);
+				Object vertexOrPath = controller.lookupAny(constraint.getFirstRole());
+				if (vertexOrPath!=null) {
+					result = constraint.check(vertexOrPath);
 				}
 				else {
 					LOG_GQL.warn("encountered unresolved role "+constraint.getFirstRole()+", cannot resolve: "+constraint);
 				}
 			}
 			else {
-				Map<String,GraphElement> bind = new HashMap<String,GraphElement>();
+				Map<String,Object> bind = new HashMap<String,Object>(constraint.getRoles().size());
 				for (Object role:constraint.getRoles()) {
-					Vertex v = (Vertex)controller.lookup(role.toString());
-					if (v!=null) {
-						bind.put(role.toString(),v);
+					Object vertexOrPath = controller.lookupAny(role.toString());
+					if (vertexOrPath!=null) {
+						bind.put(role.toString(),vertexOrPath);
 					}
 					else {
 						LOG_GQL.warn("encountered unresolved role "+constraint.getFirstRole()+", cannot resolve: "+constraint);
@@ -101,17 +101,15 @@ public abstract class GQLImplCore extends Logging implements GQL {
 			PathConstraint constraint = (PathConstraint)nextConstraint; 
 			String sourceRole = constraint.getSource();
 			String targetRole = constraint.getTarget();
-			Vertex source = (Vertex)controller.lookup(sourceRole);
-			Vertex target = (Vertex)controller.lookup(targetRole);
+			Vertex source = (Vertex)controller.lookupVertex(sourceRole);
+			Vertex target = (Vertex)controller.lookupVertex(targetRole);
+			
 			if (source!=null && target!=null) {
-				Path result=constraint.check(graph, source, target); // path or edge
-				if (result!=null) {
-					controller.bind(constraint.getRole(),result);
-					resolve(graph,motif,controller,listener);
-				}
+				Iterator<Path> iter = constraint.check(graph, source, target); // path or edge
+				resolveNextLevel(graph,motif,controller,listener,iter,target,sourceRole,constraint);
 			}
 			else if (source==null && target!=null) {
-				Iterator<Path> iter =constraint.getPossibleSources(graph,target);
+				Iterator<Path> iter = constraint.getPossibleSources(graph,target);
 				resolveNextLevel(graph,motif,controller,listener,iter,target,sourceRole,constraint);
 				
 			}
