@@ -8,7 +8,6 @@
  * and limitations under the License.
  */
 
-
 package nz.ac.massey.cs.gql4jung.jmpl;
 
 import java.util.Collection;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import edu.uci.ics.jung.graph.*;
 import nz.ac.massey.cs.gql4jung.*;
-import nz.ac.massey.cs.gql4jung.util.PathCache;
 
 /**
  * Abstract superclass for GQL implementations. The backtracking / communication
@@ -153,7 +151,6 @@ public abstract class GQLImplCore extends Logging implements GQL {
 	@Override
 	public void cancel() {
 		cancel = true;
-		PathCache.switchCachingOff();
 	}
 
 	protected Controller createController(Motif motif,List<Constraint> constraints,boolean ignoreVariants) {
@@ -167,7 +164,6 @@ public abstract class GQLImplCore extends Logging implements GQL {
 				processor.process(graph);
 			}
 		}
-		// set up caching
-		new LRUCache(graph,1000).install();
+
 	}
 }
