@@ -41,11 +41,11 @@ public class PathFinder {
 	 */
 	public static Iterator<Path> findLinks(DirectedGraph<Vertex,Edge> g,Vertex start, int minLength, int maxLength, boolean outgoing, Predicate<Edge> filter,boolean computeAll) {
 		// try cache first
-		List<Path> coll = PathCache.INSTANCE.get(g, start, minLength, maxLength, outgoing, filter);
-		if (coll!=null) return coll.iterator();
+		//List<Path> coll = PathCache.INSTANCE.get(g, start, minLength, maxLength, outgoing, filter);
+		//if (coll!=null) return coll.iterator();
 		
 		// we pre init the iterator, this should be done on demand
-		coll = new ArrayList<Path> ();
+		List<Path> coll = new ArrayList<Path> ();
 		Map<Vertex,Object> visited = new IdentityHashMap<Vertex,Object>();
 		List<Path> layer = new ArrayList<Path>();
 		
@@ -58,7 +58,7 @@ public class PathFinder {
 		
 		collectPaths(1,coll,visited,layer,start,minLength,maxLength,outgoing,filter,computeAll);
 		// cache
-		PathCache.INSTANCE.put(g,start, minLength, maxLength, outgoing, filter, coll);
+		//PathCache.INSTANCE.put(g,start, minLength, maxLength, outgoing, filter, coll);
 		
 		return coll.iterator();
 		
