@@ -21,7 +21,7 @@ public class Logging {
 	static Logger LOG_BACKJUMP = Logger.getLogger(""+Controller.class+":backjump");
 	static Logger LOG_INST = Logger.getLogger(MotifInstanceImpl.class);
 	static Logger LOG_SCHED = Logger.getLogger(ConstraintScheduler.class);
-	static Logger LOG_CACHE = Logger.getLogger(LRUCache.class);
+	
 	static {
 		BasicConfigurator.configure();
 	}
@@ -37,6 +37,5 @@ public class Logging {
 		LOG_BACKJUMP.setLevel(level);
 		LOG_INST.setLevel(level);
 		LOG_SCHED.setLevel(level);
-		LOG_CACHE.setLevel(level);
 	}
 }

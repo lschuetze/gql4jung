@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import edu.uci.ics.jung.graph.*;
 import nz.ac.massey.cs.gql4jung.*;
-import nz.ac.massey.cs.gql4jung.util.PathCache;
 
 /**
  * Improved graph query engine.
@@ -55,8 +54,7 @@ public class GQLImpl extends GQLImplCore {
     		}
     		controller.reset();
 	    }
-    	// reset caching
-    	PathCache.switchCachingOff();
+
 	}
 
 
