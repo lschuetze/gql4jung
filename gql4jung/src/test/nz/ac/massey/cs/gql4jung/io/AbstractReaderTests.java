@@ -107,6 +107,43 @@ public abstract class AbstractReaderTests {
 		assertEquals(expectedNumberOfInstances,count);
 	}
 	
+	protected void doTestEdges2(String graph,int expectedNumberOfInstances,final String id,final String sourceId,final String targetId,final String type) throws Exception {
+		DirectedGraph<Vertex, Edge> g = loadGraph(graph);
+		Iterator<Edge> iter = g.getEdges().iterator();
+		iter = Iterators.filter(iter,new Predicate<Edge>() {
+			@Override
+			public boolean apply(Edge e) {
+				return id==null || id.equals(e.getId());
+			}
+		});
+		iter = Iterators.filter(iter,new Predicate<Edge>() {
+			@Override
+			public boolean apply(Edge e) {
+				return sourceId==null || sourceId.equals(e.getStart().getFullname());
+			}
+		});
+		iter = Iterators.filter(iter,new Predicate<Edge>() {
+			@Override
+			public boolean apply(Edge e) {
+				return targetId==null || targetId.equals(e.getEnd().getFullname());
+			}
+		});
+		iter = Iterators.filter(iter,new Predicate<Edge>() {
+			@Override
+			public boolean apply(Edge e) {
+				return type==null || type.equals(e.getType());
+			}
+		});
+		// count 
+		int count = 0;
+		while (iter.hasNext()) {
+			count = count+1;
+			iter.next();
+		}
+		assertEquals(expectedNumberOfInstances,count);
+	}
+	
+	
 	
 	
 }
