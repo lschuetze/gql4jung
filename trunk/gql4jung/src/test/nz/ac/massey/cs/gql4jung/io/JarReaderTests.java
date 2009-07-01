@@ -19,7 +19,7 @@ import nz.ac.massey.cs.gql4jung.io.JarReader;
 import edu.uci.ics.jung.graph.DirectedGraph;
 
 /**
- * Tests for the graphml reader.
+ * Tests for the depfind based jar reader.
  * @author jens dietrich
  */
 
