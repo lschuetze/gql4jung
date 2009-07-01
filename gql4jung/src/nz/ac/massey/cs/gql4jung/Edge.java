@@ -66,7 +66,9 @@ public class Edge extends GraphElement{
 			.append(':')
 			.append('[')
 			.append(this.start)
-			.append("->")
+			.append(" ")
+			.append(this.type)
+			.append(" ")
 			.append(this.end)
 			.append(']')
 			.toString();
