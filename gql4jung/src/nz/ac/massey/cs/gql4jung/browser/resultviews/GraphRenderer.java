@@ -8,7 +8,7 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gql4jung.browser;
+package nz.ac.massey.cs.gql4jung.browser.resultviews;
 
 import java.awt.Font;
 import java.net.URL;

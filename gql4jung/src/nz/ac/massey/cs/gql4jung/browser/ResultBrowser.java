@@ -10,18 +10,13 @@
 
 package nz.ac.massey.cs.gql4jung.browser;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Insets;
-import java.awt.Paint;
-import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -34,25 +29,19 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
-import org.apache.commons.collections15.Transformer;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
-import nz.ac.massey.cs.gql4jung.Path;
 import nz.ac.massey.cs.gql4jung.Vertex;
+import nz.ac.massey.cs.gql4jung.browser.resultviews.GraphBasedResultView;
+import nz.ac.massey.cs.gql4jung.browser.resultviews.TableBasedResultView;
 import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
 import nz.ac.massey.cs.gql4jung.io.ODEMReader;
 import nz.ac.massey.cs.gql4jung.io.QueryResultsExporter2CSV;
@@ -60,13 +49,7 @@ import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.QueryResults.Cursor;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
-import edu.uci.ics.jung.algorithms.layout.FRLayout;
-import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
-import edu.uci.ics.jung.visualization.RenderContext;
-import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 
 /**
  * Stand alone user interface to run queries and visualise results.
@@ -94,9 +77,7 @@ public class ResultBrowser extends JFrame {
 	private JPanel mainPanel = null;
 	private JPopupMenu popup;
 	private MouseAdapter popupListener;
-	private JTable table = null;
 	private JTabbedPane tabbedPane = null;
-	private JPanel graphPane = null;
 	private JMenuBar menuBar = null;
 	
 	// actions
@@ -112,6 +93,12 @@ public class ResultBrowser extends JFrame {
 	private AbstractAction actExport2CSV;
 	private AbstractAction actAbout;
 	private List<AbstractAction> actLoadBuiltInQueries = new ArrayList<AbstractAction>();
+	
+	private ResultView[] resultViewers = {
+		new GraphBasedResultView(),
+		new TableBasedResultView()
+	};
+	
 	
 	private enum Status {
 		waiting,computing,finished,cancelled
@@ -148,15 +135,11 @@ public class ResultBrowser extends JFrame {
 		mainPanel = new JPanel(new BorderLayout(5,5));
 		this.tabbedPane = new JTabbedPane();
 		mainPanel.add(tabbedPane,BorderLayout.CENTER);
-		// panel for graph
-		graphPane = new JPanel(new GridLayout(1,1));
-		this.tabbedPane.add("result as graph",graphPane);
-		// panel for table
-		this.table = new JTable();
-		JScrollPane sTable = new JScrollPane(table);
-		addBorder(sTable);
-		this.tabbedPane.add("result as table",sTable);
-		
+		// result viewers
+		for (ResultView view:this.resultViewers) {
+			view.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
+			this.tabbedPane.add(view.getName(),view);
+		}		
 		this.setContentPane(mainPanel);
 		
 		// start listening to events
@@ -740,215 +723,12 @@ public class ResultBrowser extends JFrame {
 	};
 	
 	private void display(final MotifInstance instance) {
-		/*
-		Runnable runner = new Runnable() {
-			public void run() {
-				displayTable(instance);
-				displayGraph(instance);				
-			}
-		};
-		new Thread(runner).start();*/
-		if (this.tabbedPane.getSelectedIndex()==0) {
-			displayGraph(instance);	
-			displayTable(instance);
-		}
-		else {
-			displayTable(instance);
-			displayGraph(instance);
-		}
-		
+		for (ResultView view:this.resultViewers) {
+			view.display(instance,this.data);
+		}	
 	}
-	private void displayTable(final MotifInstance instance) {
-		final List<String> roles = (instance==null)?new ArrayList<String>():instance.getMotif().getRoles();
-		TableModel model = new AbstractTableModel() {
-		    public String getColumnName(int col) {
-		        switch (col) {
-		        	case 0: return "role";
-		        	case 1: return "name";
-		        	case 2: return "namespace";
-		        	case 3: return "container";
-		        	case 4: return "is abstract";
-		        	case 5: return "type";
-		        	case 6: return "cluster";
-		        	default: return null;
-		        }
-		    }
-		    public int getRowCount() { 
-		    	return roles.size(); 
-		    }
-		    public int getColumnCount() { 
-		    	return 7; 
-		    }
-		    public Object getValueAt(int row, int col) {
-		    	String role = roles.get(row);
-		    	if (instance==null) return "";
-		    	Vertex v = instance.getVertex(role);
-		    	Object cluster = "TODO";
-		    	if (cluster==null) cluster="n/a";
-		        switch (col) {
-	        		case 0: return role;
-	        		case 1: return v.getName();
-	        		case 2: return v.getNamespace();
-	        		case 3: return v.getContainer();
-	        		case 4: return v.isAbstract();
-	        		case 5: return v.getType();
-	        		case 6: return v.getCluster();
-	        		default: return null;
-		        }
-		    }
-		    public boolean isCellEditable(int row, int col){ 
-		    	return false; 
-		    }
-		    public void setValueAt(Object value, int row, int col) {
-		        // nothing to do - table is read only
-		    }
-		};
-		this.table.setModel(model);
 
-	}
 	
-	private void displayGraph(final MotifInstance instance) {	
-		DirectedGraph<Vertex,Edge> g = instance==null?new DirectedSparseGraph<Vertex,Edge>():this.asGraph(instance);
-		//SimpleGraphView sgv = new SimpleGraphView(); //We create our graph in here
-		// The Layout<V, E> is parameterized by the vertex and edge types
-		Layout<Vertex,Edge> layout = new FRLayout<Vertex,Edge>(g);
-		layout.setSize(graphPane.getSize());
-		VisualizationViewer<Vertex,Edge> vv = new VisualizationViewer<Vertex,Edge>(layout);
-		configureRenderer(vv.getRenderContext(),instance);
-		vv.setPreferredSize(graphPane.getSize()); //Sets the viewing area size
-		vv.setBackground(Color.white);
-		graphPane.removeAll();
-		graphPane.add(vv);
-		graphPane.revalidate();
-		//vv.addMouseListener(popupListener);
-		// Create a graph mouse and add it to the visualization component
-		DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
-		gm.setMode(edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode.PICKING);
-		vv.setGraphMouse(gm);
-	}
-	
-	private void configureRenderer (RenderContext context,final MotifInstance instance) {
-		final Map<Vertex,String> revMap = new HashMap<Vertex,String>();
-		if (instance!=null) {
-			for (String role:instance.getMotif().getRoles()) {
-				revMap.put(instance.getVertex(role),role);
-			}
-		}
-		context.setVertexLabelTransformer(
-			new Transformer<Vertex,String>(){
-				@Override
-				public String transform(Vertex v) {
-					String role = revMap.get(v);
-					StringBuffer b = new StringBuffer()
-						.append("<html>");
-					if (role!=null) {
-						b.append("&lt;&lt;")
-						.append(role==null?"?":role)
-						.append("&gt;&gt")
-						.append("<br/>");					
-					}
-					b.append(v.getNamespace())
-						.append('.')
-						.append(v.getName())
-						.append("</html>");
-					return b.toString();
-				}
-			}
-		);
-		context.setEdgeLabelTransformer(
-			new Transformer<Edge,String>(){
-				@Override
-				public String transform(Edge e) {
-					return "<<"+e.getType()+">>";
-				}
-			}
-		);
-		context.setVertexFillPaintTransformer(
-			new Transformer<Vertex,Paint>() {
-				@Override
-				public Paint transform(Vertex v) {
-					String t = v.getType();
-					if ("class".equals(t) && !v.isAbstract()) return Color.GREEN;
-					else if ("class".equals(t) && v.isAbstract()) return Color.BLUE;
-					else if ("interface".equals(t)) return new Color(255,0,255); // purble
-					else return Color.WHITE;
-				}
-			}
-		);
-		final Stroke strokeUses = new BasicStroke(1);
-		final Stroke strokeInherits = new BasicStroke(2);		
-		context.setEdgeStrokeTransformer(
-			new Transformer<Edge, Stroke>() {
-				public Stroke transform(Edge e) {
-					if ("uses".equals(e.getType())) return strokeUses;
-					else return strokeInherits;
-				}
-			}
-		);	
-		context.setVertexIconTransformer(
-			new Transformer<Vertex,Icon>() {
-				@Override
-				public Icon transform(Vertex v) {
-					boolean hasRole = revMap.containsKey(v);
-					if (v.isAbstract()) {
-						return hasRole?GraphRenderer.ICON_INTERFACE_C:GraphRenderer.ICON_INTERFACE_BW;
-					}
-					else {
-						return hasRole?GraphRenderer.ICON_CLASS_C:GraphRenderer.ICON_CLASS_BW;
-					}
-				}
-			}
-		);
-		context.setVertexFontTransformer(
-			new Transformer<Vertex,Font>(){
-				@Override
-				public Font transform(Vertex v) {
-					boolean hasRole = revMap.containsKey(v);
-					return hasRole?GraphRenderer.CORE:GraphRenderer.NON_CORE;
-				}
-			}
-		);
-		context.setEdgeFontTransformer(
-			new Transformer<Edge,Font>(){
-				@Override
-				public Font transform(Edge e) {
-					return GraphRenderer.CORE;
-				}
-			}
-		);
-		
-	}
-	
-
-
-	private DirectedGraph asGraph(MotifInstance instance) {
-		DirectedGraph<Vertex,Edge> g = new DirectedSparseGraph<Vertex,Edge>();
-		Motif motif = instance.getMotif();
-		// vertices
-		Set<Vertex> vertices = new HashSet<Vertex>();
-		for (String role:motif.getRoles()) {
-			Vertex v = instance.getVertex(role);
-			if (v==null) {
-				g.addVertex(v);
-				vertices.add(v);
-			}
-		};
-		// edges
-		for (String role:motif.getPathRoles()) {
-			Path p = instance.getPath(role);
-			if (p!=null) {
-				for (Edge e:p.getEdges()) {
-					Vertex v1 = e.getStart();
-					Vertex v2 = e.getEnd();
-					if (!vertices.contains(v1)) vertices.add(v1);
-					if (!vertices.contains(v2)) vertices.add(v2);
-					g.addEdge(e,v1,v2);
-				}
-			}
-		}
-		return g;
-	}
-
 	@Override
 	public void dispose() {
 		try {
@@ -957,7 +737,5 @@ public class ResultBrowser extends JFrame {
 		catch (Exception x){}
 		super.dispose();
 	}
-	private void addBorder(JComponent c) {
-		c.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
-	}
+
 }
