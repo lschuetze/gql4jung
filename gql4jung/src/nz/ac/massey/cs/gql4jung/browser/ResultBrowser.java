@@ -43,6 +43,7 @@ import nz.ac.massey.cs.gql4jung.Vertex;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.GraphBasedResultView;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.TableBasedResultView;
 import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
+import nz.ac.massey.cs.gql4jung.io.JarReader;
 import nz.ac.massey.cs.gql4jung.io.ODEMReader;
 import nz.ac.massey.cs.gql4jung.io.QueryResultsExporter2CSV;
 import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
@@ -82,7 +83,8 @@ public class ResultBrowser extends JFrame {
 	
 	// actions
 	private AbstractAction actExit;
-	private AbstractAction actLoadData;
+	private AbstractAction actLoadDataFromXML;
+	private AbstractAction actLoadDataFromJars;
 	private AbstractAction actLoadQuery;
 	private AbstractAction actRunQuery;
 	private AbstractAction actCancelQuery;
@@ -172,7 +174,7 @@ public class ResultBrowser extends JFrame {
 		
 		// load sample data
 		// TODO remove
-		this.loadData(new File("exampledata/ant.jar.graphml"));
+		this.loadDataFromXML(new File("exampledata/ant.jar.graphml"));
 		this.loadQuery(new File("queries/awd.xml"));
 		
 		updateActions();
@@ -184,7 +186,8 @@ public class ResultBrowser extends JFrame {
 		
 		JMenu menu = new JMenu("File");
 		menu.setMnemonic(KeyEvent.VK_F);
-		menu.add(actLoadData);
+		menu.add(actLoadDataFromXML);
+		menu.add(actLoadDataFromJars);
 		menu.add(actLoadQuery);
 		if (this.actLoadBuiltInQueries.size()>0) {
 			JMenu menu2 = new JMenu("Built-in queries");
@@ -330,14 +333,23 @@ public class ResultBrowser extends JFrame {
 			}
 		};
 		
-		actLoadData = new AbstractAction("load data",getIcon("Open16.gif")) {
+		actLoadDataFromXML = new AbstractAction("load graph from XML",getIcon("Open16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				actLoadData();
+				actLoadDataFromXML();
 			}
 		};
-		actLoadData.putValue(Action.SHORT_DESCRIPTION, "load a program dependency graph from a graphml file");
+		actLoadDataFromXML.putValue(Action.SHORT_DESCRIPTION, "load a program dependency graph from a graphml file");
 
+		actLoadDataFromJars = new AbstractAction("load graph from byte code",getIcon("Open16.gif")) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				actLoadDataFromJars();
+			}
+		};
+		actLoadDataFromJars.putValue(Action.SHORT_DESCRIPTION, "load graph from jar files and/or folders");
+
+		
 		actLoadQuery = new AbstractAction("load query",getIcon("Import16.gif")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -446,7 +458,8 @@ public class ResultBrowser extends JFrame {
 		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 		mainPanel.add(toolbar,BorderLayout.NORTH);
-		toolbar.add(actLoadData);
+		toolbar.add(actLoadDataFromXML);
+		toolbar.add(actLoadDataFromJars);
 		toolbar.add(actLoadQuery);
 		toolbar.addSeparator();
 		toolbar.add(actRunQuery);
@@ -466,7 +479,8 @@ public class ResultBrowser extends JFrame {
 		popup.add(this.actRunQuery);
 		popup.add(this.actCancelQuery);
 		popup.addSeparator();
-		popup.add(this.actLoadData);
+		popup.add(this.actLoadDataFromXML);
+		popup.add(this.actLoadDataFromJars);
 		popup.add(this.actLoadQuery);
 		popup.addSeparator();
 		popup.add(this.actNextMajorInstance);
@@ -605,18 +619,61 @@ public class ResultBrowser extends JFrame {
 	private void log(String string) {
 		System.out.println(string);
 	}
-	private void actLoadData() {
+	private void actLoadDataFromXML() {
+		FileFilter fileFilter = new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				String s = f.getAbsolutePath();
+				return s.endsWith(".odem") || s.endsWith(".graphml");
+			}
+			@Override
+			public String getDescription() {
+				return "odem or graphml files";
+			}			
+		};
 		JFileChooser fc = new JFileChooser();
+		fc.setFileFilter(fileFilter);
 		fc.setCurrentDirectory(new File("./exampledata"));
-		fc.setDialogTitle("Load graph");
+		fc.setDialogTitle("Load graph from XML/ODEM or XML/GraphML file");
 		int returnVal = fc.showOpenDialog(this);
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
-            loadData(file);
+            loadDataFromXML(file);
         }
         updateActions();
         updateStatus();
+	}
+	private void actLoadDataFromJars() {
+		FileFilter fileFilter = new FileFilter() {
+			String[] extensions = {"jar","zip","war","ear"};
+			@Override
+			public boolean accept(File f) {
+				if (f.isDirectory()) return true;
+				String s = f.getAbsolutePath();
+				for (String x:extensions) {
+					if (s.endsWith("."+x)) return true;
+				}
+				return false;
+			}
+			@Override
+			public String getDescription() {
+				return "jar files or class file folders";
+			}			
+		};
+		JFileChooser fc = new JFileChooser();
+		fc.setFileFilter(fileFilter);
+		fc.setCurrentDirectory(new File("./exampledata"));
+		fc.setDialogTitle("Load graph from jar files or class folders");
+		int returnVal = fc.showOpenDialog(this);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            loadDataFromJars(file);
+        }
+        updateActions();
+        updateStatus();
+        
 	}
 	private void loadQuery(File file) {
         try {
@@ -634,7 +691,7 @@ public class ResultBrowser extends JFrame {
         	handleException("Error loading query",x);
         }
 	}
-	private void loadData(File file) {
+	private void loadDataFromXML(File file) {
 		
         try {
             Reader reader = new FileReader(file);
@@ -663,6 +720,31 @@ public class ResultBrowser extends JFrame {
         	handleException("Error loading data file",x);
         }
 	}
+	
+	private void loadDataFromJars(File file) {
+		
+        try {
+            DirectedGraph<Vertex, Edge> g = null;
+            if (file.getAbsolutePath().endsWith(".jar") || file.isDirectory()) {
+            	JarReader input = new JarReader(new File[]{file});
+            	g =	input.readGraph();
+            }
+            if (g!=null) {
+	            this.data = g;
+	            this.status = Status.waiting;
+	            this.dataField.setText(file.getAbsolutePath());
+	            log("Data imported from " + file.getAbsolutePath());
+	            this.computationStarted = -1;
+            }
+            else {
+            	System.err.println("Cannot open file " + file + " - can only read .graphml, .odem and .xml files");
+            }
+        }
+        catch (Exception x) {
+        	handleException("Error loading data file",x);
+        }
+	}
+	
 	private void handleException(String string, Exception x) {
 		System.err.println(string);
 		x.printStackTrace();

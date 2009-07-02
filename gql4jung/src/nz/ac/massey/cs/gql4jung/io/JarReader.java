@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+
 import com.jeantessier.classreader.Classfile;
 import com.jeantessier.classreader.ClassfileLoader;
 import com.jeantessier.classreader.LoadEvent;
@@ -66,6 +69,11 @@ public class JarReader {
 	}
 
 	public synchronized DirectedGraph<Vertex, Edge> readGraph()	throws GraphIOException {
+		// TODO - for now we remove all appenders
+		// need to add proper log4j initialisation later
+		// comprehensive logging leads to memory problems
+		Logger.getRootLogger().removeAllAppenders();
+		
 		NodeFactory factory = new NodeFactory();
 		SelectionCriteria filter = new ComprehensiveSelectionCriteria();
 		CodeDependencyCollector collector = new CodeDependencyCollector(factory);
@@ -142,7 +150,7 @@ public class JarReader {
 			@Override
 			public void endSession(DependencyEvent event) {}
 		});
-		System.out.println("class loaded: " + loader.getAllClassfiles().size());
+		//System.out.println("class loaded: " + loader.getAllClassfiles().size());
 		for (Classfile cf : classfiles) {
 			collector.visitClassfile(cf);
 		}
@@ -162,13 +170,12 @@ public class JarReader {
 		graph.addVertex(v);
 		vertices.put(classfile.getClassName(),v);
 		
-		System.out.println("Adding vertex " + v);
+		//System.out.println("Adding vertex " + v);
 	}
 	
 	private void addEdge(DirectedGraph<Vertex, Edge> graph, Node start,Node end, boolean isUses, int counter, Map<String, Vertex> vertices) {
 		Vertex source = findVertex(start,vertices);
 		Vertex target = findVertex(end,vertices);
-		
 		if (target!=null) { // this is possible - reference to external class
 			String type = null;
 			if (isUses) {
@@ -182,29 +189,46 @@ public class JarReader {
 					type = "extends";
 				}
 			}
-			Edge edge = new Edge();
-			edge.setId("e-"+counter);
-			edge.setStart(source);
-			edge.setEnd(target);
-			edge.setType(type);
+
 			boolean addEdge = true;
 			if (this.removeSelfRefs && source==target) {
 				addEdge = false;
 			}
 			if (addEdge && this.removeDuplicateEdges) {
 				for (Edge e:graph.getOutEdges(source)) {
-					if (e.getEnd()==target && e.getType()==type) {
+					// TODO, FIXME
+					// note that jung will not allow to add another edge with the same sourec or target
+					// this means, we cannot have two edges of different types (extends and uses)
+					// however, this is sometimes interesting, e.g. in the composite pattern
+					// solution: use flags instead of a type attribute in Vertex
+					if (e.getEnd()==target) {
 						addEdge=false;
 						break;
 					}
 				}
 			}
 			if (addEdge) {
-				graph.addEdge(edge,source,target);
-				System.out.println("Adding edge " + edge);
+				Edge edge = new Edge();
+				edge.setId("e-"+counter);
+				edge.setStart(source);
+				edge.setEnd(target);
+				edge.setType(type);
+				boolean added = graph.addEdge(edge,source,target);
+				/** log for debugging
+				if (start.toString().indexOf("org.apache.log4j.jdbc.JDBCAppender")>-1) {
+					System.out.println("Adding edge " + edge + (added?"success":"failed"));
+					System.out.println("  Logging outgoing edges: ");
+					for (Edge e:source.getOutEdges()) {
+						System.out.println("  - "+e);
+					}
+
+				}
+				if (!added) {
+					System.out.println("Rejected edge " + edge);
+				}
+				*/
+
 			}
-			
-			
 		}
 	}
 
