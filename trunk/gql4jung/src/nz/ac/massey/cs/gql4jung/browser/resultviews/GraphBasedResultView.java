@@ -69,17 +69,28 @@ public class GraphBasedResultView extends ResultView {
 		vv.setVertexToolTipTransformer(new Transformer<Vertex,String>(){
 			@Override
 			public String transform(Vertex v) {
-				return new StringBuffer()
-					.append("<html><i>container:</i> ")
-					.append(v.getContainer())
-					.append("<br/><i>namespace:</i>")
-					.append(v.getNamespace())
-					.append("<br/><i>name:</i>")
-					.append(v.getName())
-					.append("</html>")
-					.toString();
+				return getToolTip(v);
 			}
 		});
+	}
+	
+	private String getToolTip(Vertex v) {
+		StringBuffer b = new StringBuffer();
+		b.append("<html>");
+		print(b,"container",v.getContainer(),false);
+		print(b,"namespace",v.getNamespace(),false);
+		print(b,"name",v.getName(),false);
+		print(b,"type",v.getType(),false);
+		print(b,"is abstract",v.isAbstract(),true);
+		b.append("</html>");
+		return b.toString();
+	}
+	private void print(StringBuffer b,String key,Object value,boolean last) {
+		b.append("<i>");
+		b.append(key);
+		b.append("</i>:");
+		b.append(value);
+		if (!last) b.append("<br/>");
 	}
 
 	@Override
@@ -138,13 +149,6 @@ public class GraphBasedResultView extends ResultView {
 			new Transformer<Vertex,Paint>() {
 				@Override
 				public Paint transform(Vertex v) {
-					/*
-					String t = v.getType();
-					if ("class".equals(t) && !v.isAbstract()) return new Color(0,255,0,100);
-					else if ("class".equals(t) && v.isAbstract()) return new Color(0,0,255,100);
-					else if ("interface".equals(t)) return new Color(0,0,255,100); // purble
-					else return Color.WHITE;
-					*/
 					Color c = colMap.get(v);
 					if (c!=null) return c;
 					else return Color.white;
@@ -232,7 +236,7 @@ public class GraphBasedResultView extends ResultView {
 		float offset = 100/packages.size();
 		offset = offset/100;
 		for (String p:packages) {
-			Color hsb = Color.getHSBColor(count*offset,(float)0.5,(float)0.6);
+			Color hsb = Color.getHSBColor(count*offset,(float)0.8,(float)0.6);
 			pmap.put(p,new Color(hsb.getRed(),hsb.getGreen(),hsb.getBlue(),50)); // transparency
 			//pmap.put(p,hsb);
 			count = count+1;
