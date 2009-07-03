@@ -35,6 +35,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.log4j.Logger;
+
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
@@ -67,6 +69,8 @@ public class ResultBrowser extends JFrame {
 	private Thread queryThread = null;
 	private long computationStarted = -1;
 	private boolean computeVariants = false;
+	
+	private Logger LOG = Logger.getLogger(ResultBrowser.class);
 	
 	// parts
 	private JToolBar toolbar;
@@ -103,7 +107,7 @@ public class ResultBrowser extends JFrame {
 	
 	
 	private enum Status {
-		waiting,computing,finished,cancelled
+		waiting,computing,finished,cancelled,loading
 	}
 	private Status status = Status.waiting;
 
@@ -641,8 +645,7 @@ public class ResultBrowser extends JFrame {
             File file = fc.getSelectedFile();
             loadDataFromXML(file);
         }
-        updateActions();
-        updateStatus();
+
 	}
 	private void actLoadDataFromJars() {
 		FileFilter fileFilter = new FileFilter() {
@@ -671,11 +674,11 @@ public class ResultBrowser extends JFrame {
             File file = fc.getSelectedFile();
             loadDataFromJars(file);
         }
-        updateActions();
-        updateStatus();
+
         
 	}
 	private void loadQuery(File file) {
+		resetViews();
         try {
         	InputStream in = new FileInputStream(file);
             Motif motif = new XMLMotifReader().read(in);
@@ -691,63 +694,112 @@ public class ResultBrowser extends JFrame {
         	handleException("Error loading query",x);
         }
 	}
-	private void loadDataFromXML(File file) {
+	private void loadDataFromXML(final File file) {
 		
-        try {
-            Reader reader = new FileReader(file);
-            DirectedGraph<Vertex, Edge> g = null;
-            if (file.getAbsolutePath().endsWith(".graphml") || file.getAbsolutePath().endsWith(".xml")) {
-            	GraphMLReader input = new GraphMLReader(reader);
-            	g =	input.readGraph();
-            }
-            else if (file.getAbsolutePath().endsWith(".odem")) {
-            	ODEMReader input = new ODEMReader(reader);
-            	g =	input.readGraph();
-            }
-            reader.close();
-            if (g!=null) {
-	            this.data = g;
-	            this.status = Status.waiting;
-	            this.dataField.setText(file.getAbsolutePath());
-	            log("Data imported from " + file.getAbsolutePath());
-	            this.computationStarted = -1;
-            }
-            else {
-            	System.err.println("Cannot open file " + file + " - can only read .graphml, .odem and .xml files");
-            }
-        }
-        catch (Exception x) {
-        	handleException("Error loading data file",x);
-        }
+		Runnable r = new Runnable() {
+			public void run() {
+		        try {
+		            Reader reader = new FileReader(file);
+		            DirectedGraph<Vertex, Edge> g = null;
+		            if (file.getAbsolutePath().endsWith(".graphml") || file.getAbsolutePath().endsWith(".xml")) {
+		            	GraphMLReader input = new GraphMLReader(reader);
+		            	g =	input.readGraph();
+		            }
+		            else if (file.getAbsolutePath().endsWith(".odem")) {
+		            	ODEMReader input = new ODEMReader(reader);
+		            	g =	input.readGraph();
+		            }
+		            reader.close();
+		            if (g!=null) {
+			            data = g;
+			            status = Status.waiting;
+			            dataField.setText(file.getAbsolutePath());
+			            log("Data imported from " + file.getAbsolutePath());
+			            computationStarted = -1;
+		            }
+		            else {
+			            data = null;
+			            status = Status.waiting;
+			            dataField.setText("-");
+			            computationStarted = -1;
+		            	handleException("Cannot open file " + file + " - can only read .graphml, .odem and .xml files",null);
+		            }
+		        }
+		        catch (Exception x) {
+		        	handleException("Error loading data file",x);
+		        }
+		        finally {
+		        	finishLoadingGraph();
+		        }
+			}
+		};
+
+		new Thread(r).start();
+		startLoadingGraph();
 	}
 	
-	private void loadDataFromJars(File file) {
-		
-        try {
-            DirectedGraph<Vertex, Edge> g = null;
-            if (file.getAbsolutePath().endsWith(".jar") || file.isDirectory()) {
-            	JarReader input = new JarReader(new File[]{file});
-            	g =	input.readGraph();
-            }
-            if (g!=null) {
-	            this.data = g;
-	            this.status = Status.waiting;
-	            this.dataField.setText(file.getAbsolutePath());
-	            log("Data imported from " + file.getAbsolutePath());
-	            this.computationStarted = -1;
-            }
-            else {
-            	System.err.println("Cannot open file " + file + " - can only read .graphml, .odem and .xml files");
-            }
-        }
-        catch (Exception x) {
-        	handleException("Error loading data file",x);
-        }
+	private void loadDataFromJars(final File file) {
+		Runnable r = new Runnable() {
+			public void run() {
+		        try {
+		            DirectedGraph<Vertex, Edge> g = null;
+		            if (file.getAbsolutePath().endsWith(".jar") || file.isDirectory()) {
+		            	JarReader input = new JarReader(new File[]{file});
+		            	g =	input.readGraph();
+		            }
+		            if (g!=null) {
+			            data = g;
+			            status = Status.waiting;
+			            dataField.setText(file.getAbsolutePath());
+			            log("Data imported from " + file.getAbsolutePath());
+			            computationStarted = -1;
+		            }
+		            else {
+			            data = null;
+			            status = Status.waiting;
+			            dataField.setText("-");
+			            computationStarted = -1;
+		            	handleException("Cannot open file " + file,null);
+		            }
+		        }
+		        catch (Exception x) {
+		        	handleException("Error loading data file",x);
+		        }
+		        finally {
+		        	finishLoadingGraph();
+		        }
+			}
+		};
+
+		new Thread(r).start();
+		startLoadingGraph();
 	}
 	
-	private void handleException(String string, Exception x) {
-		System.err.println(string);
-		x.printStackTrace();
+	private void startLoadingGraph() {
+		this.status = Status.loading;
+		this.statusField.setIndeterminate(true);
+		this.updateStatus();
+		this.updateActions();
+		this.resetViews();
+	}
+
+	private void resetViews() {
+		for (ResultView view:this.resultViewers) {
+			view.display(null,null);
+		}
+	}
+
+	private void finishLoadingGraph() {
+		this.status = Status.waiting;
+		this.statusField.setIndeterminate(false);
+		this.updateStatus();
+		this.updateActions();
+	}
+
+	private void handleException(String message, Exception x) {
+		if (x==null) LOG.error(message);
+		else LOG.error(message,x);
+		JOptionPane.showMessageDialog(this, message, "Error",JOptionPane.ERROR_MESSAGE);
 	}
 
 	private void nyi() {
@@ -755,14 +807,23 @@ public class ResultBrowser extends JFrame {
 	}
 
 	private void updateActions() {
-		boolean queryIsRunning = this.queryThread!=null;
-		this.actCancelQuery.setEnabled(queryIsRunning);
-		this.actRunQuery.setEnabled(!queryIsRunning);
-		this.actExport2CSV.setEnabled(!queryIsRunning && results.hasResults());
-		this.actNextMajorInstance.setEnabled(this.results.hasNextMajorInstance());
-		this.actNextMinorInstance.setEnabled(this.results.hasNextMinorInstance());
-		this.actPreviousMajorInstance.setEnabled(this.results.hasPreviousMajorInstance());
-		this.actPreviousMinorInstance.setEnabled(this.results.hasPreviousMinorInstance());
+
+		boolean querying = queryThread!=null;
+		boolean loading = status==Status.loading;
+		actCancelQuery.setEnabled(!loading&&querying);
+		actRunQuery.setEnabled(!loading&&!querying);
+		actExport2CSV.setEnabled(!loading&&!querying && results.hasResults());
+		actNextMajorInstance.setEnabled(!loading&&results.hasNextMajorInstance());
+		actNextMinorInstance.setEnabled(!loading&&results.hasNextMinorInstance());
+		actPreviousMajorInstance.setEnabled(!loading&&results.hasPreviousMajorInstance());
+		actPreviousMinorInstance.setEnabled(!loading&&results.hasPreviousMinorInstance());
+		actLoadDataFromJars.setEnabled(!loading&&!querying);
+		actLoadDataFromXML.setEnabled(!loading&&!querying);
+		actLoadQuery.setEnabled(!loading&&!querying);
+		for (Action act:actLoadBuiltInQueries) {
+			act.setEnabled(!loading&&!querying);
+		}
+
 	}
 	private void updateComputationTime() {
 		if (this.computationStarted==-1) {
