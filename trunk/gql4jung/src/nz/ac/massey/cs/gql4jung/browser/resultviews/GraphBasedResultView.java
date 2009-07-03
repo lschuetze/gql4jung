@@ -1,9 +1,15 @@
 package nz.ac.massey.cs.gql4jung.browser.resultviews;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.GridLayout;
 import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -60,6 +66,20 @@ public class GraphBasedResultView extends ResultView {
 		DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
 		gm.setMode(edu.uci.ics.jung.visualization.control.ModalGraphMouse.Mode.PICKING);
 		vv.setGraphMouse(gm);
+		vv.setVertexToolTipTransformer(new Transformer<Vertex,String>(){
+			@Override
+			public String transform(Vertex v) {
+				return new StringBuffer()
+					.append("<html><i>container:</i> ")
+					.append(v.getContainer())
+					.append("<br/><i>namespace:</i>")
+					.append(v.getNamespace())
+					.append("<br/><i>name:</i>")
+					.append(v.getName())
+					.append("</html>")
+					.toString();
+			}
+		});
 	}
 
 	@Override
@@ -68,12 +88,25 @@ public class GraphBasedResultView extends ResultView {
 	}
 
 	private void configureRenderer (RenderContext context,final MotifInstance instance) {
+		
+		
 		final Map<Vertex,String> revMap = new HashMap<Vertex,String>();
 		if (instance!=null) {
 			for (String role:instance.getMotif().getRoles()) {
 				revMap.put(instance.getVertex(role),role);
 			}
 		}
+		final Map<Vertex,Color> colMap = createColorMap(instance);
+		/*
+		context.setEdgeDrawPaintTransformer(
+			new Transformer<Edge,Paint>(){
+				@Override
+				public Paint transform(Edge e) {
+					return new Color(0,0,0,50);
+				}
+			}
+		);
+		*/
 		context.setVertexLabelTransformer(
 			new Transformer<Vertex,String>(){
 				@Override
@@ -87,9 +120,7 @@ public class GraphBasedResultView extends ResultView {
 						.append("&gt;&gt")
 						.append("<br/>");					
 					}
-					b.append(v.getNamespace())
-						.append('.')
-						.append(v.getName())
+					b.append(v.getName())
 						.append("</html>");
 					return b.toString();
 				}
@@ -107,27 +138,37 @@ public class GraphBasedResultView extends ResultView {
 			new Transformer<Vertex,Paint>() {
 				@Override
 				public Paint transform(Vertex v) {
+					/*
 					String t = v.getType();
-					if ("class".equals(t) && !v.isAbstract()) return Color.GREEN;
-					else if ("class".equals(t) && v.isAbstract()) return Color.BLUE;
-					else if ("interface".equals(t)) return new Color(255,0,255); // purble
+					if ("class".equals(t) && !v.isAbstract()) return new Color(0,255,0,100);
+					else if ("class".equals(t) && v.isAbstract()) return new Color(0,0,255,100);
+					else if ("interface".equals(t)) return new Color(0,0,255,100); // purble
 					else return Color.WHITE;
+					*/
+					Color c = colMap.get(v);
+					if (c!=null) return c;
+					else return Color.white;
 				}
 			}
 		);
-		/*
-		final Stroke strokeUses = new BasicStroke(1);
-		final Stroke strokeInherits = new BasicStroke(2);		
-		context.setEdgeStrokeTransformer(
-			new Transformer<Edge, Stroke>() {
-				public Stroke transform(Edge e) {
-					if ("uses".equals(e.getType())) return strokeUses;
-					else return strokeInherits;
+		context.setVertexDrawPaintTransformer(
+				new Transformer<Vertex,Paint>() {
+					@Override
+					public Paint transform(Vertex v) {
+						return Color.black;
+					}
+				}
+			);
+
+		context.setVertexStrokeTransformer(
+			new Transformer<Vertex, Stroke>() {
+				public Stroke transform(Vertex v) {
+					if (revMap.containsKey(v)) return GraphRendererConstants.STROKE_BOLD;
+					else return GraphRendererConstants.STROKE_NORMAL;
 				}
 			}
 		);	
-		*/
-		
+		/*
 		context.setVertexIconTransformer(
 			new Transformer<Vertex,Icon>() {
 				@Override
@@ -142,26 +183,29 @@ public class GraphBasedResultView extends ResultView {
 				}
 			}
 		);
-		/*
+		*/
+		
 		context.setVertexShapeTransformer(
 				new Transformer<Vertex,Shape>() {
 					@Override
 					public Shape transform(Vertex v) {
-						String longLabel = v.getFullname();
-						Font f = GraphRenderer.CORE;
+						String longLabel = v.getName();
+						Font f = GraphRendererConstants.CORE;
 						FontMetrics FM = GraphBasedResultView.this.getGraphics().getFontMetrics(f);
-						return new Rectangle(0,0,FM.stringWidth(longLabel)+10,30);
+						int W = Math.max(GraphRendererConstants.MIN_BOX_WIDTH,FM.stringWidth(longLabel)+10);
+						int H = revMap.containsKey(v)?3*GraphRendererConstants.BOX_HEIGHT_UNIT:2*GraphRendererConstants.BOX_HEIGHT_UNIT;
+						return new Rectangle(0,0,W,H);
 					}
 					
 				}
 		);
-		*/
+		
 		context.setVertexFontTransformer(
 			new Transformer<Vertex,Font>(){
 				@Override
 				public Font transform(Vertex v) {
 					boolean hasRole = revMap.containsKey(v);
-					return hasRole?GraphRenderer.CORE:GraphRenderer.NON_CORE;
+					return hasRole?GraphRendererConstants.CORE:GraphRendererConstants.NON_CORE;
 				}
 			}
 		);
@@ -169,13 +213,37 @@ public class GraphBasedResultView extends ResultView {
 			new Transformer<Edge,Font>(){
 				@Override
 				public Font transform(Edge e) {
-					return GraphRenderer.CORE;
+					return GraphRendererConstants.CORE;
 				}
 			}
 		);
 		
 	}
 	
+	private Map<Vertex, Color> createColorMap(MotifInstance instance) {
+		if (instance==null) return new HashMap<Vertex, Color>(0);
+		Set<Vertex> vertices = instance.getVertices();
+		Set<String> packages = new HashSet<String>(vertices.size());
+		for (Vertex v:vertices) {
+			packages.add(v.getNamespace());
+		}
+		int count = 0;
+		Map<String, Color> pmap = new HashMap<String, Color> (packages.size());
+		float offset = 100/packages.size();
+		offset = offset/100;
+		for (String p:packages) {
+			Color hsb = Color.getHSBColor(count*offset,(float)0.5,(float)0.6);
+			pmap.put(p,new Color(hsb.getRed(),hsb.getGreen(),hsb.getBlue(),50)); // transparency
+			//pmap.put(p,hsb);
+			count = count+1;
+		}
+		Map<Vertex, Color> map = new HashMap<Vertex, Color> (packages.size());
+		for (Vertex v:vertices) {
+			map.put(v,pmap.get(v.getNamespace()));
+		}
+		return map;
+	}
+
 	private DirectedGraph asGraph(MotifInstance instance) {
 		DirectedGraph<Vertex,Edge> g = new DirectedSparseGraph<Vertex,Edge>();
 		Motif motif = instance.getMotif();
