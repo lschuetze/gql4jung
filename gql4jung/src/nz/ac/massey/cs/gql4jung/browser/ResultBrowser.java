@@ -648,34 +648,8 @@ public class ResultBrowser extends JFrame {
 
 	}
 	private void actLoadDataFromJars() {
-		FileFilter fileFilter = new FileFilter() {
-			String[] extensions = {"jar","zip","war","ear"};
-			@Override
-			public boolean accept(File f) {
-				if (f.isDirectory()) return true;
-				String s = f.getAbsolutePath();
-				for (String x:extensions) {
-					if (s.endsWith("."+x)) return true;
-				}
-				return false;
-			}
-			@Override
-			public String getDescription() {
-				return "jar files or class file folders";
-			}			
-		};
-		JFileChooser fc = new JFileChooser();
-		fc.setFileFilter(fileFilter);
-		fc.setCurrentDirectory(new File("./exampledata"));
-		fc.setDialogTitle("Load graph from jar files or class folders");
-		int returnVal = fc.showOpenDialog(this);
-
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
-            loadDataFromJars(file);
-        }
-
-        
+		List<File> files = MultiFileChooserPane.selectFiles(new JFrame(),"Select libraries and class files folders");
+        loadDataFromJars(files);      
 	}
 	private void loadQuery(File file) {
 		resetViews();
@@ -738,20 +712,26 @@ public class ResultBrowser extends JFrame {
 		startLoadingGraph();
 	}
 	
-	private void loadDataFromJars(final File file) {
+	private void loadDataFromJars(final List<File> files) {
 		Runnable r = new Runnable() {
 			public void run() {
 		        try {
 		            DirectedGraph<Vertex, Edge> g = null;
-		            if (file.getAbsolutePath().endsWith(".jar") || file.isDirectory()) {
-		            	JarReader input = new JarReader(new File[]{file});
-		            	g =	input.readGraph();
-		            }
+		            JarReader input = new JarReader(files);
+		            g =	input.readGraph();
 		            if (g!=null) {
 			            data = g;
 			            status = Status.waiting;
-			            dataField.setText(file.getAbsolutePath());
-			            log("Data imported from " + file.getAbsolutePath());
+			            if (files.size()==1) {
+			            	dataField.setText(files.get(0).getAbsolutePath());
+			            }
+			            else if (files.size()==0) {
+			            	dataField.setText("no file selected");
+			            }
+			            else {
+			            	dataField.setText("multiple input files");
+			            }
+			            log("Data imported from " + files);
 			            computationStarted = -1;
 		            }
 		            else {
@@ -759,7 +739,7 @@ public class ResultBrowser extends JFrame {
 			            status = Status.waiting;
 			            dataField.setText("-");
 			            computationStarted = -1;
-		            	handleException("Cannot open file " + file,null);
+		            	handleException("Cannot open file",null);
 		            }
 		        }
 		        catch (Exception x) {
