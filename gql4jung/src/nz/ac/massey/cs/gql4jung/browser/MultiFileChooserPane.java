@@ -46,7 +46,7 @@ public class MultiFileChooserPane extends JDialog {
 	private Action actOK= null;
 	private Action actAdd = null;
 	private Action actRemove= null;
-	private File initFolder = new File("./exampledata");
+	private static File initFolder = new File("./exampledata");
 	
 	public MultiFileChooserPane(Frame owner, boolean modal) {
 		super(owner, modal);
