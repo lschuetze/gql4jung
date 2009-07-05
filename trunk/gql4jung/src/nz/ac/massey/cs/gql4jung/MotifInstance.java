@@ -11,6 +11,8 @@
 
 package nz.ac.massey.cs.gql4jung;
 
+import java.util.Set;
+
 
 public interface MotifInstance {
 	/**
@@ -31,4 +33,9 @@ public interface MotifInstance {
 	 * @return
 	 */
 	Path getPath(String roleName); 
+	/**
+	 * Get all vertices (instantiating roles and part of paths)
+	 * @return a set of vertices
+	 */
+	Set<Vertex> getVertices();
 }
