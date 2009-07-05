@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import com.jeantessier.classreader.Classfile;
@@ -87,6 +88,7 @@ public class JarReader {
 		// need to add proper log4j initialisation later
 		// comprehensive logging leads to memory problems
 		Logger.getRootLogger().removeAllAppenders();
+		//BasicConfigurator.configure();
 		
 		final int TOTAL = 100;
 		final int TOTAL1 = 50;
@@ -205,7 +207,13 @@ public class JarReader {
 		v.setId(String.valueOf(id));
 		v.setName(classfile.getSimpleName());
 		v.setAbstract(classfile.isAbstract());
-		v.setNamespace(classfile.getClassName().substring(0,classfile.getClassName().lastIndexOf('.')));
+		int sep = classfile.getClassName().lastIndexOf('.');
+		if (sep==-1){
+			v.setNamespace("");
+		}
+		else {
+			v.setNamespace(classfile.getClassName().substring(0,sep));
+		}
 		v.setType(getType(classfile));
 		v.setContainer(containerMapping.get(classfile)); // not yet supported
 		graph.addVertex(v);
