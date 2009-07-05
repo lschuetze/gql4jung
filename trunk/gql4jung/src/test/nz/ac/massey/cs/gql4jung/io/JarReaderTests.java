@@ -12,6 +12,9 @@
 package test.nz.ac.massey.cs.gql4jung.io;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.Vertex;
@@ -26,7 +29,9 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 public class JarReaderTests extends AbstractReaderTests {
 
 	protected DirectedGraph<Vertex, Edge> loadGraph(String name) throws Exception {
-        JarReader greader = new JarReader(new File[]{new File(name)});
+        List<File> files = new ArrayList<File>();
+        files.add(new File(name));
+		JarReader greader = new JarReader(files);
         DirectedGraph<Vertex, Edge> g = greader.readGraph();
         greader.close();
         return g;
