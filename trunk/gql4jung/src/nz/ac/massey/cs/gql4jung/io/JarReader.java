@@ -87,7 +87,7 @@ public class JarReader {
 		// TODO - for now we remove all appenders
 		// need to add proper log4j initialisation later
 		// comprehensive logging leads to memory problems
-		Logger.getRootLogger().removeAllAppenders();
+		//Logger.getRootLogger().removeAllAppenders();
 		//BasicConfigurator.configure();
 		
 		final int TOTAL = 100;
@@ -188,6 +188,7 @@ public class JarReader {
 		//System.out.println("class loaded: " + loader.getAllClassfiles().size());
 		int i = 0;
 		int bucket = classfiles.size()/TOTAL2;
+		if (bucket==0) bucket=1;
 		int j = 0;
 		for (Classfile cf : classfiles) {
 			collector.visitClassfile(cf);

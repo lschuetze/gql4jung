@@ -62,6 +62,15 @@ import edu.uci.ics.jung.graph.DirectedGraph;
  * @author Jens Dietrich
  */
 public class ResultBrowser extends JFrame {
+	
+	static {
+		// initialise log4j
+		Logger.getRootLogger().removeAllAppenders();
+		String config = "log4j.properties";
+		org.apache.log4j.PropertyConfigurator.configure("log4j.properties");
+		Logger.getLogger(ResultBrowser.class).info("Log4j configured from "+config);
+	}
+	
 	private static final String TITLE = "Architectural smells explorer";
 	// model
 	private DirectedGraph<Vertex,Edge> data = null;
@@ -72,7 +81,7 @@ public class ResultBrowser extends JFrame {
 	private long computationStarted = -1;
 	private boolean computeVariants = false;
 	
-	private Logger LOG = Logger.getLogger(ResultBrowser.class);
+	private static Logger LOG = Logger.getLogger(ResultBrowser.class);
 	
 	// parts
 	private JToolBar toolbar;
@@ -467,8 +476,8 @@ public class ResultBrowser extends JFrame {
 	}
 
 	private void initToolbar() {
-		int O = 4;
-		Border b = BorderFactory.createEmptyBorder(O,O,O,O);
+		int offset = 5;
+		Border b = BorderFactory.createEmptyBorder(offset,offset,offset,offset);
 		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 		mainPanel.add(toolbar,BorderLayout.NORTH);
@@ -631,7 +640,7 @@ public class ResultBrowser extends JFrame {
         updateStatus();
 	}
 	private void log(String string) {
-		System.out.println(string);
+		LOG.info(string);
 	}
 	private void actLoadDataFromXML() {
 		FileFilter fileFilter = new FileFilter() {
