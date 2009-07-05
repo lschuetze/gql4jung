@@ -48,6 +48,7 @@ import nz.ac.massey.cs.gql4jung.browser.resultviews.TableBasedResultView;
 import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
 import nz.ac.massey.cs.gql4jung.io.JarReader;
 import nz.ac.massey.cs.gql4jung.io.ODEMReader;
+import nz.ac.massey.cs.gql4jung.io.ProgressListener;
 import nz.ac.massey.cs.gql4jung.io.QueryResultsExporter2CSV;
 import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
@@ -727,6 +728,14 @@ public class ResultBrowser extends JFrame {
 		        try {
 		            DirectedGraph<Vertex, Edge> g = null;
 		            JarReader input = new JarReader(files);
+		            ProgressListener l = new ProgressListener() {
+						@Override
+						public void progressMade(int progress, int total) {
+							statusField.setMaximum(total);
+							statusField.setValue(progress);
+						}
+		            };
+		            input.addProgressListener(l);
 		            g =	input.readGraph();
 		            if (g!=null) {
 			            data = g;
@@ -766,7 +775,7 @@ public class ResultBrowser extends JFrame {
 	
 	private void startLoadingGraph() {
 		this.status = Status.loading;
-		this.statusField.setIndeterminate(true);
+		//this.statusField.setIndeterminate(true);
 		this.updateStatus();
 		this.updateActions();
 		this.resetViews();
@@ -780,7 +789,7 @@ public class ResultBrowser extends JFrame {
 
 	private void finishLoadingGraph() {
 		this.status = Status.waiting;
-		this.statusField.setIndeterminate(false);
+		//this.statusField.setIndeterminate(false);
 		this.updateStatus();
 		this.updateActions();
 	}
