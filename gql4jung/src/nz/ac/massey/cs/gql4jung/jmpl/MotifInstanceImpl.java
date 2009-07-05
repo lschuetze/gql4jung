@@ -12,7 +12,11 @@
 package nz.ac.massey.cs.gql4jung.jmpl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.Path;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
@@ -68,4 +72,21 @@ public class MotifInstanceImpl extends Logging implements MotifInstance {
 		return b.toString();
 	}
 	
+	/**
+	 * Get all vertices (instantiating roles and part of paths)
+	 * @return a set of vertices
+	 */
+	public Set<Vertex> getVertices() {
+		Set<Vertex> vertices = new HashSet<Vertex>();
+		for (Vertex v:this.vertexBindings.values()) {
+			vertices.add(v);
+		}
+		for (Path p:this.pathBindings.values()) {
+			for (Edge e:p.getEdges()) {
+				vertices.add(e.getStart());
+				vertices.add(e.getEnd());
+			}
+		}
+		return vertices;
+	}
 }
