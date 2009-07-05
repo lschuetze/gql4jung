@@ -49,6 +49,8 @@ public class JarReader {
 	private List<File> jars = null;
 	private boolean removeDuplicateEdges = true;
 	private boolean removeSelfRefs = true;
+	private List<ProgressListener> listeners = new ArrayList<ProgressListener>();
+	private int jarCounter = 0;
 
 	public JarReader(List<File> jars) {
 		super();
@@ -67,12 +69,31 @@ public class JarReader {
 	public void setRemoveSelfRefs(boolean removeSelfRefs) {
 		this.removeSelfRefs = removeSelfRefs;
 	}
-
+	
+	public void addProgressListener(ProgressListener l) {
+		this.listeners.add(l);
+	}
+	public void removeProgressListener(ProgressListener l) {
+		this.listeners.remove(l);
+	}
+	private void fireProgressListener(int progress,int total) {
+		for (ProgressListener l:listeners) {
+			l.progressMade(progress, total);
+		}
+	}
+	
 	public synchronized DirectedGraph<Vertex, Edge> readGraph()	throws GraphIOException {
 		// TODO - for now we remove all appenders
 		// need to add proper log4j initialisation later
 		// comprehensive logging leads to memory problems
 		Logger.getRootLogger().removeAllAppenders();
+		
+		final int TOTAL = 100;
+		final int TOTAL1 = 50;
+		final int TOTAL2 = TOTAL-TOTAL1;
+		final int PART1 = TOTAL1/jars.size();
+		
+		this.fireProgressListener(0,TOTAL);
 		
 		NodeFactory factory = new NodeFactory();
 		SelectionCriteria filter = new ComprehensiveSelectionCriteria();
@@ -83,7 +104,6 @@ public class JarReader {
 			list.add(f.getAbsolutePath());
 		}
 		final List<Classfile> classfiles = new ArrayList<Classfile>();
-		
 		final DirectedGraph<Vertex, Edge> graph = new DirectedSparseGraph<Vertex, Edge> ();
 		final Map<String,Vertex> vertices = new HashMap<String,Vertex>();
 		final Map<Classfile,String> containerMapping = new HashMap<Classfile,String>();
@@ -103,6 +123,8 @@ public class JarReader {
 					File f = new File(name);
 					if (f.exists()) {
 						container = f.getName();
+						jarCounter = jarCounter+1;
+						fireProgressListener(jarCounter*PART1,TOTAL);
 					}
 				}
 				catch (Exception x){}
@@ -130,6 +152,8 @@ public class JarReader {
 			addVertex(graph,classfile,counter,vertices,containerMapping);
 			counter = counter+1;
 		}
+		
+		fireProgressListener(TOTAL1,TOTAL);
 		
 		collector.addDependencyListener(new DependencyListener() {
 			int counter = 0;
@@ -160,10 +184,18 @@ public class JarReader {
 			public void endSession(DependencyEvent event) {}
 		});
 		//System.out.println("class loaded: " + loader.getAllClassfiles().size());
+		int i = 0;
+		int bucket = classfiles.size()/TOTAL2;
+		int j = 0;
 		for (Classfile cf : classfiles) {
 			collector.visitClassfile(cf);
+			i=i+1;
+			if (i%bucket==0) {
+				j=j+1;
+				fireProgressListener(TOTAL1+j,TOTAL);
+			}
 		}
-
+		fireProgressListener(TOTAL,TOTAL);
 		return graph;
 
 	}
