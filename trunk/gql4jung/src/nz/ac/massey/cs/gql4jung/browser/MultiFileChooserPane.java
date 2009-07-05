@@ -46,6 +46,7 @@ public class MultiFileChooserPane extends JDialog {
 	private Action actOK= null;
 	private Action actAdd = null;
 	private Action actRemove= null;
+	private File initFolder = new File("./exampledata");
 	
 	public MultiFileChooserPane(Frame owner, boolean modal) {
 		super(owner, modal);
@@ -121,13 +122,29 @@ public class MultiFileChooserPane extends JDialog {
 				};
 				JFileChooser fc = new JFileChooser();
 				fc.setFileFilter(fileFilter);
-				fc.setCurrentDirectory(new File("./exampledata"));
+				fc.setMultiSelectionEnabled(true);
+				fc.setCurrentDirectory(initFolder);
 				fc.setDialogTitle("Select jar files or class folders");
 				int returnVal = fc.showOpenDialog(MultiFileChooserPane.this);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
-		           File file = fc.getSelectedFile();
-		           if (!files.contains(file)) {
-		        	   files.addElement(file);
+		           File[] selection = fc.getSelectedFiles();
+		           for (File file:selection) {
+			           if (!files.contains(file)) {
+			        	   files.addElement(file);
+			           }
+		           }
+		           // set new init folder
+		           if (selection.length>0) {
+		        	   File f = selection[0];
+		        	   if (f.isDirectory() && f.exists()) {
+		        		   initFolder = f;
+		        	   }
+		        	   else {
+		        		   f = f.getParentFile();
+			        	   if (f.isDirectory() && f.exists()) {
+			        		   initFolder = f;
+			        	   }
+		        	   }
 		           }
 			    }
 			}			
