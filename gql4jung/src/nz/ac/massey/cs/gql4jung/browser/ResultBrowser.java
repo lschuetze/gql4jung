@@ -101,6 +101,7 @@ public class ResultBrowser extends JFrame {
 	private AbstractAction actLoadDataFromXML;
 	private AbstractAction actLoadDataFromJars;
 	private AbstractAction actLoadQuery;
+	private AbstractAction actAnalyseMe;
 	private AbstractAction actRunQuery;
 	private AbstractAction actCancelQuery;
 	private AbstractAction actNextMinorInstance;
@@ -209,6 +210,7 @@ public class ResultBrowser extends JFrame {
 		menu.setMnemonic(KeyEvent.VK_F);
 		menu.add(actLoadDataFromXML);
 		menu.add(actLoadDataFromJars);
+		menu.add(actAnalyseMe);
 		menu.add(actLoadQuery);
 		if (this.actLoadBuiltInQueries.size()>0) {
 			JMenu menu2 = new JMenu("Built-in queries");
@@ -370,6 +372,13 @@ public class ResultBrowser extends JFrame {
 		};
 		actLoadDataFromJars.putValue(Action.SHORT_DESCRIPTION, "load graph from jar files and/or folders");
 
+		actAnalyseMe = new AbstractAction("analyse me",getIcon("Open16.gif")) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				actAnalyseMe();
+			}
+		};
+		actAnalyseMe.putValue(Action.SHORT_DESCRIPTION, "load this program as a graph");
 		
 		actLoadQuery = new AbstractAction("load query",getIcon("Import16.gif")) {
 			@Override
@@ -451,6 +460,7 @@ public class ResultBrowser extends JFrame {
 		initBuiltInQueries();
 	}
 	
+
 	private void initBuiltInQueries() {
 		initBuildInQuery("missing decoupling by abstraction","queries/awd.xml");
 		initBuildInQuery("circular dependencies between packages","queries/cd.xml");
@@ -670,6 +680,34 @@ public class ResultBrowser extends JFrame {
 		List<File> files = MultiFileChooserPane.selectFiles(new JFrame(),"Select libraries and class files folders");
         loadDataFromJars(files);      
 	}
+	
+	protected void actAnalyseMe() {
+		List<File> files = new ArrayList<File>();
+		File bin = new File("bin");
+		if (bin.exists() && bin.isDirectory()) {
+			files.add(bin);
+		}
+		// search root folder for jars
+		File root = new File(".");
+		if (root.exists() && root.isDirectory()) {
+			for (File f:root.listFiles()) {
+				if (f.getName().endsWith(".jar")) {
+					files.add(f);
+				}
+			}
+		}
+		File lib = new File("lib");
+		if (lib.exists() && lib.isDirectory()) {
+			for (File f:lib.listFiles()) {
+				if (f.getName().endsWith(".jar")) {
+					files.add(f);
+				}
+			}
+		}
+		loadDataFromJars(files);  
+		
+	}
+	
 	private void loadQuery(File file) {
 		resetViews();
         try {
