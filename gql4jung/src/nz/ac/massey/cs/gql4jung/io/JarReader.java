@@ -46,11 +46,11 @@ import edu.uci.ics.jung.io.GraphIOException;
  */
 public class JarReader {
 
-	private File[] jars = null;
+	private List<File> jars = null;
 	private boolean removeDuplicateEdges = true;
 	private boolean removeSelfRefs = true;
 
-	public JarReader(File[] jars) {
+	public JarReader(List<File> jars) {
 		super();
 		this.jars = jars;
 	}
@@ -86,39 +86,48 @@ public class JarReader {
 		
 		final DirectedGraph<Vertex, Edge> graph = new DirectedSparseGraph<Vertex, Edge> ();
 		final Map<String,Vertex> vertices = new HashMap<String,Vertex>();
+		final Map<Classfile,String> containerMapping = new HashMap<Classfile,String>();
 		
 		loader.addLoadListener(new LoadListener() {
+			String container = null;
 			@Override
 			public void beginClassfile(LoadEvent event) {}
 			@Override
-			public void beginFile(LoadEvent event) {}
+			public void beginFile(LoadEvent event) {
+				
+			}
 			@Override
 			public void beginGroup(LoadEvent event) {
-				System.out.println("start library " + event.getGroupName());
+				String name = event.getGroupName();
+				try {
+					File f = new File(name);
+					if (f.exists()) {
+						container = f.getName();
+					}
+				}
+				catch (Exception x){}
 			}
 			@Override
 			public void beginSession(LoadEvent event) {
-				System.out.println("start depfind session");
+				//System.out.println("start depfind session ");
 			}
 			@Override
 			public void endClassfile(LoadEvent event) {
-				classfiles.add(event.getClassfile());
+				Classfile cf = event.getClassfile();
+				classfiles.add(cf);
+				containerMapping.put(cf,container);
 			}
 			@Override
 			public void endFile(LoadEvent event) {}
 			@Override
-			public void endGroup(LoadEvent event) {
-				System.out.println("finish library " + event.getGroupName());
-			}
+			public void endGroup(LoadEvent event) {}
 			@Override
-			public void endSession(LoadEvent event) {
-				System.out.println("end depfind session");
-			}
+			public void endSession(LoadEvent event) {}
 		});
 		loader.load(list);
 		int counter = 1;
 		for (Classfile classfile:classfiles) {
-			addVertex(graph,classfile,counter,vertices);
+			addVertex(graph,classfile,counter,vertices,containerMapping);
 			counter = counter+1;
 		}
 		
@@ -159,14 +168,14 @@ public class JarReader {
 
 	}
 
-	private void addVertex(DirectedGraph<Vertex, Edge> graph,Classfile classfile,int id,Map<String,Vertex> vertices) {
+	private void addVertex(DirectedGraph<Vertex, Edge> graph,Classfile classfile,int id,Map<String,Vertex> vertices,Map<Classfile,String> containerMapping) {
 		Vertex v = new Vertex();
 		v.setId(String.valueOf(id));
 		v.setName(classfile.getSimpleName());
 		v.setAbstract(classfile.isAbstract());
 		v.setNamespace(classfile.getClassName().substring(0,classfile.getClassName().lastIndexOf('.')));
 		v.setType(getType(classfile));
-		v.setContainer("nyi"); // not yet supported
+		v.setContainer(containerMapping.get(classfile)); // not yet supported
 		graph.addVertex(v);
 		vertices.put(classfile.getClassName(),v);
 		

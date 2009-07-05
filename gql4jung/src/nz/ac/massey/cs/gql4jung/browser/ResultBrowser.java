@@ -31,12 +31,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
-
+import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
@@ -136,6 +137,12 @@ public class ResultBrowser extends JFrame {
 		init();
 	}
 	private void init() {
+		// set look and feel
+		try {
+			Plastic3DLookAndFeel.setPlasticTheme(new com.jgoodies.looks.plastic.theme.Silver());
+			UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
+		} catch (Exception e) {}
+			   
 		this.setTitle(TITLE);
 				
 		mainPanel = new JPanel(new BorderLayout(5,5));
@@ -459,23 +466,25 @@ public class ResultBrowser extends JFrame {
 	}
 
 	private void initToolbar() {
+		int O = 4;
+		Border b = BorderFactory.createEmptyBorder(O,O,O,O);
 		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 		mainPanel.add(toolbar,BorderLayout.NORTH);
-		toolbar.add(actLoadDataFromXML);
-		toolbar.add(actLoadDataFromJars);
-		toolbar.add(actLoadQuery);
+		toolbar.add(actLoadDataFromXML).setBorder(b);
+		toolbar.add(actLoadDataFromJars).setBorder(b);
+		toolbar.add(actLoadQuery).setBorder(b);
 		toolbar.addSeparator();
-		toolbar.add(actRunQuery);
-		toolbar.add(actCancelQuery);
+		toolbar.add(actRunQuery).setBorder(b);
+		toolbar.add(actCancelQuery).setBorder(b);
 		toolbar.addSeparator();
-		toolbar.add(actPreviousMajorInstance);	
-		toolbar.add(actNextMajorInstance);	
+		toolbar.add(actPreviousMajorInstance).setBorder(b);	
+		toolbar.add(actNextMajorInstance).setBorder(b);	
 		toolbar.addSeparator();
-		toolbar.add(actPreviousMinorInstance);
-		toolbar.add(actNextMinorInstance);
+		toolbar.add(actPreviousMinorInstance).setBorder(b);
+		toolbar.add(actNextMinorInstance).setBorder(b);
 		toolbar.addSeparator();
-		toolbar.add(actExport2CSV);
+		toolbar.add(actExport2CSV).setBorder(b);
 	}
 	
 	private void initPopupMenu() {
