@@ -24,7 +24,6 @@ import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.Vertex;
 import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
 import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
-import nz.ac.massey.cs.gql4jung.jmpl.MultithreadedGQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 import org.junit.After;
