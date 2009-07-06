@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-
 import com.jeantessier.classreader.Classfile;
 import com.jeantessier.classreader.ClassfileLoader;
 import com.jeantessier.classreader.LoadEvent;
@@ -52,6 +49,7 @@ public class JarReader {
 	private boolean removeSelfRefs = true;
 	private List<ProgressListener> listeners = new ArrayList<ProgressListener>();
 	private int jarCounter = 0;
+	private static Logger LOG = Logger.getLogger(JarReader.class);
 
 	public JarReader(List<File> jars) {
 		super();
@@ -115,21 +113,31 @@ public class JarReader {
 			@Override
 			public void beginClassfile(LoadEvent event) {}
 			@Override
-			public void beginFile(LoadEvent event) {
-				
-			}
+			public void beginFile(LoadEvent event) {}
 			@Override
 			public void beginGroup(LoadEvent event) {
 				String name = event.getGroupName();
 				try {
 					File f = new File(name);
-					if (f.exists()) {
+					if (f.exists() && hasClasses(f) && !name.equals(container)) {
 						container = f.getName();
 						jarCounter = jarCounter+1;
 						fireProgressListener(jarCounter*PART1,TOTAL);
+						LOG.info("analyse file: "+container);
 					}
 				}
 				catch (Exception x){}
+			}
+			private boolean hasClasses(File f) {
+				if (f.isDirectory()) return true;
+				else {
+					String n = f.getName();
+					if (n.endsWith(".jar")) return true;
+					else if (n.endsWith(".zip")) return true;
+					else if (n.endsWith(".war")) return true;
+					else if (n.endsWith(".ear")) return true;
+				}
+				return false;
 			}
 			@Override
 			public void beginSession(LoadEvent event) {
