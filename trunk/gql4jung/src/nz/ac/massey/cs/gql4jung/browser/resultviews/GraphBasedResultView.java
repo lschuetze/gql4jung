@@ -24,6 +24,7 @@ import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.Path;
 import nz.ac.massey.cs.gql4jung.Vertex;
 import nz.ac.massey.cs.gql4jung.browser.ResultView;
+import nz.ac.massey.cs.gql4jung.browser.layout.EllipticFanLayout;
 import edu.uci.ics.jung.algorithms.layout.*;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -51,7 +52,7 @@ public class GraphBasedResultView extends ResultView {
 		DirectedGraph<Vertex,Edge> g = instance==null?new DirectedSparseGraph<Vertex,Edge>():this.asGraph(instance);
 		//SimpleGraphView sgv = new SimpleGraphView(); //We create our graph in here
 		// The Layout<V, E> is parameterized by the vertex and edge types
-		Layout<Vertex,Edge> layout = new FRLayout<Vertex,Edge>(g);
+		Layout<Vertex,Edge> layout = new EllipticFanLayout<Vertex,Edge>(g);
 		layout.setSize(graphPane.getSize());
 		VisualizationViewer<Vertex,Edge> vv = new VisualizationViewer<Vertex,Edge>(layout);
 		configureRenderer(vv.getRenderContext(),instance);
