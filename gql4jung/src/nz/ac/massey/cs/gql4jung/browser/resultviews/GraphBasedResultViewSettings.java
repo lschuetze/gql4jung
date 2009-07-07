@@ -206,7 +206,7 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 				new PropertyDescriptor("min box width",GraphBasedResultViewSettings.class,"getMinBoxWidth","setMinBoxWidth"),
 				new PropertyDescriptor("vertex saturation",GraphBasedResultViewSettings.class,"getVertexSaturation","setVertexSaturation"),
 				new PropertyDescriptor("vertex brightness",GraphBasedResultViewSettings.class,"getVertexBrightness","setVertexBrightness"),
-				new PropertyDescriptor("vertex transparency",GraphBasedResultViewSettings.class,"getVertexTransparency","setVertexTransparency"),
+				new PropertyDescriptor("vertex transparency (alpha)",GraphBasedResultViewSettings.class,"getVertexTransparency","setVertexTransparency"),
 				new PropertyDescriptor("backgroun colour",GraphBasedResultViewSettings.class,"getBackground","setBackground")
 			};
 				

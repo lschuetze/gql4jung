@@ -10,11 +10,6 @@
 
 package nz.ac.massey.cs.gql4jung.browser;
 
-/**
- * Dynamic editor for settings.
- * @author Jens Dietrich
- */
-
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -31,25 +26,39 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
-
 import org.apache.log4j.Logger;
-
 import com.l2fprod.common.propertysheet.Property;
 import com.l2fprod.common.propertysheet.PropertySheetPanel;
 
+/**
+ * Dynamic editor for settings.
+ * @author Jens Dietrich
+ */
 public class PropertyBeanEditor extends JDialog {
 	private PropertySheetPanel sheet = new PropertySheetPanel();
 	private JToolBar toolbar = new JToolBar();
 	private Action actOK;
 	private Action actReset;
+	private boolean readOnly = false;
 	private PropertyBean model = null;
-	public PropertyBeanEditor(Frame owner, String title) {
+	public PropertyBeanEditor(Frame owner, String title,boolean readOnly) {
 		super(owner, title,true);
+		this.readOnly = readOnly;
 		initialize();
 	}
 
 	public static void edit(JFrame parent,PropertyBean bean,String title) {
-		PropertyBeanEditor f = new PropertyBeanEditor(parent,title);
+		PropertyBeanEditor f = new PropertyBeanEditor(parent,title,false);
+		f.model = bean;
+		f.sheet.setProperties(bean.getProperties());
+		f.sheet.readFromObject(bean);
+		f.setTitle(title);
+		f.setSize(600,300);
+		f.setLocation(100,100);
+		f.setVisible(true);		
+	}
+	public static void show(JFrame parent,PropertyBean bean,String title) {
+		PropertyBeanEditor f = new PropertyBeanEditor(parent,title,true);
 		f.model = bean;
 		f.sheet.setProperties(bean.getProperties());
 		f.sheet.readFromObject(bean);
@@ -83,7 +92,7 @@ public class PropertyBeanEditor extends JDialog {
 			}			
 		};
 
-		toolbar.add(actReset);
+		if (!readOnly) toolbar.add(actReset);
 		toolbar.add(actOK);
 		
 	    PropertyChangeListener listener = new PropertyChangeListener() {
@@ -96,6 +105,7 @@ public class PropertyBeanEditor extends JDialog {
 	}
 
 	protected void save() {
+		if (readOnly) return;
 		try {
 			model.save();
 		} catch (IOException x) {

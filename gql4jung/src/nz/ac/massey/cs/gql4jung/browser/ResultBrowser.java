@@ -109,6 +109,7 @@ public class ResultBrowser extends JFrame {
 	private Action actNextMajorInstance;
 	private Action actPreviousMajorInstance;
 	private Action actExport2CSV;
+	private Action actViewGraphData;
 	private Action actAbout;
 	private List<Action> actLoadBuiltInQueries = new ArrayList<Action>();
 	private List<Action> actConfigureViews = new ArrayList<Action>();
@@ -253,6 +254,7 @@ public class ResultBrowser extends JFrame {
 		for (Action act:this.actConfigureViews) {
 			menu.add(act);
 		}
+		menu.add(this.actViewGraphData);
 		menuBar.add(menu);
 		
 		menu = new JMenu("Help");
@@ -448,6 +450,14 @@ public class ResultBrowser extends JFrame {
 		};	
 		actNextMajorInstance.putValue(Action.SHORT_DESCRIPTION, "show the next instance");
 		
+		actViewGraphData = new AbstractAction("show graph properties") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				actShowGraphProperties();
+			}
+		};	
+		actViewGraphData.putValue(Action.SHORT_DESCRIPTION, "show graph properties");
+			
 		actAbout = new AbstractAction("about") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -492,7 +502,6 @@ public class ResultBrowser extends JFrame {
 		
 		initBuiltInQueries();
 	}
-	
 
 	private void initBuiltInQueries() {
 		initBuildInQuery("missing decoupling by abstraction","queries/awd.xml");
@@ -682,6 +691,11 @@ public class ResultBrowser extends JFrame {
         updateActions();
         updateStatus();
 	}
+	
+	private void actShowGraphProperties() {
+		PropertyBeanEditor.show(this,new GraphData(data),"Graph properties");
+	}
+	
 	private void log(String string) {
 		LOG.info(string);
 	}
