@@ -870,7 +870,10 @@ public class ResultBrowser extends JFrame {
 	private void startLoadingGraph() {
 		this.status = Status.loading;
 		//this.statusField.setIndeterminate(true);
+		this.results.reset();
+		this.computationStarted=-1;
 		this.updateStatus();
+		this.updateComputationTime();
 		this.updateActions();
 		this.resetViews();
 	}
@@ -884,6 +887,7 @@ public class ResultBrowser extends JFrame {
 	private void finishLoadingGraph() {
 		this.status = Status.waiting;
 		//this.statusField.setIndeterminate(false);
+		
 		this.updateStatus();
 		this.updateActions();
 	}
@@ -928,6 +932,7 @@ public class ResultBrowser extends JFrame {
 	}
 	
 	private void updateStatus() {
+		
 		// log("update UI");
 		Cursor cursor = results.getCursor();
 		int majI = cursor.major+1;
