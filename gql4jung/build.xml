@@ -25,7 +25,7 @@ Author Jens
 ==================================================================== -->
 <project name="GQL4JUNG" default="main" basedir=".">
 	<property name="name" value="gql4jung" />
-	<property name="version" value="0.3" />
+	<property name="version" value="0.4" />
 	<property name="debug" value="on" />
 	<property name="src.dir" value="src" />
 	<property name="lib.dir" value="lib" />
@@ -163,6 +163,11 @@ Author Jens
 		<!-- copy used libs -->
    		<copy todir="${dist.dir}">
 	    	<fileset dir="${lib.dir}" includes="**/*.jar"/>
+	  	</copy>
+   	
+		<!-- copy log4j settings -->
+		<copy todir="${dist.dir}">
+	    	<fileset dir="." includes="log4j.properties"/>
 	  	</copy>
    	
    		<!-- copy queries and data -->
