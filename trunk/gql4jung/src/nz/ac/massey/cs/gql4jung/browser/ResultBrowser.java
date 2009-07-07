@@ -97,20 +97,21 @@ public class ResultBrowser extends JFrame {
 	private JMenuBar menuBar = null;
 	
 	// actions
-	private AbstractAction actExit;
-	private AbstractAction actLoadDataFromXML;
-	private AbstractAction actLoadDataFromJars;
-	private AbstractAction actLoadQuery;
-	private AbstractAction actAnalyseMe;
-	private AbstractAction actRunQuery;
-	private AbstractAction actCancelQuery;
-	private AbstractAction actNextMinorInstance;
-	private AbstractAction actPreviousMinorInstance;
-	private AbstractAction actNextMajorInstance;
-	private AbstractAction actPreviousMajorInstance;
-	private AbstractAction actExport2CSV;
-	private AbstractAction actAbout;
-	private List<AbstractAction> actLoadBuiltInQueries = new ArrayList<AbstractAction>();
+	private Action actExit;
+	private Action actLoadDataFromXML;
+	private Action actLoadDataFromJars;
+	private Action actLoadQuery;
+	private Action actAnalyseMe;
+	private Action actRunQuery;
+	private Action actCancelQuery;
+	private Action actNextMinorInstance;
+	private Action actPreviousMinorInstance;
+	private Action actNextMajorInstance;
+	private Action actPreviousMajorInstance;
+	private Action actExport2CSV;
+	private Action actAbout;
+	private List<Action> actLoadBuiltInQueries = new ArrayList<Action>();
+	private List<Action> actConfigureViews = new ArrayList<Action>();
 	
 	private ResultView[] resultViewers = {
 		new GraphBasedResultView(),
@@ -248,7 +249,10 @@ public class ResultBrowser extends JFrame {
 			public void stateChanged(ChangeEvent arg0) {
 				computeVariants = chkVariants.isSelected();
 			}});
-		menu.add(chkVariants);
+		menu.add(chkVariants);		
+		for (Action act:this.actConfigureViews) {
+			menu.add(act);
+		}
 		menuBar.add(menu);
 		
 		menu = new JMenu("Help");
@@ -456,6 +460,35 @@ public class ResultBrowser extends JFrame {
 			}
 		};	
 		actAbout.putValue(Action.SHORT_DESCRIPTION, "about this software");
+
+		class EditSettingsAction extends AbstractAction {
+			
+			public EditSettingsAction(String name,PropertyBean settings) {
+				super(name);
+				this.settings = settings;
+				this.name = name;
+			}
+			private PropertyBean settings = null;
+			private String name = null;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PropertyBeanEditor.edit(ResultBrowser.this,settings,name);
+				// refresh view
+				try {
+					Cursor cursor = results.getCursor();
+					MotifInstance instance = results.getInstance(cursor);
+					display(instance);	
+				}
+				catch (Exception x){}
+			}
+		};
+		for (ResultView view:this.resultViewers) {
+			PropertyBean settings = view.getSettings();
+			if (settings!=null) {
+				Action act = new EditSettingsAction("configure "+view.getName(),settings);
+				this.actConfigureViews.add(act);
+			}
+		}
 		
 		initBuiltInQueries();
 	}

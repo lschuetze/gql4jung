@@ -1,6 +1,15 @@
+/**
+ * Copyright 2009 Jens Dietrich Licensed under the Apache License, Version 2.0 (the "License"); 
+ * you may not use this file except in compliance with the License. 
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+ * Unless required by applicable law or agreed to in writing, software distributed under the 
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+ * either express or implied. See the License for the specific language governing permissions 
+ * and limitations under the License.
+ */
+
 package nz.ac.massey.cs.gql4jung.browser.resultviews;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -9,12 +18,10 @@ import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.apache.commons.collections15.Transformer;
@@ -23,8 +30,8 @@ import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.Path;
 import nz.ac.massey.cs.gql4jung.Vertex;
+import nz.ac.massey.cs.gql4jung.browser.PropertyBean;
 import nz.ac.massey.cs.gql4jung.browser.ResultView;
-import nz.ac.massey.cs.gql4jung.browser.layout.EllipticFanLayout;
 import edu.uci.ics.jung.algorithms.layout.*;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -36,9 +43,8 @@ import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 public class GraphBasedResultView extends ResultView {
 	
 	private JPanel graphPane = new JPanel();
+	private GraphBasedResultViewSettings settings = GraphBasedResultViewSettings.DEFAULT_INSTANCE;
 	
-	
-
 	public GraphBasedResultView() {
 		super();
 		this.setLayout(new GridLayout(1,1));
@@ -46,19 +52,23 @@ public class GraphBasedResultView extends ResultView {
 		this.add(new JScrollPane(graphPane));
 		
 	}
+	
+	public PropertyBean getSettings() {
+		return settings;
+	}
 
 	@Override
 	public void display(final MotifInstance instance,	DirectedGraph<Vertex, Edge> graph) {	
 		DirectedGraph<Vertex,Edge> g = instance==null?new DirectedSparseGraph<Vertex,Edge>():this.asGraph(instance);
 		//SimpleGraphView sgv = new SimpleGraphView(); //We create our graph in here
 		// The Layout<V, E> is parameterized by the vertex and edge types
-		Layout<Vertex,Edge> layout = new EllipticFanLayout<Vertex,Edge>(g);
+		Layout<Vertex,Edge> layout = settings.getLayout(g);
 		layout.setSize(graphPane.getSize());
 		VisualizationViewer<Vertex,Edge> vv = new VisualizationViewer<Vertex,Edge>(layout);
 		configureRenderer(vv.getRenderContext(),instance);
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		vv.setPreferredSize(graphPane.getSize()); //Sets the viewing area size
-		vv.setBackground(Color.white);
+		vv.setBackground(settings.getBackground());
 		graphPane.removeAll();
 		graphPane.add(vv);
 		graphPane.revalidate();
@@ -173,32 +183,16 @@ public class GraphBasedResultView extends ResultView {
 				}
 			}
 		);	
-		/*
-		context.setVertexIconTransformer(
-			new Transformer<Vertex,Icon>() {
-				@Override
-				public Icon transform(Vertex v) {
-					boolean hasRole = revMap.containsKey(v);
-					if (v.isAbstract()) {
-						return hasRole?GraphRenderer.ICON_INTERFACE_C:GraphRenderer.ICON_INTERFACE_BW;
-					}
-					else {
-						return hasRole?GraphRenderer.ICON_CLASS_C:GraphRenderer.ICON_CLASS_BW;
-					}
-				}
-			}
-		);
-		*/
-		
+	
 		context.setVertexShapeTransformer(
 				new Transformer<Vertex,Shape>() {
 					@Override
 					public Shape transform(Vertex v) {
 						String longLabel = v.getName();
-						Font f = GraphRendererConstants.CORE;
+						Font f = settings.getFont4Participants();
 						FontMetrics FM = GraphBasedResultView.this.getGraphics().getFontMetrics(f);
-						int W = Math.max(GraphRendererConstants.MIN_BOX_WIDTH,FM.stringWidth(longLabel)+10);
-						int H = revMap.containsKey(v)?3*GraphRendererConstants.BOX_HEIGHT_UNIT:2*GraphRendererConstants.BOX_HEIGHT_UNIT;
+						int W = Math.max(settings.getMinBoxWidth(),FM.stringWidth(longLabel)+10);
+						int H = revMap.containsKey(v)?settings.getBoxHeight4Participants():settings.getBoxHeight4NonParticipants();
 						return new Rectangle(0,0,W,H);
 					}
 					
@@ -210,7 +204,7 @@ public class GraphBasedResultView extends ResultView {
 				@Override
 				public Font transform(Vertex v) {
 					boolean hasRole = revMap.containsKey(v);
-					return hasRole?GraphRendererConstants.CORE:GraphRendererConstants.NON_CORE;
+					return hasRole?settings.getFont4Participants():settings.getFont4NonParticipants();
 				}
 			}
 		);
@@ -218,7 +212,7 @@ public class GraphBasedResultView extends ResultView {
 			new Transformer<Edge,Font>(){
 				@Override
 				public Font transform(Edge e) {
-					return GraphRendererConstants.CORE;
+					return settings.getFont4Edges();
 				}
 			}
 		);
@@ -237,8 +231,8 @@ public class GraphBasedResultView extends ResultView {
 		float offset = 100/packages.size();
 		offset = offset/100;
 		for (String p:packages) {
-			Color hsb = Color.getHSBColor(count*offset,(float)0.8,(float)0.6);
-			pmap.put(p,new Color(hsb.getRed(),hsb.getGreen(),hsb.getBlue(),50)); // transparency
+			Color hsb = Color.getHSBColor(count*offset,settings.getVertexSaturation(),settings.getVertexBrightness());
+			pmap.put(p,new Color(hsb.getRed(),hsb.getGreen(),hsb.getBlue(),settings.getVertexTransparency())); // transparency
 			//pmap.put(p,hsb);
 			count = count+1;
 		}

@@ -12,6 +12,7 @@ import javax.swing.table.TableModel;
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.Vertex;
+import nz.ac.massey.cs.gql4jung.browser.PropertyBean;
 import nz.ac.massey.cs.gql4jung.browser.ResultView;
 import edu.uci.ics.jung.graph.DirectedGraph;
 
@@ -82,5 +83,7 @@ public class TableBasedResultView extends ResultView {
 	public String getName() {
 		return "table view";
 	}
-
+	public PropertyBean getSettings() {
+		return null;
+	}
 }
