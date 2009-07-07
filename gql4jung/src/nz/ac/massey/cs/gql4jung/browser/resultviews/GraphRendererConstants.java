@@ -30,16 +30,6 @@ public class GraphRendererConstants {
 		return new ImageIcon(url);
 	}
 
-	
-	final static int FONT_SIZE = 10;
-	final static String FONT_TYPE = "Monospaced";
-	final static Font CORE = new Font(FONT_TYPE, Font.PLAIN, FONT_SIZE);
-	final static Font NON_CORE = new Font(FONT_TYPE, Font.PLAIN, FONT_SIZE);
-	final static Font OTHER = new Font(FONT_TYPE, Font.ITALIC, FONT_SIZE);
-	final static Icon ICON_CLASS_C = getIcon("class.gif");
-	final static Icon ICON_CLASS_BW = getIcon("class-bw.gif");
-	final static Icon ICON_INTERFACE_C = getIcon("interface.gif");
-	final static Icon ICON_INTERFACE_BW = getIcon("interface-bw.gif");
 	final static Stroke STROKE_NORMAL = new BasicStroke(1);
 	final static Stroke STROKE_BOLD = new BasicStroke(2);
 	final static int BOX_HEIGHT_UNIT = 12;

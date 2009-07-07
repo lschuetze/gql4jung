@@ -10,17 +10,19 @@
 
 package nz.ac.massey.cs.gql4jung.browser;
 
-import javax.swing.JPanel;
-import edu.uci.ics.jung.graph.DirectedGraph;
-import nz.ac.massey.cs.gql4jung.*;
+import java.beans.PropertyDescriptor;
+import java.io.IOException;
 
 /**
- * View for results.
+ * Class for settings. 
  * @author Jens Dietrich
  */
-public abstract class ResultView extends JPanel {
-	public abstract String getName();
-	public abstract void display(MotifInstance instance,DirectedGraph<Vertex,Edge> graph);
-	// interface to customise view
-	public abstract PropertyBean getSettings();
+
+public interface PropertyBean {
+	// get the properties that can be customised
+	public PropertyDescriptor[] getProperties();
+	// reset the object to default values
+	public void reset();
+	// save the file
+	public void save() throws IOException;
 }
