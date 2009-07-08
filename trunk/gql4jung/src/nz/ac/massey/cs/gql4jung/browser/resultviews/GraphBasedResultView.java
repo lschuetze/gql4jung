@@ -115,14 +115,6 @@ public class GraphBasedResultView extends ResultView {
 	}
 
 	private void configureRenderer (RenderContext context,final MotifInstance instance) {
-		
-		
-		final Map<Vertex,String> revMap = new HashMap<Vertex,String>();
-		if (instance!=null) {
-			for (String role:instance.getMotif().getRoles()) {
-				revMap.put(instance.getVertex(role),role);
-			}
-		}
 		final Map<String,Color> colMap = createColorMap(instance);
 		/*
 		context.setEdgeDrawPaintTransformer(
@@ -138,12 +130,12 @@ public class GraphBasedResultView extends ResultView {
 			new Transformer<VisualVertex,String>(){
 				@Override
 				public String transform(VisualVertex v) {
-					String role = revMap.get(v);
+					String role = v.getRole();
 					StringBuffer b = new StringBuffer()
 						.append("<html>");
 					if (role!=null) {
 						b.append("&lt;&lt;")
-						.append(role==null?"?":role)
+						.append(role)
 						.append("&gt;&gt")
 						.append("<br/>");					
 					}
@@ -183,7 +175,7 @@ public class GraphBasedResultView extends ResultView {
 		context.setVertexStrokeTransformer(
 			new Transformer<VisualVertex, Stroke>() {
 				public Stroke transform(VisualVertex v) {
-					if (revMap.containsKey(v)) return GraphRendererConstants.STROKE_BOLD;
+					if (v.getRole()!=null) return GraphRendererConstants.STROKE_BOLD;
 					else return GraphRendererConstants.STROKE_NORMAL;
 				}
 			}
@@ -197,7 +189,7 @@ public class GraphBasedResultView extends ResultView {
 						Font f = settings.getFont4Participants();
 						FontMetrics FM = GraphBasedResultView.this.getGraphics().getFontMetrics(f);
 						int W = Math.max(settings.getMinBoxWidth(),FM.stringWidth(longLabel)+10);
-						int H = revMap.containsKey(v)?settings.getBoxHeight4Participants():settings.getBoxHeight4NonParticipants();
+						int H = v.getRole()!=null?settings.getBoxHeight4Participants():settings.getBoxHeight4NonParticipants();
 						return new Rectangle(0,0,W,H);
 					}
 					
@@ -208,8 +200,7 @@ public class GraphBasedResultView extends ResultView {
 			new Transformer<VisualVertex,Font>(){
 				@Override
 				public Font transform(VisualVertex v) {
-					boolean hasRole = revMap.containsKey(v);
-					return hasRole?settings.getFont4Participants():settings.getFont4NonParticipants();
+					return v.getRole()!=null?settings.getFont4Participants():settings.getFont4NonParticipants();
 				}
 			}
 		);
@@ -255,9 +246,10 @@ public class GraphBasedResultView extends ResultView {
 		Map<String,VisualVertex> vertices = new HashMap<String,VisualVertex>();
 		for (String role:motif.getRoles()) {
 			Vertex v = instance.getVertex(role);			
-			if (v==null) {
-				VisualVertex vv = toVisual(v);
+			if (v!=null) {
+				VisualVertex vv = toVisual(v,true);
 				g.addVertex(vv);
+				vv.setRole(role);
 				vertices.put(v.getId(),vv);
 			}
 		};
@@ -270,12 +262,12 @@ public class GraphBasedResultView extends ResultView {
 					Vertex v2 = e.getEnd();
 					VisualVertex vv1 = vertices.get(v1.getId());
 					if (vv1==null) {
-						vv1 = toVisual(v1);
+						vv1 = toVisual(v1,true);
 						vertices.put(v1.getId(),vv1);
 					}
 					VisualVertex vv2 = vertices.get(v2.getId());
 					if (vv2==null) {
-						vv2 = toVisual(v2);
+						vv2 = toVisual(v2,true);
 						vertices.put(v2.getId(),vv2);
 					}
 					VisualEdge ve = toVisual(e);
@@ -287,10 +279,11 @@ public class GraphBasedResultView extends ResultView {
 		}
 		return g;
 	}
-	private VisualVertex toVisual(Vertex v) {
+	private VisualVertex toVisual(Vertex v,boolean isPartOfMotif) {
 		VisualVertex vv = new VisualVertex();
 		vv.setId(v.getId());
 		v.copyValuesTo(vv);
+		vv.setInMotif(isPartOfMotif);
 		return vv;		
 	}
 	private VisualEdge toVisual(Edge e) {

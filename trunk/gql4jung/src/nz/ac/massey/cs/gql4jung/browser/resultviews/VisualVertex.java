@@ -19,6 +19,15 @@ import nz.ac.massey.cs.gql4jung.Vertex;
 
 public class VisualVertex extends Vertex {
 	private String role = null;
+	private boolean inMotif = false;
+
+	public boolean isInMotif() {
+		return inMotif;
+	}
+
+	public void setInMotif(boolean inMotif) {
+		this.inMotif = inMotif;
+	}
 
 	public String getRole() {
 		return role;
