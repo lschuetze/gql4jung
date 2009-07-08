@@ -116,16 +116,16 @@ public class GraphBasedResultView extends ResultView {
 
 	private void configureRenderer (RenderContext context,final MotifInstance instance) {
 		final Map<String,Color> colMap = createColorMap(instance);
-		/*
+		
 		context.setEdgeDrawPaintTransformer(
-			new Transformer<Edge,Paint>(){
+			new Transformer<VisualEdge,Paint>(){
 				@Override
-				public Paint transform(Edge e) {
-					return new Color(0,0,0,50);
+				public Paint transform(VisualEdge e) {
+					return e.isInMotif()?new Color(0,0,0,100):new Color(100,100,100,50);
 				}
 			}
 		);
-		*/
+		
 		context.setVertexLabelTransformer(
 			new Transformer<VisualVertex,String>(){
 				@Override
@@ -157,7 +157,7 @@ public class GraphBasedResultView extends ResultView {
 			new Transformer<VisualVertex,Paint>() {
 				@Override
 				public Paint transform(VisualVertex v) {
-					Color c = colMap.get(v.getId());
+					Color c = colMap.get(v.getNamespace());
 					if (c!=null) return c;
 					else return Color.white;
 				}
@@ -167,7 +167,7 @@ public class GraphBasedResultView extends ResultView {
 				new Transformer<VisualVertex,Paint>() {
 					@Override
 					public Paint transform(VisualVertex v) {
-						return Color.black;
+						return v.isInMotif()?Color.black:Color.gray;
 					}
 				}
 			);
@@ -175,8 +175,13 @@ public class GraphBasedResultView extends ResultView {
 		context.setVertexStrokeTransformer(
 			new Transformer<VisualVertex, Stroke>() {
 				public Stroke transform(VisualVertex v) {
-					if (v.getRole()!=null) return GraphRendererConstants.STROKE_BOLD;
-					else return GraphRendererConstants.STROKE_NORMAL;
+					if (v.isInMotif()) {
+						if (v.getRole()!=null) return GraphRendererConstants.STROKE_BOLD;
+						else return GraphRendererConstants.STROKE_NORMAL;
+					}
+					else {
+						return GraphRendererConstants.STROKE_NONE;
+					}
 				}
 			}
 		);	
@@ -232,11 +237,7 @@ public class GraphBasedResultView extends ResultView {
 			//pmap.put(p,hsb);
 			count = count+1;
 		}
-		Map<String, Color> map = new HashMap<String, Color> (packages.size());
-		for (Vertex v:vertices) {
-			map.put(v.getId(),pmap.get(v.getNamespace()));
-		}
-		return map;
+		return pmap;
 	}
 
 	private DirectedGraph<VisualVertex,VisualEdge> asGraph(MotifInstance instance) {
@@ -244,6 +245,7 @@ public class GraphBasedResultView extends ResultView {
 		Motif motif = instance.getMotif();
 		// vertices
 		Map<String,VisualVertex> vertices = new HashMap<String,VisualVertex>();
+		Map<Vertex,VisualVertex> originalVertices = new HashMap<Vertex,VisualVertex>();
 		for (String role:motif.getRoles()) {
 			Vertex v = instance.getVertex(role);			
 			if (v!=null) {
@@ -251,6 +253,7 @@ public class GraphBasedResultView extends ResultView {
 				g.addVertex(vv);
 				vv.setRole(role);
 				vertices.put(v.getId(),vv);
+				originalVertices.put(v,vv);
 			}
 		};
 		// edges
@@ -264,21 +267,58 @@ public class GraphBasedResultView extends ResultView {
 					if (vv1==null) {
 						vv1 = toVisual(v1,true);
 						vertices.put(v1.getId(),vv1);
+						originalVertices.put(v1,vv1);
 					}
 					VisualVertex vv2 = vertices.get(v2.getId());
 					if (vv2==null) {
 						vv2 = toVisual(v2,true);
 						vertices.put(v2.getId(),vv2);
+						originalVertices.put(v2,vv2);
 					}
-					VisualEdge ve = toVisual(e);
+					VisualEdge ve = toVisual(e,true);
 					ve.setStart(vv1);
 					ve.setEnd(vv2);
 					g.addEdge(ve,vv1,vv2);
 				}
 			}
 		}
+		addContext(g,originalVertices,settings.getContextDepth());
 		return g;
 	}
+	private void addContext(DirectedGraph<VisualVertex, VisualEdge> g,Map<Vertex,VisualVertex> vertices, int contextDepth) {
+		if (contextDepth==0) return;
+		Set<Vertex> keys = new HashSet<Vertex>();
+		keys.addAll(vertices.keySet()); // to prevent a java.util.ConcurrentModificationException
+		for (Vertex v:keys) {
+			VisualVertex vv = vertices.get(v);
+			for (Edge e:v.getInEdges()) {
+				Vertex v1 = e.getStart();
+				if (!vertices.containsKey(v1)) {
+					VisualVertex vv1 = this.toVisual(v1,false);
+					g.addVertex(vv1);
+					vertices.put(v1,vv1);
+					VisualEdge ve = this.toVisual(e,false);
+					ve.setStart(vv1);
+					ve.setEnd(vv);
+					g.addEdge(ve,vv1,vv);
+				}
+			}
+			for (Edge e:v.getOutEdges()) {
+				Vertex v1 = e.getEnd();
+				if (!vertices.containsKey(v1)) {
+					VisualVertex vv1 = this.toVisual(v1,false);
+					g.addVertex(vv1);
+					vertices.put(v1,vv1);
+					VisualEdge ve = this.toVisual(e,false);
+					ve.setStart(vv);
+					ve.setEnd(vv1);
+					g.addEdge(ve,vv,vv1);
+				}
+			}
+		}
+		addContext(g,vertices,contextDepth-1);
+	}
+
 	private VisualVertex toVisual(Vertex v,boolean isPartOfMotif) {
 		VisualVertex vv = new VisualVertex();
 		vv.setId(v.getId());
@@ -286,10 +326,11 @@ public class GraphBasedResultView extends ResultView {
 		vv.setInMotif(isPartOfMotif);
 		return vv;		
 	}
-	private VisualEdge toVisual(Edge e) {
+	private VisualEdge toVisual(Edge e,boolean isPartOfMotif) {
 		VisualEdge ve = new VisualEdge();
 		ve.setId(e.getId());
 		e.copyValuesTo(ve);
+		ve.setInMotif(isPartOfMotif);
 		return ve;		
 	}
 	

@@ -74,7 +74,16 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 	private float vertexSaturation = (float) 0.8;
 	private float vertexBrightness = (float) 0.8;
 	private Color background = Color.WHITE;
+	private int contextDepth = 0;
 	
+	public int getContextDepth() {
+		return contextDepth;
+	}
+
+	public void setContextDepth(int contextDepth) {
+		this.contextDepth = contextDepth;
+	}
+
 	public Color getBackground() {
 		return background;
 	}
@@ -207,7 +216,8 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 				new PropertyDescriptor("vertex saturation",GraphBasedResultViewSettings.class,"getVertexSaturation","setVertexSaturation"),
 				new PropertyDescriptor("vertex brightness",GraphBasedResultViewSettings.class,"getVertexBrightness","setVertexBrightness"),
 				new PropertyDescriptor("vertex transparency (alpha)",GraphBasedResultViewSettings.class,"getVertexTransparency","setVertexTransparency"),
-				new PropertyDescriptor("backgroun colour",GraphBasedResultViewSettings.class,"getBackground","setBackground")
+				new PropertyDescriptor("background colour",GraphBasedResultViewSettings.class,"getBackground","setBackground"),
+				new PropertyDescriptor("context depth",GraphBasedResultViewSettings.class,"getContextDepth","setContextDepth")
 			};
 				
 			//PropertyDescriptor[] properties = java.beans.Introspector.getBeanInfo(Person.class).getPropertyDescriptors();
@@ -241,6 +251,7 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 		vertexSaturation = (float) 0.8;
 		vertexBrightness = (float) 0.8;
 		background = Color.WHITE;
+		contextDepth = 1;
 		
 	}
 
