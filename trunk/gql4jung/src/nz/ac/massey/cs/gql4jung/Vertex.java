@@ -125,4 +125,12 @@ public class Vertex extends GraphElement{
 		if (!this.namespace.equals(v.namespace)) return false;
 		else return (this.name.startsWith(v.name+'$'));
 	}
+	public void copyValuesTo(Vertex v) {
+		v.setName(name);
+		v.setNamespace(namespace);
+		v.setContainer(container);
+		v.setType(type);
+		v.setCluster(cluster);
+		v.setAbstract(isAbstract);
+	}
 }
