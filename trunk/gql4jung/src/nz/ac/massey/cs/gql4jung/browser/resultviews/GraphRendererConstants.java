@@ -29,9 +29,11 @@ public class GraphRendererConstants {
 		URL url = GraphRendererConstants.class.getResource("/nz/ac/massey/cs/gql4jung/browser/icons/"+name);
 		return new ImageIcon(url);
 	}
-
+	final static float dash[] = { 2.0f };
 	final static Stroke STROKE_NORMAL = new BasicStroke(1);
 	final static Stroke STROKE_BOLD = new BasicStroke(2);
+	final static Stroke STROKE_NONE = new BasicStroke(1);
+	//new BasicStroke(1.0f, BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f);
 	final static int BOX_HEIGHT_UNIT = 12;
 	final static int MIN_BOX_WIDTH = 120;
 
