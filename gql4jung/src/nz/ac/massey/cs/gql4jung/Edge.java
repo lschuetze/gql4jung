@@ -73,5 +73,7 @@ public class Edge extends GraphElement{
 			.append(']')
 			.toString();
 	}
-
+	public void copyValuesTo(Edge e) {
+		e.setType(type);
+	}
 }
