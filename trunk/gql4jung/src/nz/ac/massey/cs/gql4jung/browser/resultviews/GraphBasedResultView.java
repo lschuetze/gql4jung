@@ -257,8 +257,8 @@ public class GraphBasedResultView extends ResultView {
 		Map<String,VisualVertex> vertices = new HashMap<String,VisualVertex>();
 		Map<Vertex,VisualVertex> originalVertices = new HashMap<Vertex,VisualVertex>();
 		for (String role:motif.getRoles()) {
-			Vertex v = instance.getVertex(role);			
-			if (v!=null) {
+			Vertex v = instance.getVertex(role);
+			if (v!=null && !vertices.containsKey(v.getId())) { // the second check is necessary in case there are multiple roles for one vertex
 				VisualVertex vv = toVisual(v,0);
 				g.addVertex(vv);
 				vv.setRole(role);
