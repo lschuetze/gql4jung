@@ -11,10 +11,8 @@
 package nz.ac.massey.cs.gql4jung.browser.resultviews;
 
 import java.awt.BasicStroke;
-import java.awt.Font;
 import java.awt.Stroke;
 import java.net.URL;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 

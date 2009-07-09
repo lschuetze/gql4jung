@@ -19,6 +19,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -203,7 +204,8 @@ public class GraphBasedResultView extends ResultView {
 						FontMetrics FM = GraphBasedResultView.this.getGraphics().getFontMetrics(f);
 						int W = Math.max(settings.getMinBoxWidth(),FM.stringWidth(longLabel)+10);
 						int H = v.getRole()!=null?settings.getBoxHeight4Participants():settings.getBoxHeight4NonParticipants();
-						return new Rectangle(0,0,W,H);
+						
+						return new Rectangle2D.Float(-W/2,-H/2,W,H);
 					}
 					
 				}
