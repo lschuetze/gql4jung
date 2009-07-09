@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import org.apache.log4j.Logger;
 import com.l2fprod.common.beans.editor.ComboBoxPropertyEditor;
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout2;
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.SpringLayout;
@@ -52,6 +53,7 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 		EllipticFanLayout.class.getName(),
 		FanLayout.class.getName(),
 		FRLayout.class.getName(),
+		FRLayout2.class.getName(),
 		SpringLayout.class.getName(),
 		KKLayout.class.getName()
 	};

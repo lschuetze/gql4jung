@@ -20,6 +20,15 @@ import nz.ac.massey.cs.gql4jung.Vertex;
 public class VisualVertex extends Vertex {
 	private String role = null;
 	private boolean inMotif = false;
+	private int distanceFromMotif = 0;
+
+	public int getDistanceFromMotif() {
+		return distanceFromMotif;
+	}
+
+	public void setDistanceFromMotif(int distanceFromMotif) {
+		this.distanceFromMotif = distanceFromMotif;
+	}
 
 	public boolean isInMotif() {
 		return inMotif;

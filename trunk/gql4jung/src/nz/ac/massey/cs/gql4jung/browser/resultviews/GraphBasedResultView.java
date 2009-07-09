@@ -259,7 +259,7 @@ public class GraphBasedResultView extends ResultView {
 		for (String role:motif.getRoles()) {
 			Vertex v = instance.getVertex(role);			
 			if (v!=null) {
-				VisualVertex vv = toVisual(v,true);
+				VisualVertex vv = toVisual(v,0);
 				g.addVertex(vv);
 				vv.setRole(role);
 				vertices.put(v.getId(),vv);
@@ -275,13 +275,13 @@ public class GraphBasedResultView extends ResultView {
 					Vertex v2 = e.getEnd();
 					VisualVertex vv1 = vertices.get(v1.getId());
 					if (vv1==null) {
-						vv1 = toVisual(v1,true);
+						vv1 = toVisual(v1,0);
 						vertices.put(v1.getId(),vv1);
 						originalVertices.put(v1,vv1);
 					}
 					VisualVertex vv2 = vertices.get(v2.getId());
 					if (vv2==null) {
-						vv2 = toVisual(v2,true);
+						vv2 = toVisual(v2,0);
 						vertices.put(v2.getId(),vv2);
 						originalVertices.put(v2,vv2);
 					}
@@ -292,10 +292,10 @@ public class GraphBasedResultView extends ResultView {
 				}
 			}
 		}
-		addContext(g,originalVertices,settings.getContextDepth());
+		addContext(g,originalVertices,settings.getContextDepth(),1);
 		return g;
 	}
-	private void addContext(DirectedGraph<VisualVertex, VisualEdge> g,Map<Vertex,VisualVertex> vertices, int contextDepth) {
+	private void addContext(DirectedGraph<VisualVertex, VisualEdge> g,Map<Vertex,VisualVertex> vertices, int contextDepth,int distanceToMotif) {
 		if (contextDepth==0) return;
 		Set<Vertex> keys = new HashSet<Vertex>();
 		keys.addAll(vertices.keySet()); // to prevent a java.util.ConcurrentModificationException
@@ -304,7 +304,7 @@ public class GraphBasedResultView extends ResultView {
 			for (Edge e:v.getInEdges()) {
 				Vertex v1 = e.getStart();
 				if (!vertices.containsKey(v1)) {
-					VisualVertex vv1 = this.toVisual(v1,false);
+					VisualVertex vv1 = this.toVisual(v1,distanceToMotif);
 					g.addVertex(vv1);
 					vertices.put(v1,vv1);
 					VisualEdge ve = this.toVisual(e,false);
@@ -316,7 +316,7 @@ public class GraphBasedResultView extends ResultView {
 			for (Edge e:v.getOutEdges()) {
 				Vertex v1 = e.getEnd();
 				if (!vertices.containsKey(v1)) {
-					VisualVertex vv1 = this.toVisual(v1,false);
+					VisualVertex vv1 = this.toVisual(v1,distanceToMotif);
 					g.addVertex(vv1);
 					vertices.put(v1,vv1);
 					VisualEdge ve = this.toVisual(e,false);
@@ -326,14 +326,15 @@ public class GraphBasedResultView extends ResultView {
 				}
 			}
 		}
-		addContext(g,vertices,contextDepth-1);
+		addContext(g,vertices,contextDepth-1,distanceToMotif+1);
 	}
 
-	private VisualVertex toVisual(Vertex v,boolean isPartOfMotif) {
+	private VisualVertex toVisual(Vertex v,int distanceFromMotif) {
 		VisualVertex vv = new VisualVertex();
 		vv.setId(v.getId());
 		v.copyValuesTo(vv);
-		vv.setInMotif(isPartOfMotif);
+		vv.setInMotif(distanceFromMotif==0);
+		vv.setDistanceFromMotif(distanceFromMotif);
 		return vv;		
 	}
 	private VisualEdge toVisual(Edge e,boolean isPartOfMotif) {
