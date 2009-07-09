@@ -16,6 +16,7 @@ import java.awt.FontMetrics;
 import java.awt.GridLayout;
 import java.awt.Paint;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.util.HashMap;
@@ -70,6 +71,13 @@ public class GraphBasedResultView extends ResultView {
 		Layout<VisualVertex,VisualEdge> layout = settings.getLayout(g);
 		layout.setSize(graphPane.getSize());
 		VisualizationViewer<VisualVertex,VisualEdge> vv = new VisualizationViewer<VisualVertex,VisualEdge>(layout);
+		
+		if (!settings.isUseAntiAliasing()) {
+			Map hints = new HashMap();
+			hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+			vv.setRenderingHints(hints);
+		}
+		
 		configureRenderer(vv.getRenderContext(),instance);
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		vv.setPreferredSize(graphPane.getSize()); //Sets the viewing area size

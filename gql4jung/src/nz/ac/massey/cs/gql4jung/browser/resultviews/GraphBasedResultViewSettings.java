@@ -75,7 +75,16 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 	private float vertexBrightness = (float) 0.8;
 	private Color background = Color.WHITE;
 	private int contextDepth = 0;
+	private boolean useAntiAliasing = true;
 	
+	public boolean isUseAntiAliasing() {
+		return useAntiAliasing;
+	}
+
+	public void setUseAntiAliasing(boolean useAntiAliasing) {
+		this.useAntiAliasing = useAntiAliasing;
+	}
+
 	public int getContextDepth() {
 		return contextDepth;
 	}
@@ -217,7 +226,8 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 				new PropertyDescriptor("vertex brightness",GraphBasedResultViewSettings.class,"getVertexBrightness","setVertexBrightness"),
 				new PropertyDescriptor("vertex transparency (alpha)",GraphBasedResultViewSettings.class,"getVertexTransparency","setVertexTransparency"),
 				new PropertyDescriptor("background colour",GraphBasedResultViewSettings.class,"getBackground","setBackground"),
-				new PropertyDescriptor("context depth",GraphBasedResultViewSettings.class,"getContextDepth","setContextDepth")
+				new PropertyDescriptor("context depth (greater is slower)",GraphBasedResultViewSettings.class,"getContextDepth","setContextDepth"),
+				new PropertyDescriptor("use anti aliasing (on is slower)",GraphBasedResultViewSettings.class,"isUseAntiAliasing","setUseAntiAliasing")
 			};
 				
 			//PropertyDescriptor[] properties = java.beans.Introspector.getBeanInfo(Person.class).getPropertyDescriptors();
@@ -252,7 +262,7 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 		vertexBrightness = (float) 0.8;
 		background = Color.WHITE;
 		contextDepth = 1;
-		
+		useAntiAliasing = false;
 	}
 
 }
