@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import org.apache.log4j.Logger;
 import com.l2fprod.common.beans.editor.ComboBoxPropertyEditor;
+
+import edu.uci.ics.jung.algorithms.layout.DAGLayout;
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.layout.FRLayout2;
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
@@ -55,7 +57,8 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 		FRLayout.class.getName(),
 		FRLayout2.class.getName(),
 		SpringLayout.class.getName(),
-		KKLayout.class.getName()
+		KKLayout.class.getName(),
+		DAGLayout.class.getName()
 	};
 	
 	public static class LayoutEditor extends ComboBoxPropertyEditor {

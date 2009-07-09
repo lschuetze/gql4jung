@@ -15,7 +15,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GridLayout;
 import java.awt.Paint;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
@@ -83,9 +82,18 @@ public class GraphBasedResultView extends ResultView {
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		vv.setPreferredSize(graphPane.getSize()); //Sets the viewing area size
 		vv.setBackground(settings.getBackground());
+		
 		graphPane.removeAll();
 		graphPane.add(vv);
 		graphPane.revalidate();
+		
+		// pick the vertices that are part of the pattern - this brings them into the foreground
+		for (VisualVertex v:g.getVertices()){
+			if (v.isInMotif()) {
+				vv.getPickedVertexState().pick(v,true);
+			}
+		}
+		
 		//vv.addMouseListener(popupListener);
 		// Create a graph mouse and add it to the visualization component
 		DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
