@@ -35,6 +35,7 @@ import edu.uci.ics.jung.graph.Graph;
 import nz.ac.massey.cs.gql4jung.browser.PropertyBean;
 import nz.ac.massey.cs.gql4jung.browser.layout.EllipticFanLayout;
 import nz.ac.massey.cs.gql4jung.browser.layout.FanLayout;
+import nz.ac.massey.cs.gql4jung.browser.layout.OrbitalLayout;
 
 /**
  * Settings for the view based on jung visualisation engine.
@@ -53,6 +54,7 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 
 	private static String[] layouts = {
 		EllipticFanLayout.class.getName(),
+		OrbitalLayout.class.getName(),
 		FanLayout.class.getName(),
 		FRLayout.class.getName(),
 		FRLayout2.class.getName(),
