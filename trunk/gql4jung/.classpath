@@ -14,7 +14,7 @@
 	<classpathentry kind="lib" path="lib/jung-graph-impl-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/jung-io-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
-	<classpathentry kind="lib" path="lib/jung-visualization-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/jung-visualization-2.0.jar" sourcepath="/jung2-2.0/src"/>
 	<classpathentry kind="lib" path="lib/DependencyFinder.jar"/>
 	<classpathentry kind="lib" path="lib/google-collect-1.0-rc2.jar"/>
 	<classpathentry kind="lib" path="lib/jakarta-oro.jar"/>
