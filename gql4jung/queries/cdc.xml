@@ -1,5 +1,5 @@
 <!-- circular dependencies between containers -->
-<motif name="circular_dependency">
+<motif name="circular dependency between containers">
     <select role="inside1"/>
     <select role="inside2"/>
     <select role="outside1"/>

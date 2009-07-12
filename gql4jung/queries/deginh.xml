@@ -10,4 +10,7 @@
         	<constraint>inherits2.type=='extends' || inherits2.type=='implements'</constraint>
     </connectedBy>
     <constraint>inherits1!=inherits2</constraint>
+    <groupBy>
+        <element>supertype</element>
+    </groupBy>
 </motif>
