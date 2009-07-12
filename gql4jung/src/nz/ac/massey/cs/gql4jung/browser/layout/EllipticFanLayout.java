@@ -39,12 +39,15 @@ import edu.uci.ics.jung.graph.Graph;
 			this.graph = graph;
 		}
 	
-		private Graph<Vertex, Edge> graph = null;
-		private Dimension size = null;
+		protected Graph<Vertex, Edge> graph = null;
+		protected Dimension size = null;
 		//A map of all the points and their respective positions
-		private Map<Vertex, Point2D> points = null;
+		protected Map<Vertex, EllipticPolarPoint> points = null;
 		//Checks if the vertex map needs updating 
 		private boolean isInitialized = false;
+		
+		//The default dimension for each box
+		public static Dimension boxSize = new Dimension(120, 36);
 		
 		//Vertices that have been manually moved
 		private Map<Vertex, Point2D> movedPoints = new HashMap<Vertex, Point2D>();
@@ -52,13 +55,9 @@ import edu.uci.ics.jung.graph.Graph;
 
 	
 		//Returns a set of points for a given graph
-		private Map<Vertex, Point2D> getPoints(Graph<Vertex, Edge> graph) {
+		protected Map<Vertex, EllipticPolarPoint> getPoints(Graph<Vertex, Edge> graph) {
 	
-			Map<Vertex, Point2D> map = new HashMap<Vertex, Point2D>();
-	
-			//The default size of each vertex box
-			Dimension boxSize = new Dimension(120, 36);
-	
+			Map<Vertex, EllipticPolarPoint> map = new HashMap<Vertex, EllipticPolarPoint>();
 			int centerX = this.size.width / 2 - boxSize.width/2;
 			int centerY = this.size.height / 2 - boxSize.height/2;
 			int Xradius = centerX - boxSize.width;
@@ -83,9 +82,7 @@ import edu.uci.ics.jung.graph.Graph;
 				if (!map.containsKey(v)) {
 					count++;
 					double theta = angle * count;
-					int x = centerX + (int) (Math.sin(theta) * Xradius);
-					int y = centerY + (int) (Math.cos(theta) * Yradius);
-					Point p = new Point(x, y);
+					EllipticPolarPoint p = new EllipticPolarPoint(theta, Xradius, Yradius);
 					map.put(v, p);
 					for (Edge e : v.getOutEdges()) {
 						if (graph.containsEdge(e)) {
@@ -157,7 +154,12 @@ import edu.uci.ics.jung.graph.Graph;
 			if(this.movedPoints.containsKey(v)){
 				return this.movedPoints.get(v);
 			}
-			else return this.points.get(v);
+			int centerX = this.size.width / 2 - boxSize.width/2;
+			int centerY = this.size.height / 2 - boxSize.height/2;
+			Point p = this.points.get(v).toCartesian();
+			p.x += centerX;
+			p.y += centerY;
+			return p;
 		}
 	
 		//Does nothing
