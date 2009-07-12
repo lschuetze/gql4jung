@@ -88,11 +88,14 @@ public class GraphBasedResultView extends ResultView {
 		graphPane.revalidate();
 		
 		// pick the vertices that are part of the pattern - this brings them into the foreground
+		
+		/*
 		for (VisualVertex v:g.getVertices()){
 			if (v.isInMotif()) {
 				vv.getPickedVertexState().pick(v,true);
 			}
 		}
+		*/
 		
 		//vv.addMouseListener(popupListener);
 		// Create a graph mouse and add it to the visualization component
