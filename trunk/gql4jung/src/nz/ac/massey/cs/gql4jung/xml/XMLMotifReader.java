@@ -48,6 +48,8 @@ public class XMLMotifReader implements MotifReader {
 			JAXBContext jc= JAXBContext.newInstance("nz.ac.massey.cs.gql4jung.xml");
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			Motif query = (Motif)unmarshaller.unmarshal(source);
+			
+			motif.setName(query.getName());
 						
 			for (Object o:query.getAnnotateOrSelectOrConstraint()) {
 				if (o instanceof Annotate) {

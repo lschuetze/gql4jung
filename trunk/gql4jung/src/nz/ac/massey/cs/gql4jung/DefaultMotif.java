@@ -25,11 +25,17 @@ public class DefaultMotif implements Motif {
 	
 	private List<String> roles = new ArrayList<String>();
 	private List<String> pathRoles = new ArrayList<String>();
-
+	private String name = null;
 	private Collection<GroupByClause> groupByClauses = new ArrayList<GroupByClause>();
 	private Collection<Processor> graphProcessors = new ArrayList<Processor>();
 	private List<Constraint> constraints = new ArrayList<Constraint>();
 	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	public List<String> getRoles() {
 		return roles;
 	}

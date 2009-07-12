@@ -1,4 +1,4 @@
-<motif name="abstraction without decoupling - but accept services implemented an client inner classes">
+<motif name="abstraction without decoupling (inner classes exception)">
     <select role="client">
     	<constraint>!client.abstract</constraint>
     </select>

@@ -30,4 +30,5 @@ public interface Motif {
 	List<Constraint> getConstraints();
 	Collection<GroupByClause> getGroupByClauses(); 	
 	Collection<Processor> getGraphProcessor();
+	String getName();
 }

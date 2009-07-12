@@ -1,5 +1,5 @@
 <!-- circular dependencies between packages -->
-<motif name="circular_dependency">
+<motif name="circular dependency between packages">
     <select role="inside1"/>
     <select role="inside2"/>
     <select role="outside1"/>

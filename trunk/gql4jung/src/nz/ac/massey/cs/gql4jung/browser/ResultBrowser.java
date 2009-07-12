@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -546,28 +547,40 @@ public class ResultBrowser extends JFrame {
 	}
 
 	private void initBuiltInQueries() {
-		initBuildInQuery("missing decoupling by abstraction","queries/awd.xml");
-		initBuildInQuery("circular dependencies between packages","queries/cd.xml");
-		initBuildInQuery("db 2 ui layer dependencies","queries/db2ui.xml");
-		initBuildInQuery("multiple dependency clusters in same package","queries/cns.xml");
+		File queries = new File("queries");
+		if (!queries.exists() || !queries.isDirectory()) {
+			LOG.warn("Cannot find query folder " + queries);
+		}
+		File[] files = queries.listFiles();
+		Arrays.sort(files);
+		for (File file:files) {
+			if (!file.isDirectory()&&file.getName().endsWith(".xml")) {
+				initBuildInQuery(file);
+			}
+		}
 	}
 
-	private void initBuildInQuery(String name, final String file) {
-		final File f = new File(file);
-		if (f.exists()) {
+	private void initBuildInQuery(final File file) {
+        try {
+        	InputStream in = new FileInputStream(file);
+            Motif motif = new XMLMotifReader().read(in);
+            String name = motif.getName();
+            in.close();
 			AbstractAction act = new AbstractAction(name) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					loadQuery(f);
+					loadQuery(file);
 				}			
 			};
 			this.actLoadBuiltInQueries.add(act);
 			this.loadActions.add(act);
-			log("added action to load query from file "+f);
-		}
-		else {
-			log("cannot add action to load query from file "+f);
-		}
+			log("added action to load query from file "+file);
+            
+        }
+        catch (Exception x) {
+        	handleException("Error initialising action for built-in query "+file,x);
+        }
+
 	}
 
 	private void initToolbar() {
