@@ -808,11 +808,11 @@ public class ResultBrowser extends JFrame {
 				
 		);    
 		switch (selectedValue) {
-			case 0:actLoadDataFromJar();
-			case 1:actLoadDataFromJars();
-			case 2:actLoadDataFromGraphML();
-			case 3:actLoadDataFromODEM();
-			case 4:actAnalyseMe();
+			case 0:actLoadDataFromJar();break;
+			case 1:actLoadDataFromJars();break;
+			case 2:actLoadDataFromGraphML();break;
+			case 3:actLoadDataFromODEM();break;
+			case 4:actAnalyseMe();break;
 		}
 		
 	}
