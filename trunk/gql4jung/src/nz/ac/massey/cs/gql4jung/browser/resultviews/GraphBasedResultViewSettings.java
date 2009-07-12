@@ -268,8 +268,8 @@ public class GraphBasedResultViewSettings implements PropertyBean {
 		vertexSaturation = (float) 0.8;
 		vertexBrightness = (float) 0.8;
 		background = Color.WHITE;
-		contextDepth = 1;
-		useAntiAliasing = false;
+		contextDepth = 0;
+		useAntiAliasing = true;
 	}
 
 }
