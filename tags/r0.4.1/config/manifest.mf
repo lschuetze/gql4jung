@@ -1,0 +1,6 @@
+Manifest-version: 1.0
+Main-class: @MAIN_CLASS@
+Name: @NAME@
+Implementation-Title: @TITLE@
+Implementation-Version: @VERSION@
+Implementation-Vendor: @VENDOR@

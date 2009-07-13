@@ -1,0 +1,22 @@
+<!-- no class should depend on UI and DB classes (and therefore the respective layers) at the same time -->
+
+<motif name="db to ui layer dependencies">
+	<select role="uiclass"/>
+	<select role="uilayerclass"/>
+	<select role="dbclass"/>
+	<select role="dblayerclass"/>
+	<constraint>
+		uiclass.namespace=='javax.swing' || uiclass.namespace=='java.awt'
+    </constraint>
+   	<constraint>
+    	dbclass.namespace=='java.sql' || dbclass.namespace=='org.hibernate'
+    </constraint>
+   	<connectedBy role="db2ui" from="dblayerclass" to="uilayerclass" minLength="0"/>
+   	<connectedBy role="db link" from="dblayerclass" to="dbclass" maxLength="1"/>
+   	<connectedBy role="ui link" from="uilayerclass" to="uiclass" maxLength="1"/>
+    <groupby>
+        <element>dblayerclass.namespace</element>
+        <element>uilayerclass.namespace</element>
+    </groupby>
+    
+</motif>

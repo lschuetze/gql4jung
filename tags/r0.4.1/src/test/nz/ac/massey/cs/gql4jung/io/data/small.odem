@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- removed DTD reference for easy testing when offline of behind proxy -->
+<ODEM version="1">
+  <header>
+    <created-by>
+      <exporter version="1.1.1">mano.de.jens</exporter>
+      <provider>Jens Dietrich</provider>
+    </created-by>
+  </header>
+  <context name="New Workset">
+    <container classification="jar" name="test.jar">
+      <namespace name="com.example1">
+        <type visibility="public" classification="class" name="com.example1.Class11">
+          <dependencies count="4">
+            <depends-on classification="extends" name="java.lang.Object" />
+            <depends-on classification="uses" name="com.example1.Class12" />
+            <depends-on classification="uses" name="com.example1.Class13" />
+            <depends-on classification="uses" name="com.example1.Class21" />
+          </dependencies>
+        </type>
+        <type visibility="public" classification="class" name="com.example1.Class12">
+          <dependencies count="1">
+            <depends-on classification="extends" name="com.example1.Class11" />            
+          </dependencies>
+        </type>
+        <type visibility="public" classification="class" name="com.example1.Class13">
+          <dependencies count="1">   
+            <depends-on classification="extends" name="java.lang.Object" />       
+          </dependencies>
+        </type>
+      </namespace>
+      <namespace name="com.example2">
+        <type visibility="public" classification="class" name="com.example1.Class21">
+          <dependencies count="1">
+            <depends-on classification="extends" name="java.lang.Object" />
+          </dependencies>
+        </type>
+      </namespace>
+    </container>
+  </context>
+</ODEM>

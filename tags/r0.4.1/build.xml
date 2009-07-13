@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- ===================================================================
+
+Build file for GQL4JUNG Application
+
+Notes:
+   This is a build file for use with the Jakarta Ant build tool.
+
+Prerequisites:
+   jakarta-ant from http://jakarta.apache.org
+
+Build Instructions:
+   To build, run
+
+     java org.apache.tools.ant.Main <target>
+
+   on the directory where this file is located with the target you want.
+
+Most useful targets:
+ - lib		-> buildes a lib
+ - tests    -> runs the junit tests
+ - jdependreport -> jdepend analysis report
+Author Jens
+
+==================================================================== -->
+<project name="GQL4JUNG" default="main" basedir=".">
+	<property name="name" value="gql4jung" />
+	<property name="version" value="0.4.1" />
+	<property name="debug" value="on" />
+	<property name="src.dir" value="src" />
+	<property name="lib.dir" value="lib" />
+	<property name="config.dir" value="config" />
+	<property name="tools.dir" value="tools" />
+	<property name="docs.dir" value="docs" />
+	<property name="queries.dir" value="queries" />
+	<property name="data.dir" value="exampledata" />
+	<property name="build.dir" value="build" />
+	<property name="dist.dir" value="${build.dir}/distr" />
+	<property name="dist.queries.dir" value="${dist.dir}/queries" />
+	<property name="dist.data.dir" value="${dist.dir}/exampledata" />
+	<property name="dist.zip" value="${dist.dir}/${name}-${version}.zip" />
+	<property name="build.docs.api" value="${dist.dir}/javadoc" />
+	<property name="build.lib" value="${build.dir}/lib" />
+	<property name="build.tmp" value="${build.dir}/tmp" />
+	<property name="build.classes" value="build/classes" />
+	<property name="tests.dir" value="test_examples" />
+	<property name="qa.dir" value="${dist.dir}/qa" />
+	<property name="junit.dir" value="${qa.dir}/junit" />
+	<property name="tests.dir" value="test_examples" />
+	<property name="build.jar.name" value="${name}-${version}.jar" />
+	<property name="build.jar" value="${dist.dir}/${build.jar.name}" />
+	<property name="build.test.jar" value="${dist.dir}/${name}-tests-${version}.jar" />
+	<property name="main.class.swing" value="nz.ac.massey.cs.gql4jung.browser.ResultBrowser" />
+    <path id="build.classpath">
+	    <fileset dir="lib">
+	        <include name="**/*.jar" />
+	    </fileset>
+	    <fileset dir="tools">
+	        <include name="**/*.jar" />
+	    </fileset>
+    </path>
+
+	<!-- Prepare the output directories-->  
+	<target name="prepare" description="Prepare the build directories">
+	        <mkdir dir="${build.dir}"/>
+	        <mkdir dir="${build.classes}"/>
+	        <mkdir dir="${build.lib}"/>
+			<mkdir dir="${dist.dir}"/>
+			<mkdir dir="${dist.queries.dir}"/>
+			<mkdir dir="${dist.data.dir}"/>
+			<mkdir dir="${build.tmp}"/>
+			<mkdir dir="${qa.dir}"/>
+			<mkdir dir="${junit.dir}"/>
+			<mkdir dir="${build.docs.api}"/>
+	</target>
+
+	
+	<target name="compile" depends="prepare" description="Compile the whole project">
+	        <javac destdir="${build.classes}" 
+		        debug="${debug}" 
+		        deprecation="on"
+		        optimize="off"
+		        srcdir="${src.dir}"
+		        classpathref="build.classpath"
+	        />
+			<!-- also copy resources - icons, test data etc -->
+	    	<copy todir="${build.classes}">
+	        	<fileset dir="${src.dir}" excludes="**/*.java"/>
+	      	</copy>
+
+
+	</target>
+
+
+	<!-- =================================================================== -->
+	<!-- Unit testing                                						-->
+	<!-- =================================================================== -->
+	<target name="tests" depends="compile" description="Tests the project">
+		<junit printsummary="yes" haltonfailure="no">
+			<classpath>
+				<pathelement location="${build.classes}" />
+			    <fileset dir="lib">
+			        <include name="**/*.jar" />
+			    </fileset>
+				<pathelement location="${tools.dir}/junit.jar" />
+			</classpath>
+			<formatter type="xml" />
+			<test name="test.nz.ac.massey.cs.gql4jung.jmpl.AWDTests" todir="${junit.dir}"/>
+			<test name="test.nz.ac.massey.cs.gql4jung.jmpl.CDTests" todir="${junit.dir}" />
+			<test name="test.nz.ac.massey.cs.gql4jung.jmpl.CNSTests" todir="${junit.dir}" />
+			<test name="test.nz.ac.massey.cs.gql4jung.jmpl.DB2UITests" todir="${junit.dir}" />
+			<test name="test.nz.ac.massey.cs.gql4jung.util.Tests" todir="${junit.dir}" />
+			<test name="test.nz.ac.massey.cs.gql4jung.xml.ValidationTests" todir="${junit.dir}" />
+			<test name="test.nz.ac.massey.cs.gql4jung.io.GraphMLReaderTests" todir="${junit.dir}" />
+			<test name="test.nz.ac.massey.cs.gql4jung.io.ODEMReaderTests" todir="${junit.dir}" />
+		</junit>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Outputs the test results as an HTML report                          -->
+	<!-- =================================================================== -->
+	<target name="testreport" depends="tests" description="Produces an HTML report of test results">
+		<junitreport todir="${junit.dir}">
+			<fileset dir="${junit.dir}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${junit.dir}" />
+		</junitreport>
+	</target>
+
+   <!-- =================================================================== -->
+   <!-- Jar the classes                                                                                                                               -->
+   <!-- =================================================================== -->
+   <target name="jar" depends="tests,compile" description="Creates the jar file">
+      <!-- here we set certain meta information in the jar file dynamically by replacing values in a template -->
+      <filter token="NAME" value="${name}"/>
+      <filter token="TITLE" value="${name}"/>
+      <filter token="VERSION" value="${version}"/>
+      <filter token="VENDOR" value="Jens Dietrich, Massey University"/>
+      <filter token="MAIN_CLASS" value="${main.class.swing}"/>
+      <copy file="${config.dir}/manifest.mf" tofile="${build.tmp}/manifest.mf" filtering="yes"/>
+      <!-- separate jar files for runtime and tests -->
+      <jar jarfile="${build.jar}" 
+           manifest="${build.tmp}/manifest.mf" 
+           basedir="${build.classes}"
+           excludes="test/**/tests/*.*"
+           includes="nz/**/*.*"
+      />
+      <filter token="NAME" value="${name} Tests"/>
+      <filter token="TITLE" value="${name} Tests"/>
+      <copy file="${config.dir}/manifest.mf" tofile="${build.tmp}/manifest4tests.mf" filtering="yes"/>
+      <jar jarfile="${build.test.jar}" 
+           manifest="${build.tmp}/manifest4tests.mf" 
+           basedir="${build.classes}"
+           includes="test/**/*.*"
+      />
+   </target>
+	
+   <!-- =================================================================== -->
+   <!-- All                                                                                                                              -->
+   <!-- =================================================================== -->
+   <target name="main"  depends="jar,javadocs,testreport" description="Creates the application">
+		<!-- copy used libs -->
+   		<copy todir="${dist.dir}">
+	    	<fileset dir="${lib.dir}" includes="**/*.jar"/>
+	  	</copy>
+   	
+		<!-- copy log4j settings -->
+		<copy todir="${dist.dir}">
+	    	<fileset dir="." includes="log4j.properties"/>
+	  	</copy>
+   	
+   		<!-- copy queries and data -->
+		<copy todir="${dist.queries.dir}">
+    		<fileset dir="${queries.dir}"/>
+  		</copy>  
+		<copy todir="${dist.data.dir}">
+			<fileset dir="${data.dir}"/>
+		</copy>  
+   	
+   		<!-- scripts -->
+	    <path id="rt.jars">
+		    <fileset dir="${dist.dir}">
+		        <include name="**/*.jar" />
+		    </fileset>
+	    </path>
+	    <pathconvert targetos="unix" property="rt.jars.unix" refid="rt.jars">
+	        <flattenmapper/>
+	    </pathconvert>
+	    <filter token="classpath" value="${rt.jars.unix}"/>
+	    <filter token="mainclass" value="${main.class.swing}"/>
+	    <copy file="${config.dir}/run.sh" tofile="${dist.dir}/run.sh" filtering="yes"/>
+
+	    <pathconvert targetos="windows" property="rt.jars.win" refid="rt.jars">
+	        <flattenmapper/>
+	    </pathconvert>
+	    <filter token="classpath" value="${rt.jars.win}"/>
+	    <filter token="mainclass" value="${main.class.swing}"/>
+	    <copy file="${config.dir}/run.bat" tofile="${dist.dir}/run.bat" filtering="yes"/>  
+   	
+   		<!-- zip distribution folder - this generates the distribution -->
+	    <zip destfile="${dist.zip}"
+	         basedir="${dist.dir}"
+	    />
+   </target>
+	
+   <!-- =================================================================== -->
+   <!-- Creates the API documentation                                       -->
+   <!-- =================================================================== -->
+   <target name="javadocs" depends="prepare" description="Creates the API documentation">
+      <javadoc packagenames="nz.*"
+               sourcepath="${src.dir}"
+               destdir="${build.docs.api}"        	       
+      		   public="true"
+               author="true"
+               version="true"
+               use="false"
+               windowtitle="${name} ${version} "
+      		   classpath=""
+        >	
+       </javadoc>
+   </target>
+
+
+</project>
