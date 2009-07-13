@@ -1,1 +1,1 @@
-java -cp @classpath@ @mainclass@
+java -Xmx256m -cp @classpath@ @mainclass@
