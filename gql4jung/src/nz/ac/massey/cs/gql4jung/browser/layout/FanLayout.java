@@ -129,7 +129,7 @@ public class FanLayout<V , E> implements Layout<V, E> {
 
 	@Override
 	public void setSize(Dimension d) {
-		System.out.println("Setting size...");
+		//System.out.println("Setting size...");
 		this.size = d;
 		this.movedPoints.clear();
 		reset();
