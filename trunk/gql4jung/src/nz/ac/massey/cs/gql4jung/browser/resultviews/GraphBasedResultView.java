@@ -56,7 +56,6 @@ public class GraphBasedResultView extends ResultView {
 		this.setLayout(new GridLayout(1,1));
 		graphPane.setLayout(new GridLayout(1,1));
 		this.add(new JScrollPane(graphPane));
-		
 	}
 	
 	public PropertyBean getSettings() {

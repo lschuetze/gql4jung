@@ -18,9 +18,13 @@ import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -44,6 +48,7 @@ import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.Vertex;
+import nz.ac.massey.cs.gql4jung.browser.queryviews.GraphBasedQueryView;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.GraphBasedResultView;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.TableBasedResultView;
 import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
@@ -123,6 +128,9 @@ public class ResultBrowser extends JFrame {
 		new GraphBasedResultView(),
 		new TableBasedResultView()
 	};
+	private QueryView[] queryViewers = {
+		new GraphBasedQueryView()
+	};
 	
 	
 	private enum Status {
@@ -167,6 +175,10 @@ public class ResultBrowser extends JFrame {
 		this.tabbedPane = new JTabbedPane();
 		mainPanel.add(tabbedPane,BorderLayout.CENTER);
 		// result viewers
+		for (QueryView view:this.queryViewers) {
+			view.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
+			this.tabbedPane.add(view.getName(),view);
+		}	
 		for (ResultView view:this.resultViewers) {
 			view.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
 			this.tabbedPane.add(view.getName(),view);
@@ -208,6 +220,23 @@ public class ResultBrowser extends JFrame {
 		
 		updateActions();
 		updateStatus();
+		
+		this.addComponentListener(new ComponentListener() {
+			@Override
+			public void componentHidden(ComponentEvent e) {}
+			@Override
+			public void componentMoved(ComponentEvent e) {}
+			@Override
+			public void componentResized(ComponentEvent e) {
+				if (query!=null) displayMotif(query);
+			}
+			@Override
+			public void componentShown(ComponentEvent e) {
+			}			
+		});
+
+
+
 	}
 	private void initMenubar() {
 		menuBar = new JMenuBar();
@@ -530,7 +559,7 @@ public class ResultBrowser extends JFrame {
 				try {
 					Cursor cursor = results.getCursor();
 					MotifInstance instance = results.getInstance(cursor);
-					display(instance);	
+					displayInstance(instance);	
 				}
 				catch (Exception x){}
 			}
@@ -700,7 +729,7 @@ public class ResultBrowser extends JFrame {
 		this.updateActions();
 		this.updateStatus();
 		MotifInstance instance = results.getInstance(cursor);
-		this.display(instance);		
+		this.displayInstance(instance);		
 	}
 	private void actRunQuery() {
 		this.results.reset();
@@ -710,7 +739,7 @@ public class ResultBrowser extends JFrame {
 				computationStarted = System.currentTimeMillis();
 				engine.reset();
 				results.reset();
-				display(null);
+				displayInstance(null);
 				engine.query(data,query,results,!computeVariants);
 				queryThread = null;
 				status = Status.finished;
@@ -748,6 +777,7 @@ public class ResultBrowser extends JFrame {
         }
         updateActions();
         updateStatus();
+        
 	}
 	
 	private void actShowGraphProperties() {
@@ -905,6 +935,7 @@ public class ResultBrowser extends JFrame {
             this.status = Status.waiting;
             this.queryField.setText(file.getAbsolutePath());
             in.close();
+            displayMotif(query);
             log("Motif imported from " + file.getAbsolutePath());
             
         }
@@ -1054,7 +1085,7 @@ public class ResultBrowser extends JFrame {
 		boolean querying = queryThread!=null;
 		boolean loading = status==Status.loading;
 		actCancelQuery.setEnabled(!loading&&querying);
-		actRunQuery.setEnabled(!loading&&!querying);
+		actRunQuery.setEnabled(!loading&&!querying&&this.query!=null&&this.data!=null);
 		actExport2CSV.setEnabled(!loading&&!querying && results.hasResults());
 		actNextMajorInstance.setEnabled(!loading&&results.hasNextMajorInstance());
 		actNextMinorInstance.setEnabled(!loading&&results.hasNextMinorInstance());
@@ -1106,12 +1137,18 @@ public class ResultBrowser extends JFrame {
 		updateActions();
 	};
 	
-	private void display(final MotifInstance instance) {
+	private void displayInstance(final MotifInstance instance) {
+		switchToResultView();
 		for (ResultView view:this.resultViewers) {
 			view.display(instance,this.data);
 		}	
 	}
-
+	private void displayMotif(final Motif query) {
+		switchToQueryView();
+		for (QueryView view:this.queryViewers) {
+			view.display(query);
+		}	
+	}
 	
 	@Override
 	public void dispose() {
@@ -1122,4 +1159,17 @@ public class ResultBrowser extends JFrame {
 		super.dispose();
 	}
 
+	private boolean isShowingQuery() {
+		return this.tabbedPane.getSelectedIndex()<this.queryViewers.length;
+	}
+	private void switchToQueryView() {
+		if (!isShowingQuery()) {
+			this.tabbedPane.setSelectedIndex(0);
+		}
+	}
+	private void switchToResultView() {
+		if (isShowingQuery()) {
+			this.tabbedPane.setSelectedIndex(this.queryViewers.length);
+		}
+	}
 }

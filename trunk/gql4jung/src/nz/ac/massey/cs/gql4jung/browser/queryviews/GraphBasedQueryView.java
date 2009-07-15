@@ -8,11 +8,11 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gql4jung.browser;
+package nz.ac.massey.cs.gql4jung.browser.queryviews;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GridLayout;
@@ -27,32 +27,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import org.apache.commons.collections15.Predicate;
+import javax.swing.JScrollPane;
 import org.apache.commons.collections15.Transformer;
-
-import edu.uci.ics.jung.algorithms.layout.CircleLayout;
-import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import edu.uci.ics.jung.visualization.renderers.EdgeLabelRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import nz.ac.massey.cs.gql4jung.Constraint;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.PathConstraint;
 import nz.ac.massey.cs.gql4jung.PropertyConstraint;
-import nz.ac.massey.cs.gql4jung.browser.layout.EllipticFanLayout;
-import nz.ac.massey.cs.gql4jung.browser.layout.FanLayout;
+import nz.ac.massey.cs.gql4jung.browser.PropertyBean;
+import nz.ac.massey.cs.gql4jung.browser.QueryView;
+import nz.ac.massey.cs.gql4jung.browser.RankedVertex;
 import nz.ac.massey.cs.gql4jung.browser.layout.OrbitalLayout;
-import nz.ac.massey.cs.gql4jung.browser.resultviews.GraphBasedResultView;
-import nz.ac.massey.cs.gql4jung.browser.resultviews.VisualEdge;
-import nz.ac.massey.cs.gql4jung.browser.resultviews.VisualVertex;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 
 
@@ -60,7 +56,7 @@ import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
  * Viewer for queries.
  * @author Jens Dietrich
  */
-public class QueryViewer extends JPanel {
+public class GraphBasedQueryView extends QueryView {
 	
 	final static Stroke EDGE_STROKE = new BasicStroke(2.0f);
 	final static Stroke PATH_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER, 10.0f, new float[]{ 2.0f }, 0.0f);
@@ -111,14 +107,12 @@ public class QueryViewer extends JPanel {
 		return model;
 	}
 
-	public void setModel(Motif model) {
-		this.model = model;
-		updateView();
-	}
 
-	private void updateView() {
+	public void display(Motif model)  {
+		this.model = model;
 		DirectedGraph<VisualVertex,VisualEdge> g = asGraph(model); 
-		Layout layout = new FanLayout(g);
+		Layout layout = new OrbitalLayout(g);
+		layout.setSize(graphPane.getSize());
 		VisualizationViewer<VisualVertex,VisualEdge> vv = new VisualizationViewer<VisualVertex,VisualEdge>(layout);
 		configureRenderer(vv.getRenderContext());
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
@@ -143,7 +137,7 @@ public class QueryViewer extends JPanel {
 		
 	}
 
-	private void configureRenderer(RenderContext<nz.ac.massey.cs.gql4jung.browser.QueryViewer.VisualVertex, nz.ac.massey.cs.gql4jung.browser.QueryViewer.VisualEdge> context) {
+	private void configureRenderer(RenderContext<nz.ac.massey.cs.gql4jung.browser.queryviews.GraphBasedQueryView.VisualVertex, nz.ac.massey.cs.gql4jung.browser.queryviews.GraphBasedQueryView.VisualEdge> context) {
 		context.setVertexLabelTransformer(
 			new Transformer<VisualVertex,String>(){
 				@Override
@@ -171,23 +165,22 @@ public class QueryViewer extends JPanel {
 					if (e instanceof DepEdge) {
 						DepEdge de = (DepEdge)e;
 						StringBuffer b = new StringBuffer()
-							.append("<html>")	
 							.append(de.role)				
-							.append("<br/>[")
+							.append(" [")
 							.append(de.minLength)
-							.append(",")
-							.append(de.maxLength==-1?"unbound":de.maxLength)
-							.append("]")
-							.append("</html>");
+							.append(":")
+							.append(de.maxLength==-1?"many":de.maxLength)
+							.append("]");
 						return b.toString();
 					}
 					else return null;
 				}
 			}
 		);
+
 		context.setEdgeStrokeTransformer(new Transformer<VisualEdge,Stroke>() {
 				@Override
-				public Stroke transform(nz.ac.massey.cs.gql4jung.browser.QueryViewer.VisualEdge e) {		
+				public Stroke transform(nz.ac.massey.cs.gql4jung.browser.queryviews.GraphBasedQueryView.VisualEdge e) {		
 					if (e instanceof DepEdge) {
 						DepEdge de = (DepEdge)e;
 						return de.maxLength==1?EDGE_STROKE:PATH_STROKE;
@@ -202,7 +195,7 @@ public class QueryViewer extends JPanel {
 		context.setVertexStrokeTransformer(
 			new Transformer<VisualVertex,Stroke>() {
 				@Override
-				public Stroke transform(nz.ac.massey.cs.gql4jung.browser.QueryViewer.VisualVertex v) {		
+				public Stroke transform(nz.ac.massey.cs.gql4jung.browser.queryviews.GraphBasedQueryView.VisualVertex v) {		
 					return v instanceof TypeVertex?TYPE_VERTEX_STROKE:CONSTRAINT_VERTEX_STROKE;
 				}
 			}
@@ -212,7 +205,7 @@ public class QueryViewer extends JPanel {
 				@Override
 				public Shape transform(VisualVertex v) {
 					Font f = v instanceof TypeVertex?CORE_FONT:CONSTRAINT_FONT;
-					FontMetrics FM = QueryViewer.this.getGraphics().getFontMetrics(f);
+					FontMetrics FM = GraphBasedQueryView.this.getGraphics().getFontMetrics(f);
 					int W = Math.max(100,FM.stringWidth(getLongLabel(v))+10);
 					int H = v instanceof TypeVertex?40:25;
 					return new Rectangle2D.Float(-W/2,-H/2,W,H);
@@ -288,15 +281,15 @@ public class QueryViewer extends JPanel {
 		else return "";
 	}
 
-	public QueryViewer() {
+	public GraphBasedQueryView() {
 		super();
 		initialize();
 	}
 
 	public static void show(JFrame parent,Motif motif,String title) {
 		JDialog dlg = new JDialog(parent,title,false);
-		QueryViewer qv = new QueryViewer();
-		qv.setModel(motif);
+		GraphBasedQueryView qv = new GraphBasedQueryView();
+		qv.display(motif);
 		dlg.add(qv);
 		dlg.setTitle(title);
 		dlg.setSize(900,600);
@@ -312,8 +305,9 @@ public class QueryViewer extends JPanel {
 	}
 	
 	private void initialize() {
-		this.setLayout(new BorderLayout());
-		this.add(graphPane,BorderLayout.CENTER);
+		this.setLayout(new GridLayout(1,1));
+		graphPane.setLayout(new GridLayout(1,1));
+		this.add(new JScrollPane(graphPane));
 		
 	}
 	
@@ -357,6 +351,13 @@ public class QueryViewer extends JPanel {
 			}
 		}
 		return g;
+	}
+	
+	public String getName() {
+		return "query view";
+	}
+	public PropertyBean getSettings() {
+		return null;
 	}
 
 	
