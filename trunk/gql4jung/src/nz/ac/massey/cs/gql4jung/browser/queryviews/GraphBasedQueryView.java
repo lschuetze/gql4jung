@@ -12,7 +12,6 @@ package nz.ac.massey.cs.gql4jung.browser.queryviews;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GridLayout;
@@ -26,8 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -39,7 +36,6 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
-import edu.uci.ics.jung.visualization.renderers.EdgeLabelRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import nz.ac.massey.cs.gql4jung.Constraint;
 import nz.ac.massey.cs.gql4jung.Motif;
@@ -58,7 +54,7 @@ import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
  */
 public class GraphBasedQueryView extends QueryView {
 	
-	final static Stroke EDGE_STROKE = new BasicStroke(2.0f);
+	final static Stroke EDGE_STROKE = new BasicStroke(1.0f);
 	final static Stroke PATH_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER, 10.0f, new float[]{ 2.0f }, 0.0f);
 	final static Stroke CONSTRAINT_STROKE = new BasicStroke(0.5f);
 	final static Stroke TYPE_VERTEX_STROKE = new BasicStroke(2);
@@ -108,7 +104,7 @@ public class GraphBasedQueryView extends QueryView {
 	}
 
 
-	public void display(Motif model)  {
+	public void display(Motif model,String source)  {
 		this.model = model;
 		DirectedGraph<VisualVertex,VisualEdge> g = asGraph(model); 
 		Layout layout = new OrbitalLayout(g);
@@ -165,12 +161,12 @@ public class GraphBasedQueryView extends QueryView {
 					if (e instanceof DepEdge) {
 						DepEdge de = (DepEdge)e;
 						StringBuffer b = new StringBuffer()
-							.append(de.role)				
-							.append(" [")
+							//.append(de.role)				
+							//.append(" [")
 							.append(de.minLength)
-							.append(":")
-							.append(de.maxLength==-1?"many":de.maxLength)
-							.append("]");
+							.append("-")
+							.append(de.maxLength==-1?"many":de.maxLength);
+							//.append("]");
 						return b.toString();
 					}
 					else return null;
@@ -207,7 +203,7 @@ public class GraphBasedQueryView extends QueryView {
 					Font f = v instanceof TypeVertex?CORE_FONT:CONSTRAINT_FONT;
 					FontMetrics FM = GraphBasedQueryView.this.getGraphics().getFontMetrics(f);
 					int W = Math.max(100,FM.stringWidth(getLongLabel(v))+10);
-					int H = v instanceof TypeVertex?40:25;
+					int H = v instanceof TypeVertex?30:22;
 					return new Rectangle2D.Float(-W/2,-H/2,W,H);
 				}
 				
@@ -289,7 +285,7 @@ public class GraphBasedQueryView extends QueryView {
 	public static void show(JFrame parent,Motif motif,String title) {
 		JDialog dlg = new JDialog(parent,title,false);
 		GraphBasedQueryView qv = new GraphBasedQueryView();
-		qv.display(motif);
+		qv.display(motif,null);
 		dlg.add(qv);
 		dlg.setTitle(title);
 		dlg.setSize(900,600);
@@ -354,7 +350,7 @@ public class GraphBasedQueryView extends QueryView {
 	}
 	
 	public String getName() {
-		return "query view";
+		return "motif as graph";
 	}
 	public PropertyBean getSettings() {
 		return null;
