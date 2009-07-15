@@ -17,12 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import nz.ac.massey.cs.gql4jung.Edge;
-import nz.ac.massey.cs.gql4jung.Vertex;
-
 import org.apache.commons.collections15.Transformer;
-
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
 
@@ -31,18 +26,18 @@ import edu.uci.ics.jung.graph.Graph;
  * @author Max Dietrich
  * A graph layout that places the given vertices around the edge of an ellipse
  */
-	public class EllipticFanLayout<V extends Vertex, E extends Edge> implements
-			Layout<Vertex, Edge> {
+	public class EllipticFanLayout<V, E> implements
+			Layout<V, E> {
 		
-		public EllipticFanLayout(Graph<Vertex, Edge> graph) {
+		public EllipticFanLayout(Graph<V, E> graph) {
 			super();
 			this.graph = graph;
 		}
 	
-		protected Graph<Vertex, Edge> graph = null;
+		protected Graph<V, E> graph = null;
 		protected Dimension size = null;
 		//A map of all the points and their respective positions
-		protected Map<Vertex, EllipticPolarPoint> points = null;
+		protected Map<V, EllipticPolarPoint> points = null;
 		//Checks if the vertex map needs updating 
 		private boolean isInitialized = false;
 		
@@ -50,14 +45,14 @@ import edu.uci.ics.jung.graph.Graph;
 		public static Dimension boxSize = new Dimension(120, 36);
 		
 		//Vertices that have been manually moved
-		private Map<Vertex, Point2D> movedPoints = new HashMap<Vertex, Point2D>();
+		private Map<V, Point2D> movedPoints = new HashMap<V, Point2D>();
 	
 
 	
 		//Returns a set of points for a given graph
-		protected Map<Vertex, EllipticPolarPoint> getPoints(Graph<Vertex, Edge> graph) {
+		protected Map<V, EllipticPolarPoint> getPoints(Graph<V, E> graph) {
 	
-			Map<Vertex, EllipticPolarPoint> map = new HashMap<Vertex, EllipticPolarPoint>();
+			Map<V, EllipticPolarPoint> map = new HashMap<V, EllipticPolarPoint>();
 			int centerX = this.size.width / 2 - boxSize.width/2;
 			int centerY = this.size.height / 2 - boxSize.height/2;
 			int Xradius = centerX - boxSize.width;
@@ -65,9 +60,9 @@ import edu.uci.ics.jung.graph.Graph;
 			double angle = 2 * Math.PI / (graph.getVertexCount());
 	
 	
-			Vertex initialVertex = graph.getVertices().iterator().next();
+			V initialVertex = graph.getVertices().iterator().next();
 			//A list of the current points
-			List<Vertex> currentPoints = new ArrayList<Vertex>();
+			List<V> currentPoints = new ArrayList<V>();
 	
 			currentPoints.add(initialVertex);
 	
@@ -77,21 +72,21 @@ import edu.uci.ics.jung.graph.Graph;
 			//Adds each current point to the map, then adds all connected points
 			//Within the graph to current points. Already mapped points are eliminated.
 			while (!currentPoints.isEmpty()) {
-				Vertex v = currentPoints.get(0);
+				V v = currentPoints.get(0);
 	
 				if (!map.containsKey(v)) {
 					count++;
 					double theta = angle * count;
 					EllipticPolarPoint p = new EllipticPolarPoint(theta, Xradius, Yradius);
 					map.put(v, p);
-					for (Edge e : v.getOutEdges()) {
+					for (E e : this.graph.getOutEdges(v)) {
 						if (graph.containsEdge(e)) {
-							currentPoints.add(0, e.getEnd());
+							currentPoints.add(0, this.graph.getDest(e));
 						}
 					}
-					for (Edge e : v.getInEdges()) {
+					for (E e : this.graph.getInEdges(v)) {
 						if (graph.containsEdge(e)) {
-							currentPoints.add(0, e.getStart());
+							currentPoints.add(0, this.graph.getSource(e));
 						}
 					}
 				} else
@@ -103,7 +98,7 @@ import edu.uci.ics.jung.graph.Graph;
 		}
 	
 		@Override
-		public Graph<Vertex, Edge> getGraph() {
+		public Graph<V, E> getGraph() {
 			return graph;
 		}
 	
@@ -128,14 +123,13 @@ import edu.uci.ics.jung.graph.Graph;
 		}
 	
 		@Override
-		public void setGraph(Graph<Vertex, Edge> g) {
+		public void setGraph(Graph<V, E> g) {
 			this.graph = g;
 			this.movedPoints.clear();
 		}
 	
 		@Override
 		public void setSize(Dimension d) {
-			//System.out.println("Setting size...");
 			this.size = d;
 			this.movedPoints.clear();
 			reset();
@@ -145,7 +139,7 @@ import edu.uci.ics.jung.graph.Graph;
 		//If moved, returns moved point instead
 		//Recalculates points if necessary
 		@Override
-		public Point2D transform(Vertex v) {
+		public Point2D transform(V v) {
 	
 			if (!this.isInitialized) {
 				this.points = this.getPoints(this.graph);
@@ -164,23 +158,23 @@ import edu.uci.ics.jung.graph.Graph;
 	
 		//Does nothing
 		@Override
-		public void setInitializer(Transformer<Vertex, Point2D> t) {
+		public void setInitializer(Transformer<V, Point2D> t) {
 		}
 	
 		//Does nothing
 		@Override
-		public boolean isLocked(Vertex arg0) {
+		public boolean isLocked(V arg0) {
 			return false;
 		}
 	
 		//Does nothing
 		@Override
-		public void lock(Vertex arg0, boolean arg1) {
+		public void lock(V arg0, boolean arg1) {
 		}
 	
 		//Overrides the position of a point by adding it to movedPoints
 		@Override
-		public void setLocation(Vertex v, Point2D p) {
+		public void setLocation(V v, Point2D p) {
 			this.movedPoints.put(v, p);
 		}
 	

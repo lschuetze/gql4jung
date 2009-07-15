@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import nz.ac.massey.cs.gql4jung.Edge;
-import nz.ac.massey.cs.gql4jung.Vertex;
 import org.apache.commons.collections15.Transformer;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
@@ -28,28 +26,27 @@ import edu.uci.ics.jung.graph.Graph;
  * @author Max Dietrich
  * A graph layout that places the given vertices around the edge of a circle
  */
-public class FanLayout<V extends Vertex, E extends Edge> implements
-		Layout<Vertex, Edge> {
+public class FanLayout<V , E> implements Layout<V, E> {
 
-	private Graph<Vertex, Edge> graph = null;
+	private Graph<V, E> graph = null;
 	private Dimension size = null;
 	//A map of all the points and their respective positions
-	private Map<Vertex, Point2D> points = null;
+	private Map<V, Point2D> points = null;
 	//Checks if the vertex map needs updating 
 	private boolean isInitialized = false;
 	
 	//Vertices that have been manually moved
-	private Map<Vertex, Point2D> movedPoints = new HashMap<Vertex, Point2D>();
+	private Map<V, Point2D> movedPoints = new HashMap<V, Point2D>();
 
-	public FanLayout(Graph<Vertex, Edge> graph) {
+	public FanLayout(Graph<V, E> graph) {
 		super();
 		this.graph = graph;
 	}
 
 	//Returns a set of points for a given graph
-	private Map<Vertex, Point2D> getPoints(Graph<Vertex, Edge> graph) {
+	private Map<V, Point2D> getPoints(Graph<V, E> graph) {
 
-		Map<Vertex, Point2D> map = new HashMap<Vertex, Point2D>();
+		Map<V, Point2D> map = new HashMap<V, Point2D>();
 
 		//The default size of each vertex box
 		Dimension boxSize = new Dimension(120, 36);
@@ -60,9 +57,9 @@ public class FanLayout<V extends Vertex, E extends Edge> implements
 		double angle = 2 * Math.PI / (graph.getVertexCount());
 
 
-		Vertex initialVertex = graph.getVertices().iterator().next();
+		V initialVertex = graph.getVertices().iterator().next();
 		//A list of the current points
-		List<Vertex> currentPoints = new ArrayList<Vertex>();
+		List<V> currentPoints = new ArrayList<V>();
 
 		currentPoints.add(initialVertex);
 
@@ -72,7 +69,7 @@ public class FanLayout<V extends Vertex, E extends Edge> implements
 		//Adds each current point to the map, then adds all connected points
 		//Within the graph to current points. Already mapped points are eliminated.
 		while (!currentPoints.isEmpty()) {
-			Vertex v = currentPoints.get(0);
+			V v = currentPoints.get(0);
 
 			if (!map.containsKey(v)) {
 				count++;
@@ -81,14 +78,14 @@ public class FanLayout<V extends Vertex, E extends Edge> implements
 				int y = centerY + (int) (Math.cos(theta) * radius);
 				Point p = new Point(x, y);
 				map.put(v, p);
-				for (Edge e : v.getOutEdges()) {
+				for (E e : this.graph.getOutEdges(v)) {
 					if (graph.containsEdge(e)) {
-						currentPoints.add(0, e.getEnd());
+						currentPoints.add(0, this.graph.getDest(e));
 					}
 				}
-				for (Edge e : v.getInEdges()) {
+				for (E e : this.graph.getInEdges(v)) {
 					if (graph.containsEdge(e)) {
-						currentPoints.add(0, e.getStart());
+						currentPoints.add(0, this.graph.getSource(e));
 					}
 				}
 			} else
@@ -100,7 +97,7 @@ public class FanLayout<V extends Vertex, E extends Edge> implements
 	}
 
 	@Override
-	public Graph<Vertex, Edge> getGraph() {
+	public Graph<V, E> getGraph() {
 		return graph;
 	}
 
@@ -125,7 +122,7 @@ public class FanLayout<V extends Vertex, E extends Edge> implements
 	}
 
 	@Override
-	public void setGraph(Graph<Vertex, Edge> g) {
+	public void setGraph(Graph<V, E> g) {
 		this.graph = g;
 		this.movedPoints.clear();
 	}
@@ -142,7 +139,7 @@ public class FanLayout<V extends Vertex, E extends Edge> implements
 	//If moved, returns moved point instead
 	//Recalculates points if necessary
 	@Override
-	public Point2D transform(Vertex v) {
+	public Point2D transform(V v) {
 
 		if (!this.isInitialized) {
 			this.points = this.getPoints(this.graph);
@@ -156,23 +153,23 @@ public class FanLayout<V extends Vertex, E extends Edge> implements
 
 	//Does nothing
 	@Override
-	public void setInitializer(Transformer<Vertex, Point2D> t) {
+	public void setInitializer(Transformer<V, Point2D> t) {
 	}
 
 	//Does nothing
 	@Override
-	public boolean isLocked(Vertex arg0) {
+	public boolean isLocked(V arg0) {
 		return false;
 	}
 
 	//Does nothing
 	@Override
-	public void lock(Vertex arg0, boolean arg1) {
+	public void lock(V arg0, boolean arg1) {
 	}
 
 	//Overrides the position of a point by adding it to movedPoints
 	@Override
-	public void setLocation(Vertex v, Point2D p) {
+	public void setLocation(V v, Point2D p) {
 		this.movedPoints.put(v, p);
 	}
 

@@ -48,6 +48,8 @@ import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.PathConstraint;
 import nz.ac.massey.cs.gql4jung.PropertyConstraint;
 import nz.ac.massey.cs.gql4jung.browser.layout.EllipticFanLayout;
+import nz.ac.massey.cs.gql4jung.browser.layout.FanLayout;
+import nz.ac.massey.cs.gql4jung.browser.layout.OrbitalLayout;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.GraphBasedResultView;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.VisualEdge;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.VisualVertex;
@@ -74,16 +76,24 @@ public class QueryViewer extends JPanel {
 	final static Color BACKGROUND_COLOR = new Color(255,255,255,200);
 	final static Color BACKGROUND_COLOR_TRANSPARENT = new Color(255,255,255,255);
 	
-	class VisualVertex {
+	abstract class VisualVertex implements RankedVertex {
 	}
 	class VisualEdge {
 
 	}
 	class TypeVertex extends VisualVertex {
 		String role = null;
+		@Override
+		public int getDegree() {
+			return 0;
+		}
 	}
 	class ConstraintVertex extends VisualVertex {
 		String constraint = null;
+		@Override
+		public int getDegree() {
+			return 1;
+		}
 	}
 	class DepEdge extends VisualEdge {
 		String role = null;
@@ -108,7 +118,7 @@ public class QueryViewer extends JPanel {
 
 	private void updateView() {
 		DirectedGraph<VisualVertex,VisualEdge> g = asGraph(model); 
-		Layout layout = new CircleLayout(g);
+		Layout layout = new FanLayout(g);
 		VisualizationViewer<VisualVertex,VisualEdge> vv = new VisualizationViewer<VisualVertex,VisualEdge>(layout);
 		configureRenderer(vv.getRenderContext());
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
@@ -203,7 +213,7 @@ public class QueryViewer extends JPanel {
 				public Shape transform(VisualVertex v) {
 					Font f = v instanceof TypeVertex?CORE_FONT:CONSTRAINT_FONT;
 					FontMetrics FM = QueryViewer.this.getGraphics().getFontMetrics(f);
-					int W = Math.max(200,FM.stringWidth(getLongLabel(v))+10);
+					int W = Math.max(100,FM.stringWidth(getLongLabel(v))+10);
 					int H = v instanceof TypeVertex?40:25;
 					return new Rectangle2D.Float(-W/2,-H/2,W,H);
 				}
@@ -294,7 +304,7 @@ public class QueryViewer extends JPanel {
 		dlg.setVisible(true);		
 	}
 	public static void main(String[] args) throws Exception {
-		String query = "awd.xml";
+		String query = "cd.xml";
 		InputStream in = new FileInputStream("queries/"+query);
 		Motif motif = new XMLMotifReader().read(in);
 		in.close();
