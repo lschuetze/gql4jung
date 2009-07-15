@@ -19,6 +19,7 @@ import java.util.Map;
 
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.Vertex;
+import nz.ac.massey.cs.gql4jung.browser.RankedVertex;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.VisualEdge;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.VisualVertex;
 
@@ -30,19 +31,19 @@ import edu.uci.ics.jung.graph.Graph;
  *         varying 'layers' of nodes These nodes are arranged for minimal
  *         intershell connection lengths
  */
-public class OrbitalLayout<V extends VisualVertex, E extends VisualEdge>
-		extends EllipticFanLayout<Vertex, Edge> {
+public class OrbitalLayout<V extends RankedVertex, E>
+		extends EllipticFanLayout<RankedVertex, E> {
 
 	public OrbitalLayout(Graph graph) {
 		super(graph);
 	}
 
-	protected Map<Vertex, EllipticPolarPoint> getPoints(
-			Graph<Vertex, Edge> graph) {
+	protected Map<RankedVertex, EllipticPolarPoint> getPoints(
+			Graph<RankedVertex, E> graph) {
 
-		List<ArrayList<VisualVertex>> layers = this.extractLayers(graph);
+		List<ArrayList<RankedVertex>> layers = this.extractLayers(graph);
 
-		List<HashMap<Vertex, EllipticPolarPoint>> assignedLayers = new ArrayList<HashMap<Vertex, EllipticPolarPoint>>();
+		List<HashMap<RankedVertex, EllipticPolarPoint>> assignedLayers = new ArrayList<HashMap<RankedVertex, EllipticPolarPoint>>();
 
 		int centerX = this.size.width / 2 - boxSize.width / 2;
 		int centerY = this.size.height / 2 - boxSize.height / 2;
@@ -51,31 +52,31 @@ public class OrbitalLayout<V extends VisualVertex, E extends VisualEdge>
 
 		// Initial shell
 		{
-			List<VisualVertex> initialShell = layers.get(0);
-			Vertex initialPoint = initialShell.get(0);
-			List<Vertex> currentPoints = new ArrayList<Vertex>();
+			List<RankedVertex> initialShell = layers.get(0);
+			RankedVertex initialPoint = initialShell.get(0);
+			List<RankedVertex> currentPoints = new ArrayList<RankedVertex>();
 			currentPoints.add(initialPoint);
 
 			double innerangle = 2 * Math.PI / (initialShell.size());
 			int count = 0;
 
-			HashMap<Vertex, EllipticPolarPoint> firstMap = new HashMap<Vertex, EllipticPolarPoint>();
+			HashMap<RankedVertex, EllipticPolarPoint> firstMap = new HashMap<RankedVertex, EllipticPolarPoint>();
 
 			while (!currentPoints.isEmpty()) {
-				Vertex v = currentPoints.get(0);
+				RankedVertex v = currentPoints.get(0);
 				if (!firstMap.containsKey(v)) {
 					double theta = innerangle * count;
 					count++;
 					EllipticPolarPoint p = new EllipticPolarPoint(theta, XR, YR);
 					firstMap.put(v, p);
-					for (Edge e : v.getOutEdges()) {
-						Vertex newV = e.getEnd();
+					for (E e : this.graph.getOutEdges(v)) {
+						RankedVertex newV = this.graph.getDest(e);
 						if (initialShell.contains(newV)) {
 							currentPoints.add(0, newV);
 						}
 					}
-					for (Edge e : v.getInEdges()) {
-						Vertex newV = e.getStart();
+					for (E e : this.graph.getInEdges(v)) {
+						RankedVertex newV = this.graph.getSource(e);
 						if (initialShell.contains(newV)) {
 							currentPoints.add(0, newV);
 						}
@@ -93,7 +94,7 @@ public class OrbitalLayout<V extends VisualVertex, E extends VisualEdge>
 
 			int radiusX = (depth + 1) * XR;
 			int radiusY = (depth + 1) * YR;
-			List<VisualVertex> shell = layers.get(depth);
+			List<RankedVertex> shell = layers.get(depth);
 
 			double angle = 2 * Math.PI / (shell.size());
 			List<Integer> availableAngles = new ArrayList<Integer>();
@@ -101,23 +102,23 @@ public class OrbitalLayout<V extends VisualVertex, E extends VisualEdge>
 				availableAngles.add(i);
 			}
 
-			HashMap<Vertex, EllipticPolarPoint> previous = assignedLayers
+			HashMap<RankedVertex, EllipticPolarPoint> previous = assignedLayers
 					.get(depth - 1);
 
-			HashMap<Vertex, EllipticPolarPoint> map = new HashMap<Vertex, EllipticPolarPoint>();
+			HashMap<RankedVertex, EllipticPolarPoint> map = new HashMap<RankedVertex, EllipticPolarPoint>();
 
-			for (Vertex v : shell) {
+			for (RankedVertex v : shell) {
 
 				List<EllipticPolarPoint> connected = new ArrayList<EllipticPolarPoint>();
 
-				for (Edge e : v.getOutEdges()) {
-					Vertex newV = e.getEnd();
+				for (E e : this.graph.getOutEdges(v)) {
+					RankedVertex newV = this.graph.getDest(e);
 					if (previous.containsKey(newV)) {
 						connected.add(previous.get(newV));
 					}
 				}
-				for (Edge e : v.getInEdges()) {
-					Vertex newV = e.getStart();
+				for (E e : this.graph.getInEdges(v)) {
+					RankedVertex newV = this.graph.getSource(e);
 					if (previous.containsKey(newV)) {
 						connected.add(previous.get(newV));
 					}
@@ -151,8 +152,8 @@ public class OrbitalLayout<V extends VisualVertex, E extends VisualEdge>
 			assignedLayers.add(assignedLayers.size(), map);
 		}
 
-		Map<Vertex, EllipticPolarPoint> returnValues = new HashMap<Vertex, EllipticPolarPoint>();
-		for (HashMap<Vertex, EllipticPolarPoint> map : assignedLayers) {
+		Map<RankedVertex, EllipticPolarPoint> returnValues = new HashMap<RankedVertex, EllipticPolarPoint>();
+		for (HashMap<RankedVertex, EllipticPolarPoint> map : assignedLayers) {
 			returnValues.putAll(map);
 		}
 		return returnValues;
@@ -160,17 +161,17 @@ public class OrbitalLayout<V extends VisualVertex, E extends VisualEdge>
 
 	// Returns a list of layers, where each layer is a list of vertices of the
 	// same depth
-	private List<ArrayList<VisualVertex>> extractLayers(
-			Graph<Vertex, Edge> graph) {
-		Iterator<Vertex> iterator = graph.getVertices().iterator();
+	private List<ArrayList<RankedVertex>> extractLayers(
+			Graph<RankedVertex, E> graph) {
+		Iterator<RankedVertex> iterator = graph.getVertices().iterator();
 
-		List<ArrayList<VisualVertex>> layers = new ArrayList<ArrayList<VisualVertex>>();
+		List<ArrayList<RankedVertex>> layers = new ArrayList<ArrayList<RankedVertex>>();
 
 		while (iterator.hasNext()) {
-			VisualVertex v = (VisualVertex) iterator.next();
-			int depth = v.getDistanceFromMotif();
+			RankedVertex v = (RankedVertex) iterator.next();
+			int depth = v.getDegree();
 			while (layers.size() <= depth) {
-				layers.add(new ArrayList<VisualVertex>());
+				layers.add(new ArrayList<RankedVertex>());
 			}
 			layers.get(depth).add(v);
 		}
