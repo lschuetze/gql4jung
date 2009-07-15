@@ -130,7 +130,7 @@ public class GraphBasedResultView extends ResultView {
 
 	@Override
 	public String getName() {
-		return "graph view";
+		return "query results as graph";
 	}
 
 	private void configureRenderer (RenderContext context,final MotifInstance instance) {

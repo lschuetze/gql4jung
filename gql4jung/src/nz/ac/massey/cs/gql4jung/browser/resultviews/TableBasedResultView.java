@@ -81,7 +81,7 @@ public class TableBasedResultView extends ResultView {
 
 	@Override
 	public String getName() {
-		return "table view";
+		return "query results as table";
 	}
 	public PropertyBean getSettings() {
 		return null;

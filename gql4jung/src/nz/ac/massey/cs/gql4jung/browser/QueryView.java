@@ -19,7 +19,7 @@ import nz.ac.massey.cs.gql4jung.*;
  */
 public abstract class QueryView extends JPanel {
 	public abstract String getName();
-	public abstract void display(Motif query);
+	public abstract void display(Motif query,String source);
 	// interface to customise view
 	public abstract PropertyBean getSettings();
 }

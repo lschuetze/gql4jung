@@ -25,12 +25,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringBufferInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +51,7 @@ import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.Vertex;
 import nz.ac.massey.cs.gql4jung.browser.queryviews.GraphBasedQueryView;
+import nz.ac.massey.cs.gql4jung.browser.queryviews.XMLSourceQueryView;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.GraphBasedResultView;
 import nz.ac.massey.cs.gql4jung.browser.resultviews.TableBasedResultView;
 import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
@@ -81,6 +84,7 @@ public class ResultBrowser extends JFrame {
 	// model
 	private DirectedGraph<Vertex,Edge> data = null;
 	private Motif query = null;
+	private String querySource = null;
 	private QueryResults results = new QueryResults();
 	private GQL engine = new GQLImpl();
 	private Thread queryThread = null;
@@ -129,7 +133,8 @@ public class ResultBrowser extends JFrame {
 		new TableBasedResultView()
 	};
 	private QueryView[] queryViewers = {
-		new GraphBasedQueryView()
+		new GraphBasedQueryView(),
+		new XMLSourceQueryView()
 	};
 	
 	
@@ -228,7 +233,7 @@ public class ResultBrowser extends JFrame {
 			public void componentMoved(ComponentEvent e) {}
 			@Override
 			public void componentResized(ComponentEvent e) {
-				if (query!=null) displayMotif(query);
+				if (query!=null) displayMotif(query,querySource);
 			}
 			@Override
 			public void componentShown(ComponentEvent e) {
@@ -935,9 +940,21 @@ public class ResultBrowser extends JFrame {
             this.status = Status.waiting;
             this.queryField.setText(file.getAbsolutePath());
             in.close();
-            displayMotif(query);
-            log("Motif imported from " + file.getAbsolutePath());
             
+            // read source
+            log("Motif imported from " + file.getAbsolutePath());
+            FileReader reader = new FileReader(file);
+            BufferedReader sin = new BufferedReader(reader);
+            String line = null;
+            StringBuffer b = new StringBuffer();
+            while ((line=sin.readLine())!=null) {
+            	if (b.length()>0) b.append('\n');
+            	b.append(line);
+            }
+            this.querySource = b.toString();
+            sin.close();
+            
+            displayMotif(query,querySource);
         }
         catch (Exception x) {
         	handleException("Error loading query",x);
@@ -1143,10 +1160,10 @@ public class ResultBrowser extends JFrame {
 			view.display(instance,this.data);
 		}	
 	}
-	private void displayMotif(final Motif query) {
+	private void displayMotif(Motif query,String source) {
 		switchToQueryView();
 		for (QueryView view:this.queryViewers) {
-			view.display(query);
+			view.display(query,source);
 		}	
 	}
 	
