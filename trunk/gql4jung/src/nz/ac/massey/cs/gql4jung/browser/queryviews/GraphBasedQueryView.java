@@ -45,8 +45,6 @@ import nz.ac.massey.cs.gql4jung.PropertyConstraint;
 import nz.ac.massey.cs.gql4jung.browser.PropertyBean;
 import nz.ac.massey.cs.gql4jung.browser.QueryView;
 import nz.ac.massey.cs.gql4jung.browser.RankedVertex;
-import nz.ac.massey.cs.gql4jung.browser.layout.EllipticFanLayout;
-import nz.ac.massey.cs.gql4jung.browser.layout.OrbitalLayout;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 
 
@@ -61,14 +59,6 @@ public class GraphBasedQueryView extends QueryView {
 	final static Stroke CONSTRAINT_STROKE = new BasicStroke(0.5f);
 	final static Stroke TYPE_VERTEX_STROKE = new BasicStroke(2);
 	final static Stroke CONSTRAINT_VERTEX_STROKE = new BasicStroke(0.2f);
-	final static Color TYPE_COLOR = Color.black;
-	final static Color CONSTRAINT_COLOR = Color.red;
-	final static Color CORE_FILL_COLOR = new Color(200,200,200,200);
-	final static Color CONSTRAINT_FILL_COLOR = new Color(255,255,255,200);
-	final static Font CORE_FONT = new Font("Monospaced", Font.PLAIN,12);
-	final static Font CONSTRAINT_FONT = new Font("Monospaced", Font.PLAIN,10);
-	final static Color BACKGROUND_COLOR = new Color(255,255,255,200);
-	final static Color BACKGROUND_COLOR_TRANSPARENT = new Color(255,255,255,255);
 	
 	abstract class VisualVertex implements RankedVertex {
 	}
@@ -204,9 +194,9 @@ public class GraphBasedQueryView extends QueryView {
 			new Transformer<VisualVertex,Shape>() {
 				@Override
 				public Shape transform(VisualVertex v) {
-					Font f = v instanceof TypeVertex?CORE_FONT:CONSTRAINT_FONT;
+					Font f = v instanceof TypeVertex?settings.getRoleFont():settings.getConstraintFont();
 					FontMetrics FM = GraphBasedQueryView.this.getGraphics().getFontMetrics(f);
-					int W = Math.max(100,FM.stringWidth(getLongLabel(v))+10);
+					int W = Math.max(settings.getMinBoxWidth(),FM.stringWidth(getLongLabel(v))+10);
 					int H = v instanceof TypeVertex?30:22;
 					return new Rectangle2D.Float(-W/2,-H/2,W,H);
 				}
@@ -217,7 +207,7 @@ public class GraphBasedQueryView extends QueryView {
 			new Transformer<VisualVertex,Paint>() {
 				@Override
 				public Paint transform(VisualVertex v) {
-					return v instanceof TypeVertex?CORE_FILL_COLOR:CONSTRAINT_FILL_COLOR;
+					return v instanceof TypeVertex?makeTransparent(settings.getRoleFillColor()):makeTransparent(settings.getConstraintFillColor());
 				}
 			}
 		);
@@ -225,7 +215,7 @@ public class GraphBasedQueryView extends QueryView {
 				new Transformer<VisualVertex,Paint>() {
 					@Override
 					public Paint transform(VisualVertex v) {
-						return v instanceof TypeVertex?TYPE_COLOR:CONSTRAINT_COLOR;
+						return v instanceof TypeVertex?settings.getRoleFrameColor():settings.getConstraintFrameColor();
 					}
 				}				
 		);
@@ -233,7 +223,7 @@ public class GraphBasedQueryView extends QueryView {
 				new Transformer<VisualEdge,Paint>() {
 					@Override
 					public Paint transform(VisualEdge v) {
-						return v instanceof DepEdge?TYPE_COLOR:CONSTRAINT_COLOR;
+						return v instanceof DepEdge?settings.getRoleFrameColor():settings.getConstraintFrameColor();
 					}
 				}				
 		);
@@ -241,7 +231,7 @@ public class GraphBasedQueryView extends QueryView {
 			new Transformer<VisualVertex,Font>(){
 				@Override
 				public Font transform(VisualVertex v) {
-					return v instanceof TypeVertex?CORE_FONT:CONSTRAINT_FONT;
+					return v instanceof TypeVertex?settings.getRoleFont():settings.getConstraintFont();
 				}
 			}
 		);
@@ -249,7 +239,7 @@ public class GraphBasedQueryView extends QueryView {
 			new Transformer<VisualEdge,Font>(){
 				@Override
 				public Font transform(VisualEdge e) {
-					return e instanceof DepEdge?CORE_FONT:CONSTRAINT_FONT;
+					return settings.getEdgeFont();
 				}
 			}
 		);
@@ -257,7 +247,7 @@ public class GraphBasedQueryView extends QueryView {
 			new Transformer<VisualEdge,Paint>() {
 				@Override
 				public Paint transform(VisualEdge v) {
-					return v instanceof DepEdge?TYPE_COLOR:BACKGROUND_COLOR_TRANSPARENT;
+					return v instanceof DepEdge?settings.getRoleFrameColor():makeTransparent(settings.getBackground(),255);
 				}
 			}
 		);
@@ -265,7 +255,7 @@ public class GraphBasedQueryView extends QueryView {
 				new Transformer<VisualEdge,Paint>() {
 					@Override
 					public Paint transform(VisualEdge v) {
-						return v instanceof DepEdge?TYPE_COLOR:BACKGROUND_COLOR_TRANSPARENT;
+						return v instanceof DepEdge?settings.getRoleFrameColor():makeTransparent(settings.getBackground(),255);
 					}
 				}
 			);
@@ -359,6 +349,11 @@ public class GraphBasedQueryView extends QueryView {
 	public PropertyBean getSettings() {
 		return settings;
 	}
-
+	private Color makeTransparent(Color c) {
+		return makeTransparent(c,settings.getVertexTransparency());
+	} 
+	private Color makeTransparent(Color c, int alpha) {
+		return new Color(c.getRed(),c.getGreen(),c.getBlue(),alpha);
+	} 
 	
 }

@@ -42,6 +42,20 @@ import nz.ac.massey.cs.gql4jung.browser.layout.OrbitalLayout;
  * @author jens dietrich
  */
 public class GraphBasedQueryViewSettings implements PropertyBean {
+	
+	private String layout = null;
+	private Font roleFont =  new Font("Monospaced", Font.PLAIN,10);
+	private Font edgeFont =  new Font("Monospaced", Font.PLAIN,10);
+	private Font constraintFont =  new Font("Monospaced", Font.PLAIN,10);
+	private int minBoxWidth = 120;
+	private int vertexTransparency = 50;
+	private Color background = Color.WHITE;
+	private Color roleFrameColor = Color.BLACK;
+	private Color constraintFrameColor = Color.RED;
+	private Color roleFillColor = Color.BLACK;
+	private Color constraintFillColor = Color.RED;
+	private boolean useAntiAliasing = true;
+	
 	public GraphBasedQueryViewSettings() {
 		super();
 		reset();
@@ -70,34 +84,68 @@ public class GraphBasedQueryViewSettings implements PropertyBean {
 		}
 	}
 	
-	private String layout = null;
-	private Font font4participants =  new Font("Monospaced", Font.PLAIN,10);
-	private Font font4nonparticipants =  new Font("Monospaced", Font.ITALIC,10);
-	private Font font4edges =  new Font("Monospaced", Font.PLAIN,10);
-	private int minBoxWidth = 120;
-	private int boxHeight4participants = 36;
-	private int boxHeight4nonparticipants = 24;
-	private int vertexTransparency = 50;
-	private float vertexSaturation = (float) 0.8;
-	private float vertexBrightness = (float) 0.8;
-	private Color background = Color.WHITE;
-	private int contextDepth = 0;
-	private boolean useAntiAliasing = true;
-	
+	public Font getRoleFont() {
+		return roleFont;
+	}
+
+	public Font getEdgeFont() {
+		return edgeFont;
+	}
+
+	public Font getConstraintFont() {
+		return constraintFont;
+	}
+
+	public Color getRoleFrameColor() {
+		return roleFrameColor;
+	}
+
+	public Color getConstraintFrameColor() {
+		return constraintFrameColor;
+	}
+
+	public Color getRoleFillColor() {
+		return roleFillColor;
+	}
+
+	public Color getConstraintFillColor() {
+		return constraintFillColor;
+	}
+
+	public void setRoleFont(Font roleFont) {
+		this.roleFont = roleFont;
+	}
+
+	public void setEdgeFont(Font edgeFont) {
+		this.edgeFont = edgeFont;
+	}
+
+	public void setConstraintFont(Font constraintFont) {
+		this.constraintFont = constraintFont;
+	}
+
+	public void setRoleFrameColor(Color roleFrameColor) {
+		this.roleFrameColor = roleFrameColor;
+	}
+
+	public void setConstraintFrameColor(Color constraintFrameColor) {
+		this.constraintFrameColor = constraintFrameColor;
+	}
+
+	public void setRoleFillColor(Color roleFillColor) {
+		this.roleFillColor = roleFillColor;
+	}
+
+	public void setConstraintFillColor(Color constraintFillColor) {
+		this.constraintFillColor = constraintFillColor;
+	}
+
 	public boolean isUseAntiAliasing() {
 		return useAntiAliasing;
 	}
 
 	public void setUseAntiAliasing(boolean useAntiAliasing) {
 		this.useAntiAliasing = useAntiAliasing;
-	}
-
-	public int getContextDepth() {
-		return contextDepth;
-	}
-
-	public void setContextDepth(int contextDepth) {
-		this.contextDepth = contextDepth;
 	}
 
 	public Color getBackground() {
@@ -112,76 +160,18 @@ public class GraphBasedQueryViewSettings implements PropertyBean {
 		return vertexTransparency;
 	}
 
-	public float getVertexSaturation() {
-		return vertexSaturation;
-	}
-
-	public float getVertexBrightness() {
-		return vertexBrightness;
-	}
-
 	public void setVertexTransparency(int vertexTransparency) {
 		this.vertexTransparency = vertexTransparency;
 	}
 
-	public void setVertexSaturation(float vertexSaturation) {
-		this.vertexSaturation = vertexSaturation%256;
-	}
-
-	public void setVertexBrightness(float vertexBrightness) {
-		this.vertexBrightness = vertexBrightness%256;
-	}
 	
 	public int getMinBoxWidth() {
 		return minBoxWidth;
 	}
 
-	public int getBoxHeight4Participants() {
-		return boxHeight4participants;
-	}
-
-	public int getBoxHeight4NonParticipants() {
-		return boxHeight4nonparticipants;
-	}
-
 	public void setMinBoxWidth(int minBoxWidth) {
 		this.minBoxWidth = minBoxWidth;
 	}
-
-	public void setBoxHeight4Participants(int boxHeight4participants) {
-		this.boxHeight4participants = boxHeight4participants;
-	}
-
-	public void setBoxHeight4NonParticipants(int boxHeight4nonparticipants) {
-		this.boxHeight4nonparticipants = boxHeight4nonparticipants;
-	}
-
-	
-	public Font getFont4Edges() {
-		return font4edges;
-	}
-
-	public void setFont4Edges(Font font4edges) {
-		this.font4edges = font4edges;
-	}
-
-	public Font getFont4Participants() {
-		return font4participants;
-	}
-
-	public Font getFont4NonParticipants() {
-		return font4nonparticipants;
-	}
-
-	public void setFont4Participants(Font font4participants) {
-		this.font4participants = font4participants;
-	}
-
-	public void setFont4NonParticipants(Font font4nonparticipants) {
-		this.font4nonparticipants = font4nonparticipants;
-	}
-
-	
 
 	public String getLayout() {
 		return layout;
@@ -219,36 +209,6 @@ public class GraphBasedQueryViewSettings implements PropertyBean {
 	}
 
 	@Override
-	public PropertyDescriptor[] getProperties() {
-		try {
-			PropertyDescriptor[] properties = {
-				new PropertyDescriptor("layout",GraphBasedQueryViewSettings.class,"getLayout","setLayout"),
-				new PropertyDescriptor("font for participant labels",GraphBasedQueryViewSettings.class,"getFont4Participants","setFont4Participants"),
-				new PropertyDescriptor("font for non participant labels",GraphBasedQueryViewSettings.class,"getFont4NonParticipants","setFont4NonParticipants"),
-				new PropertyDescriptor("font for edge labels",GraphBasedQueryViewSettings.class,"getFont4Edges","setFont4Edges"),				
-				new PropertyDescriptor("box height for participant nodes",GraphBasedQueryViewSettings.class,"getBoxHeight4Participants","setBoxHeight4Participants"),
-				new PropertyDescriptor("box height for non participant nodes",GraphBasedQueryViewSettings.class,"getBoxHeight4NonParticipants","setBoxHeight4NonParticipants"),
-				new PropertyDescriptor("min box width",GraphBasedQueryViewSettings.class,"getMinBoxWidth","setMinBoxWidth"),
-				new PropertyDescriptor("vertex saturation",GraphBasedQueryViewSettings.class,"getVertexSaturation","setVertexSaturation"),
-				new PropertyDescriptor("vertex brightness",GraphBasedQueryViewSettings.class,"getVertexBrightness","setVertexBrightness"),
-				new PropertyDescriptor("vertex transparency (alpha)",GraphBasedQueryViewSettings.class,"getVertexTransparency","setVertexTransparency"),
-				new PropertyDescriptor("background colour",GraphBasedQueryViewSettings.class,"getBackground","setBackground"),
-				new PropertyDescriptor("context depth (greater is slower)",GraphBasedQueryViewSettings.class,"getContextDepth","setContextDepth"),
-				new PropertyDescriptor("use anti aliasing (on is slower)",GraphBasedQueryViewSettings.class,"isUseAntiAliasing","setUseAntiAliasing")
-			};
-				
-			//PropertyDescriptor[] properties = java.beans.Introspector.getBeanInfo(Person.class).getPropertyDescriptors();
-			properties[0].setPropertyEditorClass(LayoutEditor.class);
-			
-			return properties;
-		}
-		catch (Exception x) {
-			Logger.getLogger(this.getClass()).error("Exception initializing settings",x);
-			return new PropertyDescriptor[0];
-		}
-	}
-
-	@Override
 	public void save() throws IOException {
 		XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(getStorage())));
 		encoder.writeObject(this);
@@ -258,18 +218,45 @@ public class GraphBasedQueryViewSettings implements PropertyBean {
 	@Override
 	public void reset() {
 		layout = EllipticFanLayout.class.getName();
-		font4participants =  new Font("Monospaced", Font.PLAIN,10);
-		font4nonparticipants =  new Font("Monospaced", Font.ITALIC,10);
-		font4edges =  new Font("Monospaced", Font.PLAIN,10);
 		minBoxWidth = 120;
-		boxHeight4participants = 36;
-		boxHeight4nonparticipants = 24;
 		vertexTransparency = 200;
-		vertexSaturation = (float) 0.8;
-		vertexBrightness = (float) 0.8;
 		background = Color.WHITE;
-		contextDepth = 0;
 		useAntiAliasing = true;
+		roleFont =  new Font("Monospaced", Font.PLAIN,10);
+		edgeFont =  new Font("Monospaced", Font.PLAIN,10);
+		constraintFont =  new Font("Monospaced", Font.PLAIN,10);
+		background = Color.WHITE;
+		roleFrameColor = Color.BLACK;
+		constraintFrameColor = Color.RED;
+		roleFillColor = new Color(200,200,200,200);
+		constraintFillColor = new Color(255,200,200,200);
+		useAntiAliasing = true;
+	}
+	@Override
+	public PropertyDescriptor[] getProperties() {
+		try {
+			PropertyDescriptor[] properties = {
+				new PropertyDescriptor("layout",GraphBasedQueryViewSettings.class,"getLayout","setLayout"),
+				new PropertyDescriptor("font for roles",GraphBasedQueryViewSettings.class,"getRoleFont","setRoleFont"),
+				new PropertyDescriptor("font for constraints",GraphBasedQueryViewSettings.class,"getConstraintFont","setConstraintFont"),
+				new PropertyDescriptor("font for edge labels",GraphBasedQueryViewSettings.class,"getEdgeFont","setEdgeFont"),
+				new PropertyDescriptor("frame color for roles",GraphBasedQueryViewSettings.class,"getRoleFrameColor","setRoleFrameColor"),
+				new PropertyDescriptor("frame color for constraints",GraphBasedQueryViewSettings.class,"getConstraintFrameColor","setConstraintFrameColor"),
+				new PropertyDescriptor("fill color for roles",GraphBasedQueryViewSettings.class,"getRoleFillColor","setRoleFillColor"),
+				new PropertyDescriptor("fill color for constraints",GraphBasedQueryViewSettings.class,"getConstraintFillColor","setConstraintFillColor"),
+				new PropertyDescriptor("min box width",GraphBasedQueryViewSettings.class,"getMinBoxWidth","setMinBoxWidth"),
+				new PropertyDescriptor("vertex transparency (alpha)",GraphBasedQueryViewSettings.class,"getVertexTransparency","setVertexTransparency"),
+				new PropertyDescriptor("background colour",GraphBasedQueryViewSettings.class,"getBackground","setBackground"),
+				new PropertyDescriptor("use anti aliasing (on is slower)",GraphBasedQueryViewSettings.class,"isUseAntiAliasing","setUseAntiAliasing")
+			};
+				
+			properties[0].setPropertyEditorClass(LayoutEditor.class);			
+			return properties;
+		}
+		catch (Exception x) {
+			Logger.getLogger(this.getClass()).error("Exception initializing settings",x);
+			return new PropertyDescriptor[0];
+		}
 	}
 
 }
