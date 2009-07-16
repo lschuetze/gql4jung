@@ -12,7 +12,8 @@ package nz.ac.massey.cs.gql4jung.browser.queryviews;
 
 import java.awt.GridLayout;
 import javax.swing.JScrollPane;
-import net.boplicity.xmleditor.XmlTextPane;
+import javax.swing.JTextPane;
+
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.browser.PropertyBean;
 import nz.ac.massey.cs.gql4jung.browser.QueryView;
@@ -24,7 +25,7 @@ import nz.ac.massey.cs.gql4jung.browser.QueryView;
 
 public class XMLSourceQueryView extends QueryView {
 	
-	private XmlTextPane textPane = new XmlTextPane();
+	private JTextPane textPane = new JTextPane();
 
 	public XMLSourceQueryView() {
 		super();

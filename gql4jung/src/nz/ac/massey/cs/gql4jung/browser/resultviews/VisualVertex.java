@@ -11,13 +11,14 @@
 package nz.ac.massey.cs.gql4jung.browser.resultviews;
 
 import nz.ac.massey.cs.gql4jung.Vertex;
+import nz.ac.massey.cs.gql4jung.browser.RankedVertex;
 
 /**
  * Custom vertex class for visualisation.
  * @author jens dietrich
  */
 
-public class VisualVertex extends Vertex {
+public class VisualVertex extends Vertex implements RankedVertex {
 	private String role = null;
 	private boolean inMotif = false;
 	private int distanceFromMotif = 0;
@@ -44,6 +45,11 @@ public class VisualVertex extends Vertex {
 
 	public void setRole(String role) {
 		this.role = role;
+	}
+
+	@Override
+	public int getDegree() {
+		return distanceFromMotif;
 	}
 	
 }
