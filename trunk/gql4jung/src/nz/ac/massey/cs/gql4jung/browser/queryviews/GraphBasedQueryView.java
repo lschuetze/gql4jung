@@ -30,6 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.apache.commons.collections15.Transformer;
+import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -44,6 +45,7 @@ import nz.ac.massey.cs.gql4jung.PropertyConstraint;
 import nz.ac.massey.cs.gql4jung.browser.PropertyBean;
 import nz.ac.massey.cs.gql4jung.browser.QueryView;
 import nz.ac.massey.cs.gql4jung.browser.RankedVertex;
+import nz.ac.massey.cs.gql4jung.browser.layout.EllipticFanLayout;
 import nz.ac.massey.cs.gql4jung.browser.layout.OrbitalLayout;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 
@@ -98,7 +100,7 @@ public class GraphBasedQueryView extends QueryView {
 	
 	private Motif model = null;
 	private JPanel graphPane = new JPanel(new GridLayout(1,1));
-	
+	private GraphBasedQueryViewSettings settings = GraphBasedQueryViewSettings.DEFAULT_INSTANCE;
 	public Motif getModel() {
 		return model;
 	}
@@ -107,13 +109,13 @@ public class GraphBasedQueryView extends QueryView {
 	public void display(Motif model,String source)  {
 		this.model = model;
 		DirectedGraph<VisualVertex,VisualEdge> g = asGraph(model); 
-		Layout layout = new OrbitalLayout(g);
+		Layout layout = settings.getLayout(g);
 		layout.setSize(graphPane.getSize());
 		VisualizationViewer<VisualVertex,VisualEdge> vv = new VisualizationViewer<VisualVertex,VisualEdge>(layout);
 		configureRenderer(vv.getRenderContext());
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		vv.setPreferredSize(graphPane.getSize()); //Sets the viewing area size
-		vv.setBackground(Color.white);
+		vv.setBackground(settings.getBackground());
 		
 		graphPane.removeAll();
 		graphPane.add(vv);
@@ -160,13 +162,15 @@ public class GraphBasedQueryView extends QueryView {
 				public String transform(VisualEdge e) {					
 					if (e instanceof DepEdge) {
 						DepEdge de = (DepEdge)e;
-						StringBuffer b = new StringBuffer()
-							//.append(de.role)				
-							//.append(" [")
-							.append(de.minLength)
+						StringBuffer b = new StringBuffer();
+						if (de.minLength==de.maxLength) {
+							b.append(de.maxLength);
+						}
+						else {
+							b.append(de.minLength)
 							.append("-")
 							.append(de.maxLength==-1?"many":de.maxLength);
-							//.append("]");
+						}
 						return b.toString();
 					}
 					else return null;
@@ -353,7 +357,7 @@ public class GraphBasedQueryView extends QueryView {
 		return "motif as graph";
 	}
 	public PropertyBean getSettings() {
-		return null;
+		return settings;
 	}
 
 	

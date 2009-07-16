@@ -23,8 +23,6 @@ import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +30,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.StringBufferInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -220,8 +217,8 @@ public class ResultBrowser extends JFrame {
 		
 		// load sample data
 		// TODO remove
-		this.loadDataFromGraphML(new File("exampledata/ant.jar.graphml"));
-		this.loadQuery(new File("queries/awd.xml"));
+		// this.loadDataFromGraphML(new File("exampledata/ant.jar.graphml"));
+		// this.loadQuery(new File("queries/awd.xml"));
 		
 		updateActions();
 		updateStatus();
@@ -548,9 +545,9 @@ public class ResultBrowser extends JFrame {
 		};	
 		actAbout.putValue(Action.SHORT_DESCRIPTION, "about this software");
 
-		class EditSettingsAction extends AbstractAction {
+		class EditResultViewSettingsAction extends AbstractAction {
 			
-			public EditSettingsAction(String name,PropertyBean settings) {
+			public EditResultViewSettingsAction(String name,PropertyBean settings) {
 				super(name);
 				this.settings = settings;
 				this.name = name;
@@ -569,10 +566,37 @@ public class ResultBrowser extends JFrame {
 				catch (Exception x){}
 			}
 		};
+		class EditQueryViewSettingsAction extends AbstractAction {
+			
+			public EditQueryViewSettingsAction(String name,PropertyBean settings) {
+				super(name);
+				this.settings = settings;
+				this.name = name;
+			}
+			private PropertyBean settings = null;
+			private String name = null;
+			private boolean editQuerySettings = false;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PropertyBeanEditor.edit(ResultBrowser.this,settings,name);
+				// refresh view
+				try {
+					displayMotif(query,querySource);	
+				}
+				catch (Exception x){}
+			}
+		};
+		for (QueryView view:this.queryViewers) {
+			PropertyBean settings = view.getSettings();
+			if (settings!=null) {
+				Action act = new EditQueryViewSettingsAction("configure view: "+view.getName(),settings);
+				this.actConfigureViews.add(act);
+			}
+		}
 		for (ResultView view:this.resultViewers) {
 			PropertyBean settings = view.getSettings();
 			if (settings!=null) {
-				Action act = new EditSettingsAction("configure "+view.getName(),settings);
+				Action act = new EditResultViewSettingsAction("configure view: "+view.getName(),settings);
 				this.actConfigureViews.add(act);
 			}
 		}
