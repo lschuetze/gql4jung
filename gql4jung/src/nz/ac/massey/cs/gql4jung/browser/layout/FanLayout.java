@@ -15,6 +15,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections15.Transformer;
@@ -23,19 +24,19 @@ import edu.uci.ics.jung.graph.Graph;
 
 /**
  * 
- * @author Max Dietrich
- * A graph layout that places the given vertices around the edge of a circle
+ * @author Max Dietrich A graph layout that places the given vertices around the
+ *         edge of a circle
  */
-public class FanLayout<V , E> implements Layout<V, E> {
+public class FanLayout<V, E> implements Layout<V, E> {
 
 	private Graph<V, E> graph = null;
 	private Dimension size = null;
-	//A map of all the points and their respective positions
+	// A map of all the points and their respective positions
 	private Map<V, Point2D> points = null;
-	//Checks if the vertex map needs updating 
+	// Checks if the vertex map needs updating
 	private boolean isInitialized = false;
-	
-	//Vertices that have been manually moved
+
+	// Vertices that have been manually moved
 	private Map<V, Point2D> movedPoints = new HashMap<V, Point2D>();
 
 	public FanLayout(Graph<V, E> graph) {
@@ -43,31 +44,31 @@ public class FanLayout<V , E> implements Layout<V, E> {
 		this.graph = graph;
 	}
 
-	//Returns a set of points for a given graph
+	// Returns a set of points for a given graph
 	private Map<V, Point2D> getPoints(Graph<V, E> graph) {
 
 		Map<V, Point2D> map = new HashMap<V, Point2D>();
 
-		//The default size of each vertex box
+		// The default size of each vertex box
 		Dimension boxSize = new Dimension(120, 36);
 
-		int centerX = this.size.width / 2 - boxSize.width/2;
-		int centerY = this.size.height / 2 - boxSize.height/2;
+		int centerX = this.size.width / 2 - boxSize.width / 2;
+		int centerY = this.size.height / 2 - boxSize.height / 2;
 		int radius = centerY - boxSize.height;
 		double angle = 2 * Math.PI / (graph.getVertexCount());
 
-
 		V initialVertex = graph.getVertices().iterator().next();
-		//A list of the current points
+		// A list of the current points
 		List<V> currentPoints = new ArrayList<V>();
 
 		currentPoints.add(initialVertex);
 
-		//Count for determining angle
+		// Count for determining angle
 		int count = 0;
-		
-		//Adds each current point to the map, then adds all connected points
-		//Within the graph to current points. Already mapped points are eliminated.
+
+		// Adds each current point to the map, then adds all connected points
+		// Within the graph to current points. Already mapped points are
+		// eliminated.
 		while (!currentPoints.isEmpty()) {
 			V v = currentPoints.get(0);
 
@@ -90,10 +91,21 @@ public class FanLayout<V , E> implements Layout<V, E> {
 				}
 			} else
 				currentPoints.remove(0);
-
 		}
+			Iterator<V> iter = graph.getVertices().iterator();
+			while (iter.hasNext()) {
+				V v = iter.next();
+				if (!map.containsKey(v)) {
+					count++;
+					double theta = angle * count;
+					int x = centerX + (int) (Math.sin(theta) * radius);
+					int y = centerY + (int) (Math.cos(theta) * radius);
+					Point p = new Point(x, y);
+					map.put(v, p);
+				}
+			}
+			return map;
 
-		return map;
 	}
 
 	@Override
@@ -106,13 +118,13 @@ public class FanLayout<V , E> implements Layout<V, E> {
 		return size;
 	}
 
-	//Does nothing
+	// Does nothing
 	@Override
 	public void initialize() {
 		reset();
 	}
 
-	//Resets the current graph
+	// Resets the current graph
 	@Override
 	public void reset() {
 		if (this.movedPoints.isEmpty()) {
@@ -129,15 +141,15 @@ public class FanLayout<V , E> implements Layout<V, E> {
 
 	@Override
 	public void setSize(Dimension d) {
-		//System.out.println("Setting size...");
+		// System.out.println("Setting size...");
 		this.size = d;
 		this.movedPoints.clear();
 		reset();
 	}
 
-	//Returns the value of the vertex in the vertex map
-	//If moved, returns moved point instead
-	//Recalculates points if necessary
+	// Returns the value of the vertex in the vertex map
+	// If moved, returns moved point instead
+	// Recalculates points if necessary
 	@Override
 	public Point2D transform(V v) {
 
@@ -145,29 +157,29 @@ public class FanLayout<V , E> implements Layout<V, E> {
 			this.points = this.getPoints(this.graph);
 		}
 
-		if(this.movedPoints.containsKey(v)){
+		if (this.movedPoints.containsKey(v)) {
 			return this.movedPoints.get(v);
-		}
-		else return this.points.get(v);
+		} else
+			return this.points.get(v);
 	}
 
-	//Does nothing
+	// Does nothing
 	@Override
 	public void setInitializer(Transformer<V, Point2D> t) {
 	}
 
-	//Does nothing
+	// Does nothing
 	@Override
 	public boolean isLocked(V arg0) {
 		return false;
 	}
 
-	//Does nothing
+	// Does nothing
 	@Override
 	public void lock(V arg0, boolean arg1) {
 	}
 
-	//Overrides the position of a point by adding it to movedPoints
+	// Overrides the position of a point by adding it to movedPoints
 	@Override
 	public void setLocation(V v, Point2D p) {
 		this.movedPoints.put(v, p);

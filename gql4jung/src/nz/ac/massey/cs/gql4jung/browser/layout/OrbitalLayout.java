@@ -86,6 +86,14 @@ public class OrbitalLayout<V extends RankedVertex, E>
 				else
 					currentPoints.remove(0);
 			}
+			for(RankedVertex v:initialShell){
+				if(!firstMap.containsKey(v)){
+					double theta = innerangle * count;
+					count++;
+					EllipticPolarPoint p = new EllipticPolarPoint(theta, XR, YR);
+					firstMap.put(v, p);
+				}
+			}
 			assignedLayers.add(firstMap);
 		}
 
@@ -148,7 +156,13 @@ public class OrbitalLayout<V extends RankedVertex, E>
 				availableAngles.remove((Integer)I);
 				map.put(v, p);
 			}
-
+			for(RankedVertex v:shell){
+				if(!map.containsKey(v)){
+					double theta = availableAngles.get(0);
+					EllipticPolarPoint p = new EllipticPolarPoint(theta, XR, YR);
+					map.put(v, p);
+				}
+			}
 			assignedLayers.add(assignedLayers.size(), map);
 		}
 
