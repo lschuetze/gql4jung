@@ -22,6 +22,5 @@
 	<classpathentry kind="lib" path="lib/l2fprod-common-fontchooser.jar"/>
 	<classpathentry kind="lib" path="lib/l2fprod-common-shared.jar"/>
 	<classpathentry kind="lib" path="lib/l2fprod-common-sheet.jar"/>
-	<classpathentry kind="lib" path="lib/xml-text-editor-0.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
