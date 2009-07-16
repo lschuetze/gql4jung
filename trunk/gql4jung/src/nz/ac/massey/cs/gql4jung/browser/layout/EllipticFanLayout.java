@@ -15,6 +15,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections15.Transformer;
@@ -93,7 +94,16 @@ import edu.uci.ics.jung.graph.Graph;
 					currentPoints.remove(0);
 	
 			}
-	
+			Iterator<V> iter = graph.getVertices().iterator();
+			while(iter.hasNext()){
+				V v = iter.next();
+				if(!map.containsKey(v)){
+					count++;
+					double theta = angle * count;
+					EllipticPolarPoint p = new EllipticPolarPoint(theta, Xradius, Yradius);
+					map.put(v, p);
+				}
+			}
 			return map;
 		}
 	
