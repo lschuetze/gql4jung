@@ -213,7 +213,34 @@ public class ResultBrowser extends JFrame {
 		initToolbar();
 		initMenubar();
 		initStatusBar();
-
+		
+		final String text = "<html><a href=\"actloadquery\">click here to load query</a></html>";
+		this.queryField.setText(text);
+		this.queryField.addMouseListener(
+				new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						if (queryField.getText().equals(text)) {
+							actLoadQuery();
+						}
+					}
+			
+				}
+		);
+		
+		final String text2 = "<html><a href=\"actloadquery\">click here to load graph</a></html>";
+		this.dataField.setText(text2);
+		this.dataField.addMouseListener(
+				new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						if (dataField.getText().equals(text2)) {
+							actLoadData();
+						}
+					}
+			
+				}
+		);
 		
 		// load sample data
 		// TODO remove
@@ -237,6 +264,7 @@ public class ResultBrowser extends JFrame {
 			}			
 		});
 
+		
 
 
 	}
@@ -364,6 +392,7 @@ public class ResultBrowser extends JFrame {
 		c.fill = c.HORIZONTAL;
 		c.weightx = 1;
 		c.anchor = c.WEST;
+		statusField.setBorder(BorderFactory.createEmptyBorder(3,0,0,0));
 		statusBar.add(statusField,c);
 		
 		c.gridx = 2;
