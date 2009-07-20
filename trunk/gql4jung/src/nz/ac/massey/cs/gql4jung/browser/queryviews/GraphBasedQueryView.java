@@ -19,6 +19,7 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import nz.ac.massey.cs.gql4jung.Constraint;
+import nz.ac.massey.cs.gql4jung.GroupByClause;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.PathConstraint;
 import nz.ac.massey.cs.gql4jung.PropertyConstraint;
@@ -60,6 +62,16 @@ public class GraphBasedQueryView extends QueryView {
 	final static Stroke TYPE_VERTEX_STROKE = new BasicStroke(2);
 	final static Stroke CONSTRAINT_VERTEX_STROKE = new BasicStroke(0.2f);
 	
+	/*
+	public static void main(String[] args) throws Exception {
+		String query = "cd.xml";
+		InputStream in = new FileInputStream("queries/"+query);
+		Motif motif = new XMLMotifReader().read(in);
+		in.close();
+		show(null,motif,"Query Viewer");
+	}
+	*/
+	
 	abstract class VisualVertex implements RankedVertex {
 	}
 	class VisualEdge {
@@ -79,14 +91,20 @@ public class GraphBasedQueryView extends QueryView {
 			return 1;
 		}
 	}
+	class GroupByVertex extends VisualVertex {
+		String def = null;
+		@Override
+		public int getDegree() {
+			return 1;
+		}
+	}
 	class DepEdge extends VisualEdge {
 		String role = null;
 		int minLength = -1;
 		int maxLength = -1;
 	}
-	class ConstraintEdge extends VisualEdge {
-		
-	}
+	class ConstraintEdge extends VisualEdge {}
+	class GroupByEdge extends VisualEdge {}
 	
 	private Motif model = null;
 	private JPanel graphPane = new JPanel(new GridLayout(1,1));
@@ -132,15 +150,15 @@ public class GraphBasedQueryView extends QueryView {
 				public String transform(VisualVertex v) {
 					if (v instanceof TypeVertex) {
 						TypeVertex tv = (TypeVertex)v;
-						StringBuffer b = new StringBuffer()
-							.append("<html>")
-							.append(tv.role)				
-							.append("</html>");
-						return b.toString();
+						return tv.role;
 					}
 					else if (v instanceof ConstraintVertex) {
 						ConstraintVertex cv = (ConstraintVertex)v;
 						return cv.constraint;
+					}
+					else if (v instanceof GroupByVertex) {
+						GroupByVertex cv = (GroupByVertex)v;
+						return "group by " + cv.def;
 					}
 					else return "";
 				}
@@ -178,6 +196,9 @@ public class GraphBasedQueryView extends QueryView {
 					else if (e instanceof ConstraintEdge) {
 						return CONSTRAINT_STROKE;
 					}
+					else if (e instanceof GroupByEdge) {
+						return CONSTRAINT_STROKE;
+					}
 					else return EDGE_STROKE;
 				}
 			}
@@ -198,7 +219,7 @@ public class GraphBasedQueryView extends QueryView {
 					FontMetrics FM = GraphBasedQueryView.this.getGraphics().getFontMetrics(f);
 					int W = Math.max(settings.getMinBoxWidth(),FM.stringWidth(getLongLabel(v))+10);
 					int H = v instanceof TypeVertex?30:22;
-					return new Rectangle2D.Float(-W/2,-H/2,W,H);
+					return new RoundRectangle2D.Float(-W/2,-H/2,W,H,5,5);
 				}
 				
 			}
@@ -207,7 +228,10 @@ public class GraphBasedQueryView extends QueryView {
 			new Transformer<VisualVertex,Paint>() {
 				@Override
 				public Paint transform(VisualVertex v) {
-					return v instanceof TypeVertex?makeTransparent(settings.getRoleFillColor()):makeTransparent(settings.getConstraintFillColor());
+					if (v instanceof TypeVertex) return makeTransparent(settings.getRoleFillColor());
+					else if (v instanceof ConstraintVertex) return makeTransparent(settings.getConstraintFillColor());
+					else if (v instanceof GroupByVertex) return makeTransparent(settings.getGroupByFillColor());
+					return Color.WHITE;
 				}
 			}
 		);
@@ -215,7 +239,10 @@ public class GraphBasedQueryView extends QueryView {
 				new Transformer<VisualVertex,Paint>() {
 					@Override
 					public Paint transform(VisualVertex v) {
-						return v instanceof TypeVertex?settings.getRoleFrameColor():settings.getConstraintFrameColor();
+						if (v instanceof TypeVertex ) return settings.getRoleFrameColor();
+						else if (v instanceof ConstraintVertex) return settings.getConstraintFrameColor();
+						else if (v instanceof GroupByVertex) return settings.getGroupByFrameColor();
+						else return Color.BLACK;
 					}
 				}				
 		);
@@ -223,7 +250,10 @@ public class GraphBasedQueryView extends QueryView {
 				new Transformer<VisualEdge,Paint>() {
 					@Override
 					public Paint transform(VisualEdge v) {
-						return v instanceof DepEdge?settings.getRoleFrameColor():settings.getConstraintFrameColor();
+						if (v instanceof DepEdge) return settings.getRoleFrameColor();
+						else if (v instanceof ConstraintEdge) return settings.getConstraintFrameColor();
+						else if (v instanceof GroupByEdge) return settings.getGroupByFrameColor();
+						else return Color.BLACK;
 					}
 				}				
 		);
@@ -268,6 +298,9 @@ public class GraphBasedQueryView extends QueryView {
 		else if (v instanceof ConstraintVertex) {
 			return ((ConstraintVertex)v).constraint;
 		}
+		else if (v instanceof GroupByVertex) {
+			return "group by "+((GroupByVertex)v).def;
+		}
 		else return "";
 	}
 
@@ -286,13 +319,7 @@ public class GraphBasedQueryView extends QueryView {
 		dlg.setLocation(100,100);
 		dlg.setVisible(true);		
 	}
-	public static void main(String[] args) throws Exception {
-		String query = "cd.xml";
-		InputStream in = new FileInputStream("queries/"+query);
-		Motif motif = new XMLMotifReader().read(in);
-		in.close();
-		show(null,motif,"Query Viewer");
-	}
+
 	
 	private void initialize() {
 		this.setLayout(new GridLayout(1,1));
@@ -321,7 +348,7 @@ public class GraphBasedQueryView extends QueryView {
 				TypeVertex v2 = verticesByRole.get(pc.getTarget());
 				g.addEdge(e, v1, v2);
 			}
-			if (c instanceof PropertyConstraint) {
+			if (c instanceof PropertyConstraint && settings.isShowConstraints()) {
 				PropertyConstraint pc = (PropertyConstraint)c;
 				ConstraintVertex cv = new ConstraintVertex();
 				cv.constraint = pc.getExpression();
@@ -337,6 +364,19 @@ public class GraphBasedQueryView extends QueryView {
 						ConstraintEdge e = new ConstraintEdge();
 						g.addEdge(e,v,cv);
 					}
+				}
+			}
+		}
+		if (settings.isShowGroupByClauses()) {
+			for (GroupByClause gb:model.getGroupByClauses()) {
+				GroupByVertex gbv = new GroupByVertex();
+				gbv.def = gb.getExpression();
+				g.addVertex(gbv);
+				String role = gb.getRole();
+				TypeVertex v = verticesByRole.get(role);
+				if (v!=null) {
+					GroupByEdge e = new GroupByEdge();
+					g.addEdge(e,gbv,v);
 				}
 			}
 		}

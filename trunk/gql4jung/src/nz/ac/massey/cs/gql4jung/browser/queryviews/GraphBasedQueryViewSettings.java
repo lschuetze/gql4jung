@@ -52,9 +52,13 @@ public class GraphBasedQueryViewSettings implements PropertyBean {
 	private Color background = Color.WHITE;
 	private Color roleFrameColor = Color.BLACK;
 	private Color constraintFrameColor = Color.RED;
+	private Color groupByFrameColor = Color.BLUE;
 	private Color roleFillColor = Color.BLACK;
 	private Color constraintFillColor = Color.RED;
+	private Color groupByFillColor = Color.BLUE;
 	private boolean useAntiAliasing = true;
+	private boolean showConstraints = true;
+	private boolean showGroupByClauses = true;
 	
 	public GraphBasedQueryViewSettings() {
 		super();
@@ -82,6 +86,38 @@ public class GraphBasedQueryViewSettings implements PropertyBean {
 			super();	    
 		    setAvailableValues(layouts);
 		}
+	}
+	
+	public boolean isShowConstraints() {
+		return showConstraints;
+	}
+
+	public boolean isShowGroupByClauses() {
+		return showGroupByClauses;
+	}
+
+	public void setShowConstraints(boolean showConstraints) {
+		this.showConstraints = showConstraints;
+	}
+
+	public void setShowGroupByClauses(boolean showGroupByClauses) {
+		this.showGroupByClauses = showGroupByClauses;
+	}
+	
+	public Color getGroupByFrameColor() {
+		return groupByFrameColor;
+	}
+
+	public Color getGroupByFillColor() {
+		return groupByFillColor;
+	}
+
+	public void setGroupByFrameColor(Color groupByFrameColor) {
+		this.groupByFrameColor = groupByFrameColor;
+	}
+
+	public void setGroupByFillColor(Color groupByFillColor) {
+		this.groupByFillColor = groupByFillColor;
 	}
 	
 	public Font getRoleFont() {
@@ -222,6 +258,8 @@ public class GraphBasedQueryViewSettings implements PropertyBean {
 		vertexTransparency = 200;
 		background = Color.WHITE;
 		useAntiAliasing = true;
+		showConstraints = true;
+		showGroupByClauses = true;
 		roleFont =  new Font("Monospaced", Font.PLAIN,10);
 		edgeFont =  new Font("Monospaced", Font.PLAIN,10);
 		constraintFont =  new Font("Monospaced", Font.PLAIN,10);
@@ -229,21 +267,28 @@ public class GraphBasedQueryViewSettings implements PropertyBean {
 		roleFrameColor = Color.BLACK;
 		constraintFrameColor = Color.RED;
 		roleFillColor = new Color(200,200,200,200);
+		groupByFillColor = new Color(200,200,255,200);
 		constraintFillColor = new Color(255,200,200,200);
 		useAntiAliasing = true;
+		groupByFrameColor = Color.BLUE;
+		
 	}
 	@Override
 	public PropertyDescriptor[] getProperties() {
 		try {
 			PropertyDescriptor[] properties = {
 				new PropertyDescriptor("layout",GraphBasedQueryViewSettings.class,"getLayout","setLayout"),
+				new PropertyDescriptor("show constraints",GraphBasedQueryViewSettings.class,"isShowConstraints","setShowConstraints"),
+				new PropertyDescriptor("show group by clauses",GraphBasedQueryViewSettings.class,"isShowGroupByClauses","setShowGroupByClauses"),
 				new PropertyDescriptor("font for roles",GraphBasedQueryViewSettings.class,"getRoleFont","setRoleFont"),
 				new PropertyDescriptor("font for constraints",GraphBasedQueryViewSettings.class,"getConstraintFont","setConstraintFont"),
 				new PropertyDescriptor("font for edge labels",GraphBasedQueryViewSettings.class,"getEdgeFont","setEdgeFont"),
 				new PropertyDescriptor("frame color for roles",GraphBasedQueryViewSettings.class,"getRoleFrameColor","setRoleFrameColor"),
 				new PropertyDescriptor("frame color for constraints",GraphBasedQueryViewSettings.class,"getConstraintFrameColor","setConstraintFrameColor"),
+				new PropertyDescriptor("frame color for groupby clauses",GraphBasedQueryViewSettings.class,"getGroupByFrameColor","setGroupByFrameColor"),
 				new PropertyDescriptor("fill color for roles",GraphBasedQueryViewSettings.class,"getRoleFillColor","setRoleFillColor"),
 				new PropertyDescriptor("fill color for constraints",GraphBasedQueryViewSettings.class,"getConstraintFillColor","setConstraintFillColor"),
+				new PropertyDescriptor("fill color for groupby clauses",GraphBasedQueryViewSettings.class,"getGroupByFillColor","setGroupByFillColor"),
 				new PropertyDescriptor("min box width",GraphBasedQueryViewSettings.class,"getMinBoxWidth","setMinBoxWidth"),
 				new PropertyDescriptor("vertex transparency (alpha)",GraphBasedQueryViewSettings.class,"getVertexTransparency","setVertexTransparency"),
 				new PropertyDescriptor("background colour",GraphBasedQueryViewSettings.class,"getBackground","setBackground"),
