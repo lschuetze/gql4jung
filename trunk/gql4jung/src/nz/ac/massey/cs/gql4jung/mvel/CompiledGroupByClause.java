@@ -27,7 +27,7 @@ import nz.ac.massey.cs.gql4jung.Vertex;
  * @author jens dietrich
  */
 public class CompiledGroupByClause implements GroupByClause{
-	private String expression = null;
+	public String expression = null;
 	private String role = null;
 	private CompiledExpression compiledExpression = null;
 	public CompiledGroupByClause(String expression) {

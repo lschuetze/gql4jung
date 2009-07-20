@@ -26,4 +26,5 @@ public interface GroupByClause {
 	 * @return
 	 */
 	public Object getGroup(Vertex v);
+	public String getExpression();
 }
