@@ -99,14 +99,16 @@ public class AnalysisBatchJob {
 		File[] dataFiles = data.listFiles();
 		for (int i=0;i<queryFiles.length;i++) {
 			for (int j=0;j<dataFiles.length;j++) {
-				String cursorLog = "graph "+(j+1)+"/"+dataFiles.length;
-				log("query ",i+1,"/",queryFiles.length," ",cursorLog);
-				try {
-					analyse(queryFiles[i],dataFiles[j],cursorLog);
-					System.gc();
-				}
-				catch (Exception x) {
-					LOGGER.error("analysis error",x);
+				if (queryFiles[i].getAbsolutePath().endsWith(".xml")) { // to make sure we dont try .svn folders
+					String cursorLog = "graph "+(j+1)+"/"+dataFiles.length;
+					log("query ",i+1,"/",queryFiles.length," ",cursorLog);
+					try {
+						analyse(queryFiles[i],dataFiles[j],cursorLog);
+						System.gc();
+					}
+					catch (Exception x) {
+						LOGGER.error("analysis error",x);
+					}
 				}
 			}
 		}
