@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<graph edgedefault="directed" file="">
+<node id="0" container="example.jar" namespace="org.example1" name="Inside1" isInterface="false" type="class" isAbstract="false" />
+<node id="1" container="example.jar" namespace="org.example2" name="Outside"  isInterface="false" type="class" isAbstract="false" />
+<node id="2" container="example.jar" namespace="org.example1" name="Inside2"  isInterface="false" type="class" isAbstract="false"  />
+<node id="3" container="example.jar" namespace="org.example3" name="InsideA"  isInterface="false" type="class" isAbstract="false"  />
+<node id="4" container="example.jar" namespace="org.example3" name="InsideB"  isInterface="false" type="class" isAbstract="false"  />
+<edge id="edge-1" source="0" target="1" type="uses" />
+<edge id="edge-2" source="1" target="2" type="uses" />
+<edge id="edge-3" source="3" target="1" type="uses" />
+<edge id="edge-4" source="1" target="4" type="uses" />
+</graph>
+</graphml>
