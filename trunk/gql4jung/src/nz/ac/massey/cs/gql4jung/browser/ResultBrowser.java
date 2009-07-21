@@ -1164,6 +1164,7 @@ public class ResultBrowser extends JFrame {
 		for (Action act:loadActions) {
 			act.setEnabled(!loading&&!querying);
 		}
+		actViewGraphData.setEnabled(this.data!=null);
 
 	}
 	private void updateComputationTime() {

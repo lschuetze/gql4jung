@@ -18,6 +18,7 @@ import java.awt.GridLayout;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.io.FileInputStream;
@@ -219,7 +220,8 @@ public class GraphBasedQueryView extends QueryView {
 					FontMetrics FM = GraphBasedQueryView.this.getGraphics().getFontMetrics(f);
 					int W = Math.max(settings.getMinBoxWidth(),FM.stringWidth(getLongLabel(v))+10);
 					int H = v instanceof TypeVertex?30:22;
-					return new RoundRectangle2D.Float(-W/2,-H/2,W,H,5,5);
+					if (v instanceof TypeVertex) return new RoundRectangle2D.Float(-W/2,-H/2,W,H,5,5);
+					else return new Ellipse2D.Float(-W/2,-H/2,W,H);
 				}
 				
 			}
