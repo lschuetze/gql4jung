@@ -253,7 +253,7 @@ public class GraphBasedQueryViewSettings implements PropertyBean {
 
 	@Override
 	public void reset() {
-		layout = EllipticFanLayout.class.getName();
+		layout = OrbitalLayout.class.getName();
 		minBoxWidth = 120;
 		vertexTransparency = 200;
 		background = Color.WHITE;
