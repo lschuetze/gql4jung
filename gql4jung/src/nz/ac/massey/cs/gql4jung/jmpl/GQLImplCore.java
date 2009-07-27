@@ -39,7 +39,9 @@ public abstract class GQLImplCore extends Logging implements GQL {
 		// check for termination
 		if (controller.isDone()) {
 			MotifInstance instance = createInstance(graph,motif,controller);
-			listener.found(instance);
+			if (!listener.found(instance)) {
+				this.cancel();
+			}
 			return;
 		}
 		
