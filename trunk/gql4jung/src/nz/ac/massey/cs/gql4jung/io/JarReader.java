@@ -55,6 +55,11 @@ public class JarReader {
 		super();
 		this.jars = jars;
 	}
+	public JarReader(File... files) {
+		super();
+		jars = new ArrayList<File>(files.length);
+		for (File f:files) jars.add(f);
+	}
 	
 	public boolean isRemoveDuplicateEdges() {
 		return removeDuplicateEdges;
@@ -87,6 +92,11 @@ public class JarReader {
 		// comprehensive logging leads to memory problems
 		//Logger.getRootLogger().removeAllAppenders();
 		//BasicConfigurator.configure();
+		
+		if (jars.size()==0) {
+			this.fireProgressListener(0,0);
+			return new DirectedSparseGraph<Vertex, Edge>();
+		}
 		
 		final int TOTAL = 100;
 		final int TOTAL1 = 50;
