@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<graph edgedefault="directed" file="">
+<node id="11" container="example.jar" namespace="namespace1" name="Class11" isInterface="false" type="class" isAbstract="false" access="default" isBoundry="false" />
+<node id="12" container="example.jar" namespace="namespace1" name="Class12"  isInterface="false" type="class" isAbstract="false" access="null" isBoundry="false" />
+<node id="21" container="example.jar" namespace="namespace2" name="Class21"  isInterface="false" type="class" isAbstract="false" access="null" isBoundry="false" />
+<node id="31" container="example.jar" namespace="namespace3" name="Class31"  isInterface="false" type="class" isAbstract="false" access="null" isBoundry="false" />
+<node id="41" container="example.jar" namespace="namespace14" name="Class41"  isInterface="false" type="class" isAbstract="false" access="null" isBoundry="false" />
+<edge id="edge-1" source="11" target="21" type="uses" />
+<edge id="edge-2" source="21" target="31" type="uses" />
+<edge id="edge-3" source="21" target="41" type="uses" />
+<edge id="edge-4" source="31" target="12" type="uses" />
+<edge id="edge-5" source="41" target="12" type="uses" />
+</graph>
+</graphml>

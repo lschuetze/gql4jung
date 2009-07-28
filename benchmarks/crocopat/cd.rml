@@ -1,0 +1,5 @@
+ref(x,y) := uses(x,y) | extends(x,y) | implements(x,y) ;
+refs(x,y) := TC(uses(x,y));
+sameNS(x,y) := EX(n1,namespace(x,n1) & EX(n2,namespace(y,n2) & =(n1,n2)));
+nscycle(x,y) := sameNS(x,y) & EX(z,ref(x,z) & !sameNS(x,z) & EX(w,refs(z,w) & ref(w,y) & !sameNS(x,w)));
+PRINT nscycle(x,y);
