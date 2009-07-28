@@ -8,7 +8,7 @@
  * and limitations under the License.
  */
 
-package test.nz.ac.massey.cs.gql4jung.jmpl;
+package nz.ac.massey.cs.gql4jung.util;
 
 import java.util.List;
 import java.util.Vector;
