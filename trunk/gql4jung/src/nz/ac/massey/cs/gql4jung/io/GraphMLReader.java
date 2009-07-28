@@ -34,6 +34,7 @@ import nz.ac.massey.cs.gql4jung.Vertex;
 public class GraphMLReader implements GraphReader<DirectedGraph<Vertex,Edge>, Vertex, Edge> {
 
 	private Reader reader = null;
+	private int idCounter = 0;
 
 	public GraphMLReader(Reader reader) {
 		super();
@@ -83,10 +84,14 @@ public class GraphMLReader implements GraphReader<DirectedGraph<Vertex,Edge>, Ve
 		return graph;
 		
 	}
+	private String createNextId(String prefix) {
+		this.idCounter = idCounter+1;
+		return prefix+idCounter;
+	}
 	private Edge buildEdge(Map<String, Vertex> vertices, Element e) throws GraphIOException {
 		Edge edge = new Edge();
 		String id = e.getAttributeValue("id");
-		if (id==null) throw new GraphIOException("Id attribute missing in edge");
+		if (id==null) id = createNextId("e");
 		edge.setId(id);
 		
 		String source = e.getAttributeValue("source");
@@ -109,7 +114,9 @@ public class GraphMLReader implements GraphReader<DirectedGraph<Vertex,Edge>, Ve
 	}
 	private Vertex buildVertex(Map<String, Vertex> vertices, Element e) throws GraphIOException {
 		Vertex v = new Vertex();
-		v.setId(e.getAttributeValue("id"));
+		String id = e.getAttributeValue("id");
+		if (id==null) id = this.createNextId("v");
+		v.setId(id);
 		v.setName(e.getAttributeValue("name"));
 		v.setAbstract("true".equals(e.getAttributeValue("isAbstract")));
 		v.setNamespace(e.getAttributeValue("namespace"));

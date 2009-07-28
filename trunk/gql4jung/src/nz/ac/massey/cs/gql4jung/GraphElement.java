@@ -11,11 +11,13 @@
 
 package nz.ac.massey.cs.gql4jung;
 
+import java.io.Serializable;
+
 /**
  * Abstract superclass for custom vertex and edge classes.
  * @author jens dietrich
  */
-public class GraphElement {
+public class GraphElement implements Serializable {
 	private String id = null;
 	
 	public GraphElement() {
