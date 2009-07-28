@@ -1,0 +1,10 @@
+uses namespace1.Class11 namespace2.Class21
+uses namespace2.Class21 namespace3.Class31
+uses namespace2.Class21 namespace4.Class41
+uses namespace3.Class31 namespace1.Class12
+uses namespace4.Class41 namespace1.Class12
+namespace namespace1.Class11 namespace1
+namespace namespace2.Class21 namespace2
+namespace namespace3.Class31 namespace3
+namespace namespace1.Class12 namespace1
+namespace namespace4.Class41 namespace4
