@@ -24,7 +24,7 @@ public class CountAzureusVariants extends Utils {
 	
 	public static void main(String[] args) throws Exception {
 		Motif m = loadQuery("queries/cd.xml");
-		DirectedGraph<Vertex, Edge> g = loadGraph("data/Azureus3.0.3.4.jar");
+		DirectedGraph<Vertex, Edge> g = loadGraph("data/Azureus3.0.3.4.jar.graphml");
 		System.out.println("file read, nodes: " + g.getVertexCount());
 		System.out.println("file read, edges: " + g.getEdgeCount());
 		countAll(g,m,false);

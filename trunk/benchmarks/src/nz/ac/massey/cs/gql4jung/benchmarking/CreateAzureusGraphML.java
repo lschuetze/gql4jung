@@ -10,24 +10,34 @@
 
 package nz.ac.massey.cs.gql4jung.benchmarking;
 
+import java.io.FileWriter;
+
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.Vertex;
+import nz.ac.massey.cs.gql4jung.io.GraphMLWriter;
 import edu.uci.ics.jung.graph.DirectedGraph;
 
 /**
- * Counts all instances in this package. Ignores variants. 
- * Also measures the time for the computation of the query (the time needed
- * to import / build the graph from byte code is not included).
+ * Script to create a GraphML file for Azureus. The main reason to analyse the 
+ * graphml input instead of using the jar directly is that the bytecode parser
+ * (DepFinder) needs more memory than the graph query engine. We are interested
+ * to find out how much memory the query engine needs.
  * @author jens dietrich
  */
-public class CountAzureusInstances extends Utils {
+public class CreateAzureusGraphML extends Utils {
 	
 	public static void main(String[] args) throws Exception {
-		Motif m = loadQuery("queries/cd.xml");
-		DirectedGraph<Vertex, Edge> g = loadGraph("data/Azureus3.0.3.4.jar.graphml");
+		String in = "data/Azureus3.0.3.4.jar";
+		String out = "data/Azureus3.0.3.4.jar.graphml";
+		DirectedGraph<Vertex, Edge> g = loadGraph("data/Azureus3.0.3.4.jar");
 		System.out.println("file read, nodes: " + g.getVertexCount());
 		System.out.println("file read, edges: " + g.getEdgeCount());
-		countAll(g,m,true);
+		FileWriter writer = new FileWriter(out);
+		GraphMLWriter converter = new GraphMLWriter(writer);
+		converter.writeGraph(g);
+		System.out.println("graph exported to " + out);
+		converter.close();
+		
 	}
 }
