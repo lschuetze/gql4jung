@@ -19,6 +19,7 @@ import edu.uci.ics.jung.graph.DirectedGraph;
  * Counts all instances in this package. Ignores variants. 
  * Also measures the time for the computation of the query (the time needed
  * to import / build the graph from byte code is not included).
+ * Should run with -Xmx64m option !
  * @author jens dietrich
  */
 public class CountAzureusInstances extends Utils {
