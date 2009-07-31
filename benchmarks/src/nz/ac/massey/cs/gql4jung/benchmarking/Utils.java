@@ -35,12 +35,12 @@ public class Utils {
 		System.out.println("Starting query");
 		GQLImpl engine = new GQLImpl();
 	
-		ResultCollector rs = new ResultCollector();
+		ResultCounter rs = new ResultCounter();
 		long before = System.currentTimeMillis();
 		engine.query(g, m, rs, aggregationOn);
 		long after = System.currentTimeMillis();
 		
-		System.out.println(""+rs.getInstances().size()+" instances found");
+		System.out.println(""+rs.getCounter()+" instances found");
 		System.out.println("time taken "+(after-before)+" ms");
 	}
 
