@@ -18,7 +18,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
@@ -35,6 +34,7 @@ import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifReaderException;
 import nz.ac.massey.cs.gql4jung.Vertex;
 import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
+import nz.ac.massey.cs.gql4jung.io.JarReader;
 import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.QueryResults.QueryResultListener;
@@ -45,8 +45,8 @@ import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
  * @author jens dietrich
  */
 public class AnalysisBatchJob {
-	public static final String ROOT = "batch/";
-	public static final String INPUT_DATA_FOLDER = "/media/disk-3/gql4jung/input";
+	public static final String ROOT = "./";
+	public static final String INPUT_DATA_FOLDER = "input";
 	public static final String QUERY_FOLDER = ROOT+"queries";
 	public static final String OUTPUT_FOLDER = ROOT+"output";
 	public static final String SUMMARY = ROOT+"summary.csv";
@@ -57,17 +57,7 @@ public class AnalysisBatchJob {
 
 	static {
 		try {
-			// delete old log file
-			File log = new File(LOG_FILE);
-			if (log.exists()) log.delete();	
-			
-			// setup logger
-			Layout layout = new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN);
-			Appender app1 = new FileAppender(layout,LOG_FILE); 
-			Appender app2 = new ConsoleAppender(layout,ConsoleAppender.SYSTEM_OUT);
-			LOGGER.addAppender(app1);
-			//LOGGER.addAppender(app2);
-			LOGGER.setLevel(Level.ALL);
+			org.apache.log4j.PropertyConfigurator.configure("log4j.properties");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -221,12 +211,21 @@ public class AnalysisBatchJob {
 
 
 	private static DirectedGraph<Vertex,Edge> loadGraph(File file) throws Exception {
-		Reader reader = new FileReader(file);
-		GraphMLReader input = new GraphMLReader(reader);
-        log("Loading graphml file ",file.getAbsolutePath());
-        DirectedGraph<Vertex,Edge> g =	input.readGraph();
-        reader.close();
-        return g;
+		log("Loading graph from ",file.getAbsolutePath());
+		if (file.getAbsolutePath().endsWith(".jar")) {
+			JarReader r = new JarReader(file);
+			DirectedGraph<Vertex,Edge> g = new JarReader(file).readGraph();
+			r.close();
+			return g;
+		}
+		else if (file.getAbsolutePath().endsWith(".graphml")) {
+			GraphMLReader r = new GraphMLReader(new FileReader(file));
+			DirectedGraph<Vertex,Edge> g = r.readGraph();
+			r.close();
+			return g;
+		}
+		else throw new IllegalArgumentException("non existing file or wrong file type: "+file.getAbsolutePath());
+
 	}
 
 	private static File getOutputFile(File querySource,File graphSource) {
