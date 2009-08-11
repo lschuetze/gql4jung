@@ -22,7 +22,7 @@ import org.junit.Test;
 public class BatchJobSettingsTests {
 	@Test
 	public void testData1() throws Exception {
-		String [] args = {"-data","exampledata/ant.jar.graphml"};
+		String [] args = {"-data","exampledata/ant.jar.graphml","-query","queries/cd.xml","-out","results.txt"};
 		BatchJobSettings settings = new BatchJobSettings(args);
 		assertEquals(new File("exampledata/ant.jar.graphml"),settings.getDataSource());
 		assertFalse(settings.getDataSource().isDirectory());
@@ -32,7 +32,7 @@ public class BatchJobSettingsTests {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testData2() throws Exception {
-		String [] args = {"-data","exampledata/doesnotexist.graphml"};
+		String [] args = {"-data","exampledata/doesnotexist.graphml","-query","queries/cd.xml","-out","results.txt"};
 		BatchJobSettings settings = new BatchJobSettings(args);
 	}
 }
