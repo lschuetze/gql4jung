@@ -798,6 +798,7 @@ public class ResultBrowser extends JFrame {
 				engine.reset();
 				results.reset();
 				displayInstance(null);
+				engine = new GQLImpl(); // create new engine in case the old one has been cancelled 
 				engine.query(data,query,results,!computeVariants);
 				queryThread = null;
 				status = Status.finished;
@@ -850,7 +851,7 @@ public class ResultBrowser extends JFrame {
 			@Override
 			public boolean accept(File f) {
 				String s = f.getAbsolutePath();
-				return s.endsWith(".odem");
+				return f.isDirectory() || s.endsWith(".odem");
 			}
 			@Override
 			public String getDescription() {
@@ -872,7 +873,7 @@ public class ResultBrowser extends JFrame {
 			@Override
 			public boolean accept(File f) {
 				String s = f.getAbsolutePath();
-				return s.endsWith(".graphml");
+				return f.isDirectory() || s.endsWith(".graphml");
 			}
 			@Override
 			public String getDescription() {
