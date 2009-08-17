@@ -13,18 +13,9 @@ package nz.ac.massey.cs.gql4jung.io;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.io.GraphIOException;
-import edu.uci.ics.jung.io.GraphReader;
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.Vertex;
 
@@ -64,6 +55,7 @@ public class GraphMLWriter {
 		printAttr(out,"name",v.getName());
 		printAttr(out,"cluster",v.getCluster());
 		printAttr(out,"type",v.getType());
+		printAttr(out,"isAbstract",String.valueOf(v.isAbstract()));
 		out.println(" />");
 	}
 	
