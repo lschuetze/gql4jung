@@ -10,7 +10,7 @@
     <constraint>
     	class1.cluster!=class2.cluster
     </constraint>
-	<groupby>
+	<groupBy>
         <element>class1.namespace</element>
-    </groupby>
+    </groupBy >
 </motif>

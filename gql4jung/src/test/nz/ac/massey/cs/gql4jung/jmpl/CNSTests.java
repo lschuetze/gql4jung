@@ -40,6 +40,27 @@ public class CNSTests extends Tests{
 		expected.put("class2","org.example.Class2A");
 		doTest("cns.xml","testdata-cns1.graphml",expected,true);
 	}
+	@Test
+	public void test2() throws Exception {
+		Map<String,String> expected = new HashMap<String,String>();
+		expected.put("class1","org.example1.Class1A");
+		expected.put("class2","org.example1.Class1B");
+		doTest("cns.xml","testdata-cns2.graphml",expected,true);
+	}
+	
+	@Test
+	public void test3() throws Exception {
+		Map<String,String> expected = new HashMap<String,String>();
+		expected.put("class1","org.example2.Class2A");
+		expected.put("class2","org.example2.Class2B");
+		doTest("cns.xml","testdata-cns2.graphml",expected,true);
+	}
+	
+	@Test
+	public void test4() throws Exception {
+		this.doTestExpectedInstances("cns.xml","testdata-cns2.graphml", 2, true);
+	}
+	
 	
 	
 }
