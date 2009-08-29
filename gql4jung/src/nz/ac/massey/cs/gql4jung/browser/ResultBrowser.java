@@ -257,7 +257,16 @@ public class ResultBrowser extends JFrame {
 			public void componentMoved(ComponentEvent e) {}
 			@Override
 			public void componentResized(ComponentEvent e) {
-				if (query!=null) displayMotif(query,querySource);
+				if (query!=null) {
+					for (QueryView view:queryViewers) {
+						view.display(query,querySource);
+					}	
+				}
+				if (results.hasResults()) {
+					for (ResultView view:resultViewers) {
+						view.display(results.getInstance(results.getCursor()), data);
+					}
+				}
 			}
 			@Override
 			public void componentShown(ComponentEvent e) {
