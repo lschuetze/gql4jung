@@ -47,10 +47,6 @@ import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.Vertex;
-import nz.ac.massey.cs.gql4jung.browser.queryviews.GraphBasedQueryView;
-import nz.ac.massey.cs.gql4jung.browser.queryviews.XMLSourceQueryView;
-import nz.ac.massey.cs.gql4jung.browser.resultviews.GraphBasedResultView;
-import nz.ac.massey.cs.gql4jung.browser.resultviews.TableBasedResultView;
 import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
 import nz.ac.massey.cs.gql4jung.io.JarReader;
 import nz.ac.massey.cs.gql4jung.io.ODEMReader;
@@ -87,7 +83,6 @@ public class ResultBrowser extends JFrame {
 	private Thread queryThread = null;
 	private long computationStarted = -1;
 	private boolean computeVariants = false;
-	
 	private static Logger LOG = Logger.getLogger(ResultBrowser.class);
 	
 	// parts
@@ -118,21 +113,15 @@ public class ResultBrowser extends JFrame {
 	private Action actPreviousMinorInstance;
 	private Action actNextMajorInstance;
 	private Action actPreviousMajorInstance;
-	private Action actExport2CSV;
 	private Action actViewGraphData;
 	private Action actAbout;
 	private List<Action> actLoadBuiltInQueries = new ArrayList<Action>();
 	private List<Action> actConfigureViews = new ArrayList<Action>();
-	private List<Action> loadActions = new ArrayList<Action>();
+	private List<Action> actLoadActions = new ArrayList<Action>();
+	private List<Action> actExportActions = new ArrayList<Action>();
 	
-	private ResultView[] resultViewers = {
-		new GraphBasedResultView(),
-		new TableBasedResultView()
-	};
-	private QueryView[] queryViewers = {
-		new GraphBasedQueryView(),
-		new XMLSourceQueryView()
-	};
+	private List<ResultView> resultViewers = ServiceBinder.getServices(ResultView.class);
+	private List<QueryView> queryViewers = ServiceBinder.getServices(QueryView.class);
 	
 	
 	private enum Status {
@@ -302,7 +291,9 @@ public class ResultBrowser extends JFrame {
 			menu.add(menu2);
 		}
 		menu.addSeparator();
-		menu.add(actExport2CSV);
+		for (Action act:actExportActions) {
+			menu.add(act);
+		}
 		menu.addSeparator();
 		menu.add(actExit);
 		menuBar.add(menu);
@@ -450,7 +441,7 @@ public class ResultBrowser extends JFrame {
 			}
 		};
 		actLoadData.putValue(Action.SHORT_DESCRIPTION, "load graph");
-		loadActions.add(actLoadData);
+		actLoadActions.add(actLoadData);
 		
 		actLoadDataFromODEM = new AbstractAction("load graph from ODEM file",getIcon("Open16.gif")) {
 			@Override
@@ -459,7 +450,7 @@ public class ResultBrowser extends JFrame {
 			}
 		};
 		actLoadDataFromODEM.putValue(Action.SHORT_DESCRIPTION, "load a program dependency graph from an XML/ODEM file");
-		loadActions.add(actLoadDataFromODEM);
+		actLoadActions.add(actLoadDataFromODEM);
 		
 		actLoadDataFromGraphML = new AbstractAction("load graph from GraphML file",getIcon("Open16.gif")) {
 			@Override
@@ -468,7 +459,7 @@ public class ResultBrowser extends JFrame {
 			}
 		};
 		actLoadDataFromGraphML.putValue(Action.SHORT_DESCRIPTION, "load a program dependency graph from an XML/GraphML file");
-		loadActions.add(actLoadDataFromGraphML);
+		actLoadActions.add(actLoadDataFromGraphML);
 		
 		actLoadDataFromJars = new AbstractAction("open multiple jars or folders",getIcon("Open16.gif")) {
 			@Override
@@ -477,7 +468,7 @@ public class ResultBrowser extends JFrame {
 			}
 		};
 		actLoadDataFromJars.putValue(Action.SHORT_DESCRIPTION, "load dependency graph from multiple jar files and/or folders");
-		loadActions.add(actLoadDataFromJars);
+		actLoadActions.add(actLoadDataFromJars);
 		
 		actLoadDataFromJar = new AbstractAction("open jar or folder",getIcon("Open16.gif")) {
 			@Override
@@ -486,7 +477,7 @@ public class ResultBrowser extends JFrame {
 			}
 		};
 		actLoadDataFromJar.putValue(Action.SHORT_DESCRIPTION, "load dependency graph from single jar file and/or folder");
-		loadActions.add(actLoadDataFromJar);
+		actLoadActions.add(actLoadDataFromJar);
 		
 		actAnalyseMe = new AbstractAction("analyse me",getIcon("Open16.gif")) {
 			@Override
@@ -495,7 +486,7 @@ public class ResultBrowser extends JFrame {
 			}
 		};
 		actAnalyseMe.putValue(Action.SHORT_DESCRIPTION, "load this program as a graph");
-		loadActions.add(actAnalyseMe);
+		actLoadActions.add(actAnalyseMe);
 		
 		actLoadQuery = new AbstractAction("load query",getIcon("Import16.gif")) {
 			@Override
@@ -504,7 +495,7 @@ public class ResultBrowser extends JFrame {
 			}
 		};
 		actLoadQuery.putValue(Action.SHORT_DESCRIPTION, "load a query from a xml file");
-		loadActions.add(actLoadQuery);
+		actLoadActions.add(actLoadQuery);
 		
 		actRunQuery = new AbstractAction("run query",getIcon("Play16.gif")) {
 			@Override
@@ -522,13 +513,24 @@ public class ResultBrowser extends JFrame {
 		};
 		actCancelQuery.putValue(Action.SHORT_DESCRIPTION, "cancel the currently running query");
 		
-		actExport2CSV = new AbstractAction("export to csv",getIcon("Export16.gif")) {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				actExport2CSV();
-			}
-		};
-		actExport2CSV.putValue(Action.SHORT_DESCRIPTION, "export the query results to a CSV (spreadsheet) file");
+		
+		List<ResultExportAction> exports = ServiceBinder.getServices(ResultExportAction.class);
+		
+		for (final ResultExportAction act:exports) {
+			Action actExport = new AbstractAction(act.getName(),getIcon("Export16.gif")) {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						act.exportResults(results,ResultBrowser.this);
+					} catch (IOException e1) {
+						handleException("Error exporting results",e1);
+					}
+				}
+			};
+			actExport.putValue(Action.SHORT_DESCRIPTION,act.getDescription());
+			this.actExportActions.add(actExport);
+
+		}
 		
 		actPreviousMinorInstance = new AbstractAction("previous minor instance",getIcon("PreviousMinor16.gif")) {
 			@Override
@@ -669,7 +671,7 @@ public class ResultBrowser extends JFrame {
 				}			
 			};
 			this.actLoadBuiltInQueries.add(act);
-			this.loadActions.add(act);
+			this.actLoadActions.add(act);
 			log("added action to load query from file "+file);
             
         }
@@ -699,7 +701,9 @@ public class ResultBrowser extends JFrame {
 		toolbar.add(actPreviousMinorInstance).setBorder(b);
 		toolbar.add(actNextMinorInstance).setBorder(b);
 		toolbar.addSeparator();
-		toolbar.add(actExport2CSV).setBorder(b);
+		for (Action act:actExportActions) {
+			toolbar.add(act).setBorder(b);
+		}
 	}
 	
 	private void initPopupMenu() {
@@ -1166,12 +1170,14 @@ public class ResultBrowser extends JFrame {
 		boolean loading = status==Status.loading;
 		actCancelQuery.setEnabled(!loading&&querying);
 		actRunQuery.setEnabled(!loading&&!querying&&this.query!=null&&this.data!=null);
-		actExport2CSV.setEnabled(!loading&&!querying && results.hasResults());
+		for (Action act:actExportActions) {
+			act.setEnabled(!loading&&!querying && results.hasResults());
+		}
 		actNextMajorInstance.setEnabled(!loading&&results.hasNextMajorInstance());
 		actNextMinorInstance.setEnabled(!loading&&results.hasNextMinorInstance());
 		actPreviousMajorInstance.setEnabled(!loading&&results.hasPreviousMajorInstance());
 		actPreviousMinorInstance.setEnabled(!loading&&results.hasPreviousMinorInstance());
-		for (Action act:loadActions) {
+		for (Action act:actLoadActions) {
 			act.setEnabled(!loading&&!querying);
 		}
 		actViewGraphData.setEnabled(this.data!=null);
@@ -1241,7 +1247,7 @@ public class ResultBrowser extends JFrame {
 	}
 
 	private boolean isShowingQuery() {
-		return this.tabbedPane.getSelectedIndex()<this.queryViewers.length;
+		return this.tabbedPane.getSelectedIndex()<this.queryViewers.size();
 	}
 	private void switchToQueryView() {
 		if (!isShowingQuery()) {
@@ -1250,7 +1256,7 @@ public class ResultBrowser extends JFrame {
 	}
 	private void switchToResultView() {
 		if (isShowingQuery()) {
-			this.tabbedPane.setSelectedIndex(this.queryViewers.length);
+			this.tabbedPane.setSelectedIndex(this.queryViewers.size());
 		}
 	}
 }
