@@ -1,0 +1,2 @@
+ant.jar.graphml,cd.xml,983,8107,1,49367,0:0:17.232
+Azureus3.0.3.4.jar.graphml,cd.xml,5909,56515,1,749834,0:24:57.567 // after migrating to jung 2.0 and accessing properties directly
