@@ -24,6 +24,7 @@ import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.Vertex;
 import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
 import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
+import nz.ac.massey.cs.gql4jung.jmpl.MultiThreadedGQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.ResultCollector;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
@@ -54,7 +55,8 @@ public abstract class Tests {
 	 public static Collection engines() {
 	  return Arrays.asList(
 			  new GQL[][] {
-					  //{new MultithreadedGQLImpl()}
+					  {new MultiThreadedGQLImpl()}
+					  ,
 					  {new GQLImpl()}
 			  });
 	 }
