@@ -52,7 +52,7 @@ import nz.ac.massey.cs.gql4jung.io.JarReader;
 import nz.ac.massey.cs.gql4jung.io.ODEMReader;
 import nz.ac.massey.cs.gql4jung.io.ProgressListener;
 import nz.ac.massey.cs.gql4jung.io.QueryResultsExporter2CSV;
-import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
+import nz.ac.massey.cs.gql4jung.jmpl.MultiThreadedGQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.QueryResults.Cursor;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
@@ -79,7 +79,7 @@ public class ResultBrowser extends JFrame {
 	private Motif query = null;
 	private String querySource = null;
 	private QueryResults results = new QueryResults();
-	private GQL engine = new GQLImpl();
+	private GQL engine = new MultiThreadedGQLImpl(2);
 	private Thread queryThread = null;
 	private long computationStarted = -1;
 	private boolean computeVariants = false;
@@ -115,10 +115,14 @@ public class ResultBrowser extends JFrame {
 	private Action actPreviousMajorInstance;
 	private Action actViewGraphData;
 	private Action actAbout;
+	private Action actEditGQL;
 	private List<Action> actLoadBuiltInQueries = new ArrayList<Action>();
 	private List<Action> actConfigureViews = new ArrayList<Action>();
 	private List<Action> actLoadActions = new ArrayList<Action>();
 	private List<Action> actExportActions = new ArrayList<Action>();
+	
+	// settings
+	private GQLSettings settings = GQLSettings.load();
 	
 	private List<ResultView> resultViewers = ServiceBinder.getServices(ResultView.class);
 	private List<QueryView> queryViewers = ServiceBinder.getServices(QueryView.class);
@@ -326,6 +330,7 @@ public class ResultBrowser extends JFrame {
 			menu.add(act);
 		}
 		menu.add(this.actViewGraphData);
+		menu.add(this.actEditGQL);
 		menuBar.add(menu);
 		
 		menu = new JMenu("Help");
@@ -641,6 +646,15 @@ public class ResultBrowser extends JFrame {
 			}
 		}
 		
+		actEditGQL = new AbstractAction("configure query engine") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PropertyBeanEditor.edit(ResultBrowser.this,settings,"hello");
+			}
+
+		};
+		
 		initBuiltInQueries();
 	}
 
@@ -811,7 +825,7 @@ public class ResultBrowser extends JFrame {
 				engine.reset();
 				results.reset();
 				displayInstance(null);
-				engine = new GQLImpl(); // create new engine in case the old one has been cancelled 
+				engine = settings.getGQLFactory().createGQL();
 				engine.query(data,query,results,!computeVariants);
 				queryThread = null;
 				status = Status.finished;
