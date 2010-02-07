@@ -19,10 +19,12 @@ import nz.ac.massey.cs.gql4jung.*;
 
 /**
  * Improved graph query engine supporting multithreading.
+ * Each query should be run using a new instance - instances maintain state to keep track of working threads. 
  * @author jens dietrich
  */
 public class MultiThreadedGQLImpl extends GQLImplCore {
-	private int numberOfThreads = 2;
+	
+	
 	private int activeThreadCount = 0;
 	public MultiThreadedGQLImpl() {
 		super();
@@ -31,7 +33,15 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
 		super();
 		this.numberOfThreads = numberOfThreads;
 	}
-
+	
+	private int numberOfThreads = 2;
+	
+	public int getNumberOfThreads() {
+		return numberOfThreads;
+	}
+	public void setNumberOfThreads(int numberOfThreads) {
+		this.numberOfThreads = numberOfThreads;
+	}
 
 	@Override
 	public void query(final DirectedGraph<Vertex,Edge> graph, final Motif motif, final ResultListener listener,final boolean ignoreVariants) {
