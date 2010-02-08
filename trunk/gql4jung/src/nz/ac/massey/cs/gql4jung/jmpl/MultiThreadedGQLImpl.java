@@ -40,7 +40,7 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
 	
 	
 	public int getNumberOfThreads() {
-		return numberOfThreads;
+		return numberOfThreads==-1?Runtime.getRuntime().availableProcessors():numberOfThreads;
 	}
 	public void setNumberOfThreads(int n) {
 		if (n<1) throw new IllegalArgumentException();
@@ -98,7 +98,7 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
     	};
     	
     	// start resolver
-    	int N = this.numberOfThreads==-1?Runtime.getRuntime().availableProcessors():this.numberOfThreads;
+    	int N = getNumberOfThreads();
     	activeThreadCount = N;
     	for (int i=0;i<N;i++) {
     		new Thread(worker).start();
@@ -117,7 +117,7 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
 	}
 	@Override
 	public String toString() {
-		return super.toString() + "[" + this.numberOfThreads + " threads]";
+		return super.toString() + "[" + this.getNumberOfThreads() + " threads]";
 	}
 
 	
