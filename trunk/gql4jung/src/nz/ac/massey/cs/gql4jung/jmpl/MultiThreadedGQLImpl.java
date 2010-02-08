@@ -19,6 +19,7 @@ import nz.ac.massey.cs.gql4jung.*;
 
 /**
  * Improved graph query engine supporting multithreading.
+ * The number of threads can be set in the constructor, if not set, the number of processors will be used.
  * Each query should be run using a new instance - instances maintain state to keep track of working threads. 
  * @author jens dietrich
  */
@@ -26,21 +27,24 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
 	
 	
 	private int activeThreadCount = 0;
+	private int numberOfThreads = -1;
+	
 	public MultiThreadedGQLImpl() {
 		super();
 	}
 	public MultiThreadedGQLImpl(int numberOfThreads) {
 		super();
-		this.numberOfThreads = numberOfThreads;
+		this.setNumberOfThreads(numberOfThreads);
 	}
 	
-	private int numberOfThreads = 2;
+	
 	
 	public int getNumberOfThreads() {
 		return numberOfThreads;
 	}
-	public void setNumberOfThreads(int numberOfThreads) {
-		this.numberOfThreads = numberOfThreads;
+	public void setNumberOfThreads(int n) {
+		if (n<1) throw new IllegalArgumentException();
+		this.numberOfThreads = n;
 	}
 
 	@Override
@@ -94,8 +98,9 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
     	};
     	
     	// start resolver
-    	activeThreadCount = numberOfThreads;
-    	for (int i=0;i<this.numberOfThreads;i++) {
+    	int N = this.numberOfThreads==-1?Runtime.getRuntime().availableProcessors():this.numberOfThreads;
+    	activeThreadCount = N;
+    	for (int i=0;i<N;i++) {
     		new Thread(worker).start();
     	}
     	
