@@ -110,6 +110,11 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
     	}
     	listener.done();
 	}
+	@Override
+	public String toString() {
+		return super.toString() + "[" + this.numberOfThreads + " threads]";
+	}
 
+	
 
 }
