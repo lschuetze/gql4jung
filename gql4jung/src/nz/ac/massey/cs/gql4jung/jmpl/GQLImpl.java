@@ -54,6 +54,8 @@ public class GQLImpl extends GQLImplCore {
     		}
     		controller.reset();
 	    }
+    	
+    	listener.done();
 
 	}
 
