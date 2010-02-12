@@ -31,6 +31,7 @@ public class GQLSettings implements PropertyBean {
 	
 	private static String[] gqlFactories = {
 		DefaultGQLFactory.class.getName(),
+		MultiThreadedGQLFactory.class.getName(),
 		MultiThreadedGQLFactory2.class.getName(),
 		MultiThreadedGQLFactory4.class.getName()
 	};
