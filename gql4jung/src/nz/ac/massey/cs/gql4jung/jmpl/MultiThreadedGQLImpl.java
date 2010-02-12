@@ -12,7 +12,9 @@
 package nz.ac.massey.cs.gql4jung.jmpl;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import edu.uci.ics.jung.graph.*;
 import nz.ac.massey.cs.gql4jung.*;
@@ -28,7 +30,11 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
 	
 	private int activeThreadCount = 0;
 	private int numberOfThreads = -1;
+	// only used if ignoreVariants is false - if this flag is false, for some queries some variants (computed in different threads)
+	// could be returned. However, it can be faster to do do
+	private boolean removeAllVariants = true;
 	
+
 	public MultiThreadedGQLImpl() {
 		super();
 	}
@@ -38,7 +44,12 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
 	}
 	
 	
-	
+	public boolean isRemoveAllVariants() {
+		return removeAllVariants;
+	}
+	public void setRemoveAllVariants(boolean removeAllVariants) {
+		this.removeAllVariants = removeAllVariants;
+	}
 	public int getNumberOfThreads() {
 		return numberOfThreads==-1?Runtime.getRuntime().availableProcessors():numberOfThreads;
 	}
@@ -67,6 +78,35 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
     	for (Vertex v:vertices) {
     		agenda.push(v); // reverses order - could use agenda.add(0, v) to retain order
     	}
+    	// in general, aggregation needs to be enforced across different threads
+    	// this is done by wrapping the controller
+    	ResultListener aggregationController = new ResultListener() {
+    		Set<Object> instanceIdentifiers = new HashSet<Object>();
+    		GroupByAggregation groupBy = new GroupByAggregation();
+			@Override
+			public void done() {
+				listener.done();
+				instanceIdentifiers = null;
+			}
+
+			@Override
+			public synchronized boolean found(MotifInstance instance) {
+				// check whether there already is a variant for this instance
+				if (instanceIdentifiers.add(groupBy.getGroupIdentifier(instance))) {
+					return listener.found(instance);
+				}
+				return true;
+			}
+
+			@Override
+			public void progressMade(int progress, int total) {
+				listener.progressMade(progress, total);
+			}
+    		
+    	} ;
+    	
+    	// create workers
+    	final ResultListener l = ignoreVariants&&removeAllVariants?aggregationController:listener;
     	Runnable worker = new Runnable() {
 			@Override
 			public void run() {
@@ -83,7 +123,7 @@ public class MultiThreadedGQLImpl extends GQLImplCore {
 					//Thread.yield();
 					if (nextNode!=null) {
 						controller.bind(role, nextNode);
-						resolve(graph, motif, controller, listener);
+						resolve(graph, motif, controller, l);
 						counter = S-agenda.size();
 			    		if (counter%stepSize==0) {
 			    			listener.progressMade(counter,S);
