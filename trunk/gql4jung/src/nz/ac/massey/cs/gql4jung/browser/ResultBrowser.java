@@ -41,7 +41,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
-import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+//import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
@@ -158,11 +158,7 @@ public class ResultBrowser extends JFrame {
 		init();
 	}
 	private void init() {
-		// set look and feel
-		try {
-			Plastic3DLookAndFeel.setPlasticTheme(new com.jgoodies.looks.plastic.theme.Silver());
-			UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
-		} catch (Exception e) {}
+
 			   
 		this.setTitle(TITLE);
 				
@@ -845,7 +841,7 @@ public class ResultBrowser extends JFrame {
 		JFileChooser fc = new JFileChooser();
 		fc.setCurrentDirectory(new File("./queries"));
 		fc.setDialogTitle("Load query");
-		int returnVal = fc.showOpenDialog(this);
+		
 		FileFilter filter = new FileFilter() {
 			@Override
 			public boolean accept(File f) {
@@ -857,6 +853,7 @@ public class ResultBrowser extends JFrame {
 			}			
 		};
 		fc.setFileFilter(filter);
+		int returnVal = fc.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             loadQuery(file);

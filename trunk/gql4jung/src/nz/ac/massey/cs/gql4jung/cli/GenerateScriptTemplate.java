@@ -48,6 +48,9 @@ public class GenerateScriptTemplate {
 		out.print(" -threads 2");
 		out.print(" -variants");
 		
+		out.println();
+		out.println(Runtime.getRuntime().availableProcessors());
+		
 		
 		
 	}
