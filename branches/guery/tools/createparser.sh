@@ -1,0 +1,1 @@
+xjc -d ../src -p nz.ac.massey.cs.gql4jung.xml ../schema/gql4jung.xsd

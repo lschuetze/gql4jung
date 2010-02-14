@@ -1,0 +1,9 @@
+Manifest-version: 1.0
+Main-class: @MAIN_CLASS@
+Name: @NAME@
+Specification-Title: @TITLE@
+Specification-Version: @VERSION@
+Specification-Vendor: @VENDOR@
+Implementation-Title: @TITLE@
+Implementation-Version: @VERSION@
+Implementation-Vendor: @VENDOR@

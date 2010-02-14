@@ -1,0 +1,6 @@
+24,	24,	1, 1	568,197,1,1	// tests 1-4 in r0.2
+93, 93, 1, 1	1024,664,2,2 // first working mvel2 based version
+93, 93, 1, 1	968,335,3,3 // after making ConstrainedShortestPathFinder static
+93, 93, 1, 1	895,751,1,1 // after making PathFinder static
+93, 93, 1, 1	3650,3505,3,2 // after introducing loop instructions and resolving them before following links
+93,	93,	1, 1	727,198,3,1 // after migrating to jung 2.0 and accessing properties directly
