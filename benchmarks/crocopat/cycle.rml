@@ -1,4 +1,0 @@
-Use(x,y) := uses(x,y) | implements(x,y) | extends(x,y);
-Cycle3(x,y,z) := Use(x,y) & Use(y,z) & Use(z,x);
-Cycle3(x,y,z) := Cycle3(x,y,z) & (x <= y) & (x <= z);
-PRINT Cycle3(x,y,z);
