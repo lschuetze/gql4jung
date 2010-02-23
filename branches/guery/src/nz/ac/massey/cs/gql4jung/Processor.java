@@ -18,6 +18,6 @@ import edu.uci.ics.jung.graph.DirectedGraph;
  * This annotates the graph, it does not create a new graph.
  * @author jens dietrich
  */
-public interface Processor<V extends Vertex<E>,E extends Edge<V>> {
+public interface Processor<V extends Vertex,E extends Edge> {
 	void process(DirectedGraph<V,E> g);
 }

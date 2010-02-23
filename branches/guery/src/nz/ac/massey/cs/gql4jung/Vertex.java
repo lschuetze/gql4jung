@@ -16,7 +16,7 @@ import java.util.HashSet;
 
 /**
  * General vertex class. Vertices have references to incoming and outgoing edges. This is different to jung 2. 
- * Teh advantage is that lookup is much faster.
+ * The advantage is that lookup is much faster.
  * @author jens dietrich
  */
 public class Vertex<E extends Edge> extends GraphElement{
