@@ -24,7 +24,7 @@ import nz.ac.massey.cs.gql4jung.Vertex;
  * memory.
  * @author jens dietrich
  */
-public class GraphMLWriter {
+public abstract class GraphMLWriter<V extends Vertex<E>,E extends Edge<V>> {
 
 	private Writer writer = null;
 
@@ -32,45 +32,40 @@ public class GraphMLWriter {
 		super();
 		this.writer = writer;
 	}
-	public synchronized void writeGraph(DirectedGraph<Vertex, Edge> g) throws GraphIOException {
+	public synchronized void writeGraph(DirectedGraph<V, E> g) throws GraphIOException {
 		PrintWriter out = new PrintWriter(writer);
 		out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		out.println("<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns/graphml\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns/graphml\">");
 		out.println("<graph edgedefault=\"directed\" file=\"\">");
-		for (Vertex v:g.getVertices()) {
+		for (V v:g.getVertices()) {
 			write(out,v);
 		}
-		for (Edge e:g.getEdges()) {
+		for (E e:g.getEdges()) {
 			write(out,e);
 		}
 		out.println("</graph>");
 		out.println("</graphml>");
 	}
 
-	private void write(PrintWriter out, Vertex v) {
+	protected void write(PrintWriter out, V v) throws GraphIOException {
 		out.print("<node ");
 		printAttr(out,"id",v.getId());
-		printAttr(out,"container",v.getContainer());
-		printAttr(out,"namespace",v.getNamespace());
-		printAttr(out,"name",v.getName());
-		printAttr(out,"cluster",v.getCluster());
-		printAttr(out,"type",v.getType());
-		printAttr(out,"isAbstract",String.valueOf(v.isAbstract()));
+		writeAttributes(out,v);
 		out.println(" />");
 	}
 	
-	private void printAttr(PrintWriter out, String name, String value) {
+	protected void printAttr(PrintWriter out, String name, String value) {
 		out.print(name);
 		out.print("=\"");
 		out.print(value);
 		out.print("\" ");
 	}
-	private void write(PrintWriter out, Edge e) {
+	protected void write(PrintWriter out, E e) throws GraphIOException {
 		out.print("<edge ");
 		printAttr(out,"id",e.getId());
 		printAttr(out,"source",e.getStart().getId());
 		printAttr(out,"target",e.getEnd().getId());
-		printAttr(out,"type",e.getType());
+		writeAttributes(out,e);
 		out.println(" />");		
 	}
 	
@@ -79,5 +74,8 @@ public class GraphMLWriter {
 			writer.close();
 		}
 	}
+	
+	protected abstract void writeAttributes(PrintWriter out,E edge) throws GraphIOException;
+	protected abstract void writeAttributes(PrintWriter out,V vertex) throws GraphIOException;
 
 }

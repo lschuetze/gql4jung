@@ -55,7 +55,7 @@ public abstract class GraphMLReader<V extends Vertex<E>,E extends Edge<V>> imple
 			Element eGraph = root.getChild("graph",NS_GRAPHML); 
 			for (Object o:eGraph.getChildren("node",NS_GRAPHML)) {
 				if (o instanceof Element) {
-					V v = buildVertex(vertices,(Element)o);
+					buildVertex(vertices,(Element)o);
 				}
 			}
 			for (Object o:eGraph.getChildren("edge",NS_GRAPHML)) {
@@ -84,11 +84,11 @@ public abstract class GraphMLReader<V extends Vertex<E>,E extends Edge<V>> imple
 		return graph;
 		
 	}
-	private String createNextId(String prefix) {
+	protected String createNextId(String prefix) {
 		this.idCounter = idCounter+1;
 		return prefix+idCounter;
 	}
-	private E buildEdge(Map<String, V> vertices, Element e) throws GraphIOException {
+	protected E buildEdge(Map<String, V> vertices, Element e) throws GraphIOException {
 		E edge = createNewEdge();
 		
 		String id = e.getAttributeValue("id");
@@ -106,36 +106,18 @@ public abstract class GraphMLReader<V extends Vertex<E>,E extends Edge<V>> imple
 		V v2 = vertices.get(target);
 		if (v2 == null) throw new GraphIOException("No vertex found for id " + source);
 		edge.setEnd(v2);
+		
+		readAttributes(edge,e);
 				
 		return edge;
-	}
-	protected abstract E createNewEdge();
-	protected abstract V createNewVertex();
-	
-	protected void readAttributes(E edge,Element e) throws GraphIOException {
-		/* TODO make abstract
-		String type = e.getAttributeValue("type");
-		if (type==null) throw new GraphIOException("Type attribute missing in edge " + id);
-		edge.setType(type);
-		*/
-	}
-	
-	protected void readAttributes(V v,Element e) throws GraphIOException {
-		/* TODO make abstract
-		v.setId(id);
-		v.setName(e.getAttributeValue("name"));
-		v.setAbstract("true".equals(e.getAttributeValue("isAbstract")));
-		v.setNamespace(e.getAttributeValue("namespace"));
-		v.setType(e.getAttributeValue("type"));
-		v.setCluster(e.getAttributeValue("cluster"));
-		v.setContainer(e.getAttributeValue("container"));
-		*/
 	}
 	
 	private V buildVertex(Map<String, V> vertices, Element e) throws GraphIOException {
 		V v = createNewVertex();
 		String id = e.getAttributeValue("id");
 		if (id==null) id = this.createNextId("v");
+		
+		readAttributes(v,e);
 
 		// register
 		if (vertices.containsKey(v.getId())) {
@@ -154,5 +136,10 @@ public abstract class GraphMLReader<V extends Vertex<E>,E extends Edge<V>> imple
 			}
 		}
 	}
+	
+	protected abstract E createNewEdge();
+	protected abstract V createNewVertex();
+	protected abstract void readAttributes(E edge,Element e) throws GraphIOException;
+	protected abstract void readAttributes(V v,Element e) throws GraphIOException;
 
 }
