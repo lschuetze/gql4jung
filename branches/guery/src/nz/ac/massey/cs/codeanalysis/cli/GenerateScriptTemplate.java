@@ -8,7 +8,7 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gql4jung.cli;
+package nz.ac.massey.cs.codeanalysis.cli;
 
 import java.io.File;
 import java.io.PrintStream;

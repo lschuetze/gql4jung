@@ -9,7 +9,7 @@
  */
 
 
-package nz.ac.massey.cs.gql4jung.cli;
+package nz.ac.massey.cs.codeanalysis.cli;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,14 +20,14 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Level;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import nz.ac.massey.cs.codeanalysis.JarReader;
-import nz.ac.massey.cs.gql4jung.Edge;
+import nz.ac.massey.cs.codeanalysis.TypeNode;
+import nz.ac.massey.cs.codeanalysis.TypeReference;
+import nz.ac.massey.cs.codeanalysis.io.GraphMLReader;
+import nz.ac.massey.cs.codeanalysis.io.JarReader;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifReaderException;
 import nz.ac.massey.cs.gql4jung.ResultListener;
-import nz.ac.massey.cs.gql4jung.Vertex;
-import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
 import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
 import nz.ac.massey.cs.gql4jung.jmpl.MultiThreadedGQLImpl;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
@@ -68,18 +68,18 @@ public class Run {
 		
 		Map<String,Object> param = parseArgs(args);
 		
-		GQL engine = (GQL)param.get(GQLCLASS);
+		GQL<TypeNode,TypeReference> engine = (GQL<TypeNode,TypeReference>)param.get(GQLCLASS);
 		Integer i = (Integer) param.get(THREADS);
 		if (i==null || i<2) {
 			if (engine==null) {
-				engine = new GQLImpl();	
+				engine = new GQLImpl<TypeNode,TypeReference>();	
 			}
 		}
 		else if (engine instanceof MultiThreadedGQLImpl) {
 			((MultiThreadedGQLImpl)engine).setNumberOfThreads(i);
 		}
 		else {
-			engine = new MultiThreadedGQLImpl(i);
+			engine = new MultiThreadedGQLImpl<TypeNode,TypeReference>(i);
 		}
 		log("Using engine: ",engine);
 		
@@ -87,7 +87,7 @@ public class Run {
 		if (graphSource==null) {
 			throw new IllegalArgumentException("No graph source defined, use " + INPUT + " parameter to define source");
 		}
-		DirectedGraph<Vertex,Edge> graph = loadGraph(graphSource);
+		DirectedGraph<TypeNode,TypeReference> graph = loadGraph(graphSource);
 		if (graph.getVertices()==null) {
 			throw new IllegalArgumentException("The graph imported from "+graphSource.getName()+" does not contain nodes");
 		}
@@ -97,7 +97,7 @@ public class Run {
 		Motif motif = loadMotif(motifSource);
 		log("Using motif: ",motifSource.getAbsolutePath());
 		
-		ResultListener listener = (ResultListener) param.get(LISTENER);
+		ResultListener<TypeNode,TypeReference> listener = (ResultListener<TypeNode,TypeReference>) param.get(LISTENER);
 		if (listener==null) {
 			listener = new ResultCounter();
 		}
@@ -134,11 +134,11 @@ public class Run {
 
 	private static void addEntry(String arg, String value,Map<String, Object> param) throws Exception {
 		if (GQLCLASS.equals(arg)) {
-			GQL engine = (GQL)parseObject(GQL.class,arg);	
+			GQL<TypeNode,TypeReference> engine = (GQL<TypeNode,TypeReference>)parseObject(GQL.class,arg);	
 			param.put(arg, engine);
 		}
 		else if (LISTENER.equals(arg)) {
-			ResultListener listener = (ResultListener)parseObject(ResultListener.class,value);	
+			ResultListener<TypeNode,TypeReference> listener = (ResultListener<TypeNode,TypeReference>)parseObject(ResultListener.class,value);	
 			param.put(arg, listener);
 		}
 		else if (THREADS.equals(arg)) {
@@ -199,17 +199,17 @@ public class Run {
 	}
 
 
-	private static DirectedGraph<Vertex,Edge> loadGraph(File file) throws Exception {
+	private static DirectedGraph<TypeNode,TypeReference> loadGraph(File file) throws Exception {
 		log("Loading graph from ",file.getAbsolutePath());
 		if (file.getAbsolutePath().endsWith(".jar")) {
 			JarReader r = new JarReader(file);
-			DirectedGraph<Vertex,Edge> g = new JarReader(file).readGraph();
+			DirectedGraph<TypeNode,TypeReference> g = new JarReader(file).readGraph();
 			r.close();
 			return g;
 		}
 		else if (file.getAbsolutePath().endsWith(".graphml")) {
 			GraphMLReader r = new GraphMLReader(new FileReader(file));
-			DirectedGraph<Vertex,Edge> g = r.readGraph();
+			DirectedGraph<TypeNode,TypeReference> g = r.readGraph();
 			r.close();
 			return g;
 		}

@@ -8,15 +8,17 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.gql4jung.cli;
+package nz.ac.massey.cs.codeanalysis.cli;
 
+import nz.ac.massey.cs.codeanalysis.TypeNode;
+import nz.ac.massey.cs.codeanalysis.TypeReference;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.ResultListener;
 /**
  * Simple listener that just calls results.
  * @author jens dietrich
  */
-public class ResultCounter implements ResultListener {
+public class ResultCounter implements ResultListener<TypeNode,TypeReference> {
 	private int counter = 0;
 	private long started = -1;
 	@Override
@@ -28,7 +30,7 @@ public class ResultCounter implements ResultListener {
 	}
 
 	@Override
-	public synchronized boolean  found(MotifInstance instance) {
+	public synchronized boolean  found(MotifInstance<TypeNode,TypeReference> instance) {
 		if (started==-1) {
 			started = System.currentTimeMillis();
 		} 
