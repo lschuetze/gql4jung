@@ -1,7 +1,7 @@
 <!-- packages with multiple clusters within the package -->
 <motif name="multiple clusters in package">
     <!--  Cluster implements interface Processor with method process(Graph) -->
-	<annotate class="nz.ac.massey.cs.processors.Clusterer"/>
+	<annotate class="nz.ac.massey.cs.codeanalysis.processors.Clusterer"/>
     <select role="class1"/>
     <select role="class2"/>
     <constraint>
