@@ -9,35 +9,43 @@
  */
 
 
-package nz.ac.massey.cs.processors;
+package nz.ac.massey.cs.gql4jung.processors;
 
 import java.util.Set;
-
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.Processor;
 import nz.ac.massey.cs.gql4jung.Vertex;
 import edu.uci.ics.jung.algorithms.cluster.EdgeBetweennessClusterer;
-import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.DirectedGraph;
 
 /**
  * Implementation class for processing clusters in graph.
  * @author jens dietrich
  */
-public class Clusterer implements Processor {
+public abstract class Clusterer<V extends Vertex<E>,E extends Edge<V>> implements Processor<V,E> {
+	
+	public Clusterer() {
+		super();
+	}
 	
 	@Override
-	public void process(Graph<Vertex, Edge> g){
-		EdgeBetweennessClusterer clusterer = new EdgeBetweennessClusterer(0);
-		Set<Set<Vertex>> clusters = clusterer.transform(g);  
+	public void process(DirectedGraph<V, E> g){
+		EdgeBetweennessClusterer<V,E> clusterer = new EdgeBetweennessClusterer<V,E>(0);
+		Set<Set<V>> clusters = clusterer.transform(g);  
 		int counter = 1;
-		for (Set<Vertex> cluster:clusters) {
-			String label = "cluster-"+counter;
+		for (Set<V> cluster:clusters) {
+			String label = this.createClusterLabel(counter);
 			counter=counter+1;
-			for (Vertex v:cluster) {
-				v.setCluster(label);
+			for (V v:cluster) {
+				annotateWithClusterLabel(v,label);
 			}
 		}
 	}
 
+	protected abstract void annotateWithClusterLabel(V vertex,String clusterLabel);
+
+	protected String createClusterLabel(int counter) {
+		return "cluster-"+counter;
+	}
 
 }
