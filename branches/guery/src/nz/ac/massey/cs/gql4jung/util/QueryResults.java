@@ -29,7 +29,7 @@ import nz.ac.massey.cs.gql4jung.Vertex;
  * in user interfaces.
  * @author Jens Dietrich
  */
-public class QueryResults<V extends Vertex<E>,E extends Edge<V>> implements ResultListener<V,E>, Iterable<Map.Entry<QueryResults<V,E>.Cursor,MotifInstance<V,E>>> {
+public class QueryResults<V extends Vertex<E>,E extends Edge<V>> implements ResultListener<V,E>, Iterable<Map.Entry<Cursor,MotifInstance<V,E>>> {
 	
 	public QueryResults() {
 		super();
@@ -39,17 +39,7 @@ public class QueryResults<V extends Vertex<E>,E extends Edge<V>> implements Resu
 		super();
 		this.aggregation = aggregation;
 	}
-	
-	
-	public class Cursor {
-		public Cursor(int major, int minor) {
-			super();
-			this.major = major;
-			this.minor = minor;
-		}
-		public int major = -1;
-		public int minor = -1;
-	}
+
 	
 	private MotifInstanceAggregation aggregation = new GroupByAggregation();
 	
@@ -68,12 +58,7 @@ public class QueryResults<V extends Vertex<E>,E extends Edge<V>> implements Resu
 	private long lastupdate;
 	private long minTimeBetweenEvents = 50;
 	
-	public interface QueryResultListener {
-		@SuppressWarnings("unchecked")
-		public void resultsChanged(QueryResults source);
-		public void progressMade(int progress,int total);
-	} 
-	private List<QueryResultListener> listeners = new Vector<QueryResultListener>();
+	private List<QueryResultListener<V, E>> listeners = new Vector<QueryResultListener<V, E>>();
 
 	public long getMinTimeBetweenEvents() {
 		return minTimeBetweenEvents;
@@ -81,10 +66,10 @@ public class QueryResults<V extends Vertex<E>,E extends Edge<V>> implements Resu
 	public void setMinTimeBetweenEvents(long minTimeBetweenEvents) {
 		this.minTimeBetweenEvents = minTimeBetweenEvents;
 	}
-	public void addListener(QueryResultListener l) {
+	public void addListener(QueryResultListener<V, E> l) {
 		listeners.add(l);
 	}
-	public void removeListener(QueryResultListener l) {
+	public void removeListener(QueryResultListener<V, E> l) {
 		listeners.remove(l);
 	}
 	
@@ -116,7 +101,7 @@ public class QueryResults<V extends Vertex<E>,E extends Edge<V>> implements Resu
 		long t = System.currentTimeMillis();
 		if (t-lastupdate > minTimeBetweenEvents) { 
 			lastupdate = t;
-			for (QueryResultListener l:this.listeners) {
+			for (QueryResultListener<V, E> l:this.listeners) {
 				l.resultsChanged(this);
 			}	
 		} 
@@ -247,7 +232,7 @@ public class QueryResults<V extends Vertex<E>,E extends Edge<V>> implements Resu
 	@Override
 	public void progressMade(int progress, int total) {
 		// dispatch events
-		for (QueryResultListener l:this.listeners) {
+		for (QueryResultListener<V, E> l:this.listeners) {
 			l.progressMade(progress, total);
 		}
 		
