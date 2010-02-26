@@ -15,9 +15,11 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import nz.ac.massey.cs.codeanalysis.TypeNode;
+import nz.ac.massey.cs.codeanalysis.TypeReference;
+
 import org.apache.log4j.Logger;
-import nz.ac.massey.cs.gql4jung.Edge;
-import nz.ac.massey.cs.gql4jung.Vertex;
 import edu.uci.ics.jung.graph.DirectedGraph;
 
 /**
@@ -26,7 +28,7 @@ import edu.uci.ics.jung.graph.DirectedGraph;
  */
 public class GraphData implements PropertyBean {
 	
-	private DirectedGraph<Vertex,Edge> graph = null;
+	private DirectedGraph<TypeNode,TypeReference> graph = null;
 	
 	private int vertexCount = 0;
 	private int edgeCount = 0;
@@ -41,12 +43,12 @@ public class GraphData implements PropertyBean {
 	private int annotationCount = 0;
 	private String containers = null; // comma separated
 	
-	public DirectedGraph<Vertex, Edge> getGraph() {
+	public DirectedGraph<TypeNode,TypeReference> getGraph() {
 		return graph;
 	}
 
 	
-	public GraphData(DirectedGraph<Vertex, Edge> graph) {
+	public GraphData(DirectedGraph<TypeNode,TypeReference> graph) {
 		super();
 		this.graph = graph;
 		
@@ -57,7 +59,7 @@ public class GraphData implements PropertyBean {
 		Set<String> containers = new HashSet<String>();
 		Set<String> namespaces = new HashSet<String>();
 		
-		for (Vertex v:graph.getVertices()) {
+		for (TypeNode v:graph.getVertices()) {
 			containers.add(v.getContainer());
 			namespaces.add(v.getNamespace());
 			String type = v.getType();
@@ -69,7 +71,7 @@ public class GraphData implements PropertyBean {
 		this.containerCount = containers.size();
 		this.namespaceCount = namespaces.size();
 		this.containers = printList(containers);
-		for (Edge e:graph.getEdges()) {
+		for (TypeReference e:graph.getEdges()) {
 			String type = e.getType();
 			usesCount = usesCount + ("uses".equals(type)?1:0);
 			extendsCount = extendsCount + ("extends".equals(type)?1:0);

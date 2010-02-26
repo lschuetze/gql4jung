@@ -12,15 +12,18 @@ package nz.ac.massey.cs.gql4jung.browser;
 
 import javax.swing.JPanel;
 import edu.uci.ics.jung.graph.DirectedGraph;
+import nz.ac.massey.cs.codeanalysis.TypeNode;
+import nz.ac.massey.cs.codeanalysis.TypeReference;
 import nz.ac.massey.cs.gql4jung.*;
 
 /**
  * View for results.
  * @author Jens Dietrich
  */
+@SuppressWarnings("serial")
 public abstract class ResultView extends JPanel {
 	public abstract String getName();
-	public abstract void display(MotifInstance instance,DirectedGraph<Vertex,Edge> graph);
+	public abstract void display(MotifInstance<TypeNode,TypeReference> instance,DirectedGraph<TypeNode,TypeReference> graph);
 	// interface to customise view
 	public abstract PropertyBean getSettings();
 }

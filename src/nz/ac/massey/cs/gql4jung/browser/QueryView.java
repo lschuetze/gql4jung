@@ -17,6 +17,7 @@ import nz.ac.massey.cs.gql4jung.*;
  * View for queries.
  * @author Jens Dietrich
  */
+@SuppressWarnings("serial")
 public abstract class QueryView extends JPanel {
 	public abstract String getName();
 	public abstract void display(Motif query,String source);

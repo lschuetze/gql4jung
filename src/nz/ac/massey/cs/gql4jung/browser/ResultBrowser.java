@@ -42,17 +42,18 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
 //import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
-import nz.ac.massey.cs.codeanalysis.JarReader;
-import nz.ac.massey.cs.codeanalysis.ODEMReader;
+import nz.ac.massey.cs.codeanalysis.TypeNode;
+import nz.ac.massey.cs.codeanalysis.TypeReference;
+import nz.ac.massey.cs.codeanalysis.io.GraphMLReader;
+import nz.ac.massey.cs.codeanalysis.io.JarReader;
+import nz.ac.massey.cs.codeanalysis.io.ODEMReader;
 import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.Vertex;
-import nz.ac.massey.cs.gql4jung.io.GraphMLReader;
+import nz.ac.massey.cs.gql4jung.impl.MultiThreadedGQLImpl;
 import nz.ac.massey.cs.gql4jung.io.ProgressListener;
-import nz.ac.massey.cs.gql4jung.io.QueryResultsExporter2CSV;
-import nz.ac.massey.cs.gql4jung.jmpl.MultiThreadedGQLImpl;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.QueryResults.Cursor;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
@@ -75,11 +76,11 @@ public class ResultBrowser extends JFrame {
 	
 	private static final String TITLE = "Architectural smells explorer";
 	// model
-	private DirectedGraph<Vertex,Edge> data = null;
+	private DirectedGraph<TypeNode,TypeReference> data = null;
 	private Motif query = null;
 	private String querySource = null;
-	private QueryResults results = new QueryResults();
-	private GQL engine = new MultiThreadedGQLImpl(2);
+	private QueryResults<TypeNode,TypeReference> results = new QueryResults<TypeNode,TypeReference>();
+	private GQL<TypeNode,TypeReference> engine = null;
 	private Thread queryThread = null;
 	private long computationStarted = -1;
 	private boolean computeVariants = false;
@@ -780,32 +781,7 @@ public class ResultBrowser extends JFrame {
 		Cursor cursor = this.results.nextMinorInstance();
 		this.selectAndDisplay(cursor);
 	}
-	private void actExport2CSV() {
-		JFileChooser fc = new JFileChooser();
-		int returnVal = fc.showOpenDialog(this);
-		FileFilter filter = new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				return f.getAbsolutePath().endsWith(".csv");
-			}
-			@Override
-			public String getDescription() {
-				return "csv files";
-			}			
-		};
-		fc.setFileFilter(filter);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
-            QueryResultsExporter2CSV exporter = new QueryResultsExporter2CSV();
-            try {
-				exporter.export(this.results,file);
-				log("results exported to " + file.getAbsolutePath());
-				JOptionPane.showMessageDialog(this,"Results have been exported to\n" + file.getAbsolutePath());
-			} catch (IOException x) {
-				this.handleException("Error exporting file", x);
-			}
-        }
-	}
+
 	private void selectAndDisplay(Cursor cursor) {
 		this.updateActions();
 		this.updateStatus();
@@ -1044,7 +1020,7 @@ public class ResultBrowser extends JFrame {
 		        try {
 		            Reader reader = new FileReader(file);
 		            ODEMReader input = new ODEMReader(reader);
-		            DirectedGraph<Vertex, Edge>	g =	input.readGraph();
+		            DirectedGraph<TypeNode,TypeReference>	g =	input.readGraph();
 		            reader.close();
 		            data = g;
 			        status = Status.waiting;
@@ -1069,7 +1045,7 @@ public class ResultBrowser extends JFrame {
 		        try {
 		            Reader reader = new FileReader(file);
 		            GraphMLReader input = new GraphMLReader(reader);
-		            DirectedGraph<Vertex, Edge> g =	input.readGraph();
+		            DirectedGraph<TypeNode, TypeReference> g =	input.readGraph();
 		            reader.close();
 		            data = g;
 			        status = Status.waiting;
@@ -1093,7 +1069,7 @@ public class ResultBrowser extends JFrame {
 		Runnable r = new Runnable() {
 			public void run() {
 		        try {
-		            DirectedGraph<Vertex, Edge> g = null;
+		            DirectedGraph<TypeNode,TypeReference> g = null;
 		            JarReader input = new JarReader(files);
 		            ProgressListener l = new ProgressListener() {
 						@Override

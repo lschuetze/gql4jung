@@ -10,8 +10,10 @@
 
 package nz.ac.massey.cs.gql4jung.browser;
 
+import nz.ac.massey.cs.codeanalysis.TypeNode;
+import nz.ac.massey.cs.codeanalysis.TypeReference;
 import nz.ac.massey.cs.gql4jung.GQL;
-import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
+import nz.ac.massey.cs.gql4jung.impl.GQLImpl;
 /**
  * Simple factory to create query engines.
  * @author jens dietrich
@@ -20,8 +22,8 @@ import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
 public class DefaultGQLFactory implements GQLFactory {
 
 	@Override
-	public GQL createGQL() {
-		return new GQLImpl();
+	public GQL<TypeNode,TypeReference> createGQL() {
+		return new GQLImpl<TypeNode,TypeReference>();
 	}
 	@Override
 	public String toString() {

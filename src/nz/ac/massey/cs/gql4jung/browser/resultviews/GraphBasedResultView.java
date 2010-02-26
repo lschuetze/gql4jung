@@ -26,11 +26,11 @@ import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.apache.commons.collections15.Transformer;
-import nz.ac.massey.cs.gql4jung.Edge;
+import nz.ac.massey.cs.codeanalysis.TypeNode;
+import nz.ac.massey.cs.codeanalysis.TypeReference;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.Path;
-import nz.ac.massey.cs.gql4jung.Vertex;
 import nz.ac.massey.cs.gql4jung.browser.PropertyBean;
 import nz.ac.massey.cs.gql4jung.browser.ResultView;
 import edu.uci.ics.jung.algorithms.layout.*;
@@ -63,7 +63,7 @@ public class GraphBasedResultView extends ResultView {
 	}
 
 	@Override
-	public void display(final MotifInstance instance,	DirectedGraph<Vertex, Edge> graph) {	
+	public void display(final MotifInstance<TypeNode,TypeReference> instance,DirectedGraph<TypeNode,TypeReference> graph) {	
 		DirectedGraph<VisualVertex,VisualEdge> g = instance==null?new DirectedSparseGraph<VisualVertex,VisualEdge>():this.asGraph(instance);
 		//SimpleGraphView sgv = new SimpleGraphView(); //We create our graph in here
 		// The Layout<V, E> is parameterized by the vertex and edge types
@@ -109,7 +109,7 @@ public class GraphBasedResultView extends ResultView {
 		});
 	}
 	
-	private String getToolTip(Vertex v) {
+	private String getToolTip(TypeNode v) {
 		StringBuffer b = new StringBuffer();
 		b.append("<html>");
 		print(b,"container",v.getContainer(),false);
@@ -133,7 +133,7 @@ public class GraphBasedResultView extends ResultView {
 		return "query results as graph";
 	}
 
-	private void configureRenderer (RenderContext context,final MotifInstance instance) {
+	private void configureRenderer (RenderContext context,final MotifInstance<TypeNode,TypeReference> instance) {
 		final Map<String,Color> colMap = createColorMap(instance);
 		
 		context.setEdgeDrawPaintTransformer(
@@ -240,11 +240,11 @@ public class GraphBasedResultView extends ResultView {
 		
 	}
 	
-	private Map<String, Color> createColorMap(MotifInstance instance) {
+	private Map<String, Color> createColorMap(MotifInstance<TypeNode,TypeReference> instance) {
 		if (instance==null) return new HashMap<String, Color>(0);
-		Set<Vertex> vertices = instance.getVertices();
+		Set<TypeNode> vertices = instance.getVertices();
 		Set<String> packages = new HashSet<String>(vertices.size());
-		for (Vertex v:vertices) {
+		for (TypeNode v:vertices) {
 			packages.add(v.getNamespace());
 		}
 		int count = 0;
@@ -260,14 +260,14 @@ public class GraphBasedResultView extends ResultView {
 		return pmap;
 	}
 
-	private DirectedGraph<VisualVertex,VisualEdge> asGraph(MotifInstance instance) {
+	private DirectedGraph<VisualVertex,VisualEdge> asGraph(MotifInstance<TypeNode,TypeReference> instance) {
 		DirectedGraph<VisualVertex,VisualEdge> g = new DirectedSparseGraph<VisualVertex,VisualEdge>();
 		Motif motif = instance.getMotif();
 		// vertices
 		Map<String,VisualVertex> vertices = new HashMap<String,VisualVertex>();
-		Map<Vertex,VisualVertex> originalVertices = new HashMap<Vertex,VisualVertex>();
+		Map<TypeNode,VisualVertex> originalVertices = new HashMap<TypeNode,VisualVertex>();
 		for (String role:motif.getRoles()) {
-			Vertex v = instance.getVertex(role);
+			TypeNode v = instance.getVertex(role);
 			if (v!=null && !vertices.containsKey(v.getId())) { // the second check is necessary in case there are multiple roles for one vertex
 				VisualVertex vv = toVisual(v,0);
 				g.addVertex(vv);
@@ -278,11 +278,11 @@ public class GraphBasedResultView extends ResultView {
 		};
 		// edges
 		for (String role:motif.getPathRoles()) {
-			Path p = instance.getPath(role);
+			Path<TypeNode,TypeReference> p = instance.getPath(role);
 			if (p!=null) {
-				for (Edge e:p.getEdges()) {
-					Vertex v1 = e.getStart();
-					Vertex v2 = e.getEnd();
+				for (TypeReference e:p.getEdges()) {
+					TypeNode v1 = e.getStart();
+					TypeNode v2 = e.getEnd();
 					VisualVertex vv1 = vertices.get(v1.getId());
 					if (vv1==null) {
 						vv1 = toVisual(v1,0);
@@ -305,14 +305,14 @@ public class GraphBasedResultView extends ResultView {
 		addContext(g,originalVertices,settings.getContextDepth(),1);
 		return g;
 	}
-	private void addContext(DirectedGraph<VisualVertex, VisualEdge> g,Map<Vertex,VisualVertex> vertices, int contextDepth,int distanceToMotif) {
+	private void addContext(DirectedGraph<VisualVertex, VisualEdge> g,Map<TypeNode,VisualVertex> vertices, int contextDepth,int distanceToMotif) {
 		if (contextDepth==0) return;
-		Set<Vertex> keys = new HashSet<Vertex>();
+		Set<TypeNode> keys = new HashSet<TypeNode>();
 		keys.addAll(vertices.keySet()); // to prevent a java.util.ConcurrentModificationException
-		for (Vertex v:keys) {
+		for (TypeNode v:keys) {
 			VisualVertex vv = vertices.get(v);
-			for (Edge e:v.getInEdges()) {
-				Vertex v1 = e.getStart();
+			for (TypeReference e:v.getInEdges()) {
+				TypeNode v1 = e.getStart();
 				if (!vertices.containsKey(v1)) {
 					VisualVertex vv1 = this.toVisual(v1,distanceToMotif);
 					g.addVertex(vv1);
@@ -323,8 +323,8 @@ public class GraphBasedResultView extends ResultView {
 					g.addEdge(ve,vv1,vv);
 				}
 			}
-			for (Edge e:v.getOutEdges()) {
-				Vertex v1 = e.getEnd();
+			for (TypeReference e:v.getOutEdges()) {
+				TypeNode v1 = e.getEnd();
 				if (!vertices.containsKey(v1)) {
 					VisualVertex vv1 = this.toVisual(v1,distanceToMotif);
 					g.addVertex(vv1);
@@ -339,7 +339,7 @@ public class GraphBasedResultView extends ResultView {
 		addContext(g,vertices,contextDepth-1,distanceToMotif+1);
 	}
 
-	private VisualVertex toVisual(Vertex v,int distanceFromMotif) {
+	private VisualVertex toVisual(TypeNode v,int distanceFromMotif) {
 		VisualVertex vv = new VisualVertex();
 		vv.setId(v.getId());
 		v.copyValuesTo(vv);
@@ -347,7 +347,7 @@ public class GraphBasedResultView extends ResultView {
 		vv.setDistanceFromMotif(distanceFromMotif);
 		return vv;		
 	}
-	private VisualEdge toVisual(Edge e,boolean isPartOfMotif) {
+	private VisualEdge toVisual(TypeReference e,boolean isPartOfMotif) {
 		VisualEdge ve = new VisualEdge();
 		ve.setId(e.getId());
 		e.copyValuesTo(ve);

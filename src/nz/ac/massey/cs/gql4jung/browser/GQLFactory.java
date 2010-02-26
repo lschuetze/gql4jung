@@ -10,11 +10,13 @@
 
 package nz.ac.massey.cs.gql4jung.browser;
 
+import nz.ac.massey.cs.codeanalysis.TypeNode;
+import nz.ac.massey.cs.codeanalysis.TypeReference;
 import nz.ac.massey.cs.gql4jung.GQL;
 /**
  * Simple factory to create query engines.
  * @author jens dietrich
  */
 public interface GQLFactory {
-	GQL createGQL();
+	GQL<TypeNode,TypeReference> createGQL();
 }
