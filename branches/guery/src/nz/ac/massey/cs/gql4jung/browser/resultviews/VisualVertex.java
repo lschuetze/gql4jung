@@ -10,6 +10,7 @@
 
 package nz.ac.massey.cs.gql4jung.browser.resultviews;
 
+import nz.ac.massey.cs.codeanalysis.TypeNode;
 import nz.ac.massey.cs.gql4jung.Vertex;
 import nz.ac.massey.cs.gql4jung.browser.RankedVertex;
 
@@ -18,7 +19,7 @@ import nz.ac.massey.cs.gql4jung.browser.RankedVertex;
  * @author jens dietrich
  */
 
-public class VisualVertex extends Vertex implements RankedVertex {
+public class VisualVertex extends TypeNode implements RankedVertex {
 	private String role = null;
 	private boolean inMotif = false;
 	private int distanceFromMotif = 0;

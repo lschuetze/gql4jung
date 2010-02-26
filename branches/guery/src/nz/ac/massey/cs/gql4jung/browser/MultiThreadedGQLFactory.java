@@ -10,8 +10,10 @@
 
 package nz.ac.massey.cs.gql4jung.browser;
 
+import nz.ac.massey.cs.codeanalysis.TypeNode;
+import nz.ac.massey.cs.codeanalysis.TypeReference;
 import nz.ac.massey.cs.gql4jung.GQL;
-import nz.ac.massey.cs.gql4jung.jmpl.MultiThreadedGQLImpl;
+import nz.ac.massey.cs.gql4jung.impl.MultiThreadedGQLImpl;
 /**
  * Simple factory to create query engines.
  * @author jens dietrich
@@ -20,8 +22,8 @@ import nz.ac.massey.cs.gql4jung.jmpl.MultiThreadedGQLImpl;
 public class MultiThreadedGQLFactory implements GQLFactory {
 
 	@Override
-	public GQL createGQL() {
-		return new MultiThreadedGQLImpl();
+	public GQL<TypeNode,TypeReference> createGQL() {
+		return new MultiThreadedGQLImpl<TypeNode,TypeReference>();
 	}
 	@Override
 	public String toString() {

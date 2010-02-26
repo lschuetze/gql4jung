@@ -10,13 +10,14 @@
 
 package nz.ac.massey.cs.gql4jung.browser.resultviews;
 
+import nz.ac.massey.cs.codeanalysis.TypeReference;
 import nz.ac.massey.cs.gql4jung.Edge;
 
 /**
  * Custom edge class for visualisation.
  * @author jens dietrich
  */
-public class VisualEdge extends Edge {
+public class VisualEdge extends TypeReference {
 	private String role = null;
 	private boolean inMotif = false;
 
