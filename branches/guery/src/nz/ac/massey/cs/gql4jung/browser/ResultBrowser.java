@@ -41,23 +41,21 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
-//import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import nz.ac.massey.cs.codeanalysis.TypeNode;
 import nz.ac.massey.cs.codeanalysis.TypeReference;
 import nz.ac.massey.cs.codeanalysis.io.GraphMLReader;
 import nz.ac.massey.cs.codeanalysis.io.JarReader;
 import nz.ac.massey.cs.codeanalysis.io.ODEMReader;
-import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
-import nz.ac.massey.cs.gql4jung.Vertex;
-import nz.ac.massey.cs.gql4jung.impl.MultiThreadedGQLImpl;
 import nz.ac.massey.cs.gql4jung.io.ProgressListener;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
-import nz.ac.massey.cs.gql4jung.util.QueryResults.Cursor;
+import nz.ac.massey.cs.gql4jung.util.Cursor;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 import edu.uci.ics.jung.graph.DirectedGraph;
+
+import static java.awt.GridBagConstraints.*;
 
 /**
  * Stand alone user interface to run queries and visualise results.
@@ -232,6 +230,9 @@ public class ResultBrowser extends JFrame {
 				}
 		);
 		
+		// init engine
+		engine = settings.getGQLFactory().createGQL();
+		
 		// load sample data
 		// TODO remove
 		// this.loadDataFromGraphML(new File("exampledata/ant.jar.graphml"));
@@ -358,75 +359,76 @@ public class ResultBrowser extends JFrame {
 		c.insets = new Insets(0,3,0,3);
 		c.gridx = 0;
 		c.gridy = 0;
-		c.fill = c.NONE;
+		c.fill = NONE;
 		c.weightx = 0;
-		c.anchor = c.EAST;
+		c.anchor = EAST;
 		c.gridwidth = 1;
 		statusBar.add(new JLabel("data:",JLabel.RIGHT),c);
 		c.gridx = 1;
-		c.fill = c.HORIZONTAL;
+		c.fill = HORIZONTAL;
 		c.weightx = 1;
-		c.anchor = c.WEST;
+		c.anchor = WEST;
 		c.gridwidth = cols-1;
 		statusBar.add(dataField,c);
 		c.gridx = 0;
 		c.gridy = 1;
-		c.fill = c.NONE;
+		c.fill = NONE;
 		c.weightx = 0;
-		c.anchor = c.EAST;
+		c.anchor = EAST;
 		c.gridwidth = 1;
 		statusBar.add(new JLabel("query:",JLabel.RIGHT),c);
 		c.gridx = 1;
-		c.fill = c.HORIZONTAL;
+		c.fill = HORIZONTAL;
 		c.weightx = 1;
-		c.anchor = c.WEST;
+		c.anchor = WEST;
 		c.gridwidth = cols-1;
 		statusBar.add(queryField,c);
 		
 		c.gridx = 0;
 		c.gridy = 2;
-		c.fill = c.NONE;
+		c.fill = NONE;
 		c.weightx = 0;
-		c.anchor = c.EAST;
+		c.anchor = EAST;
 		c.gridwidth = 1;
 		statusBar.add(new JLabel("status:",JLabel.RIGHT),c);
 		c.gridx = 1;
-		c.fill = c.HORIZONTAL;
+		c.fill = HORIZONTAL;
 		c.weightx = 1;
-		c.anchor = c.WEST;
+		c.anchor = WEST;
 		statusField.setBorder(BorderFactory.createEmptyBorder(3,0,0,0));
 		statusBar.add(statusField,c);
 		
 		c.gridx = 2;
 		c.gridy = 2;
-		c.fill = c.NONE;
+		c.fill = NONE;
 		c.weightx = 0;
-		c.anchor = c.EAST;
+		c.anchor = EAST;
 		c.gridwidth = 1;
 		statusBar.add(new JLabel("cursor:",JLabel.RIGHT),c);
 		c.gridx = 3;
-		c.fill = c.HORIZONTAL;
+		c.fill = HORIZONTAL;
 		c.weightx = 1;
-		c.anchor = c.WEST;
+		c.anchor = WEST;
 		statusBar.add(cursorField,c);
 		
 		c.gridx = 4;
 		c.gridy = 2;
-		c.fill = c.NONE;
+		c.fill = NONE;
 		c.weightx = 0;
-		c.anchor = c.EAST;
+		c.anchor = EAST;
 		c.gridwidth = 1;
 		statusBar.add(new JLabel("computation time:",JLabel.RIGHT),c);
 		c.gridx = 5;
-		c.fill = c.HORIZONTAL;
+		c.fill = HORIZONTAL;
 		c.weightx = 1;
-		c.anchor = c.WEST;
+		c.anchor = WEST;
 		statusBar.add(timeField,c);
 		
 		mainPanel.add(statusBar,BorderLayout.SOUTH);
 		statusBar.setBorder(BorderFactory.createEtchedBorder());		
 	}
 
+	@SuppressWarnings("serial")
 	private void initActions() {
 		
 		actExit = new AbstractAction("exit") {
@@ -602,7 +604,7 @@ public class ResultBrowser extends JFrame {
 				// refresh view
 				try {
 					Cursor cursor = results.getCursor();
-					MotifInstance instance = results.getInstance(cursor);
+					MotifInstance<TypeNode,TypeReference> instance = results.getInstance(cursor);
 					displayInstance(instance);	
 				}
 				catch (Exception x){}
@@ -617,7 +619,6 @@ public class ResultBrowser extends JFrame {
 			}
 			private PropertyBean settings = null;
 			private String name = null;
-			private boolean editQuerySettings = false;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				PropertyBeanEditor.edit(ResultBrowser.this,settings,name);
@@ -669,6 +670,7 @@ public class ResultBrowser extends JFrame {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	private void initBuildInQuery(final File file) {
         try {
         	InputStream in = new FileInputStream(file);
@@ -785,7 +787,7 @@ public class ResultBrowser extends JFrame {
 	private void selectAndDisplay(Cursor cursor) {
 		this.updateActions();
 		this.updateStatus();
-		MotifInstance instance = results.getInstance(cursor);
+		MotifInstance<TypeNode,TypeReference> instance = results.getInstance(cursor);
 		this.displayInstance(instance);		
 	}
 	private void actRunQuery() {
