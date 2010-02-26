@@ -26,8 +26,7 @@ import edu.uci.ics.jung.io.GraphIOException;
 import edu.uci.ics.jung.io.GraphReader;
 import nz.ac.massey.cs.codeanalysis.TypeNode;
 import nz.ac.massey.cs.codeanalysis.TypeReference;
-import nz.ac.massey.cs.gql4jung.Edge;
-import nz.ac.massey.cs.gql4jung.Vertex;
+
 
 /**
  * Reads ODEM files.
@@ -41,6 +40,7 @@ public class ODEMReader implements GraphReader<DirectedGraph<TypeNode,TypeRefere
 		super();
 		this.reader = reader;
 	}
+	@SuppressWarnings("unchecked")
 	@Override
 	public synchronized DirectedGraph<TypeNode, TypeReference> readGraph() throws GraphIOException {
 		DirectedGraph<TypeNode, TypeReference> graph = new DirectedSparseGraph<TypeNode, TypeReference> ();
@@ -74,6 +74,7 @@ public class ODEMReader implements GraphReader<DirectedGraph<TypeNode,TypeRefere
 		return graph;
 		
 	}
+	@SuppressWarnings("unchecked")
 	private void collectTypesInContext(Element e,Map<String, TypeNode> vertices) {
 		List<Element> eContainers = e.getChildren("container");
 		for (Element eContainer:eContainers) {
@@ -81,6 +82,7 @@ public class ODEMReader implements GraphReader<DirectedGraph<TypeNode,TypeRefere
 			collectTypesInContainer(eContainer,vertices,container);
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private void collectEdgesInContext(Element e,Map<String, TypeNode> vertices,Collection<TypeReference> edges) {
 		List<Element> eContainers = e.getChildren("container");
 		for (Element eContainer:eContainers) {
@@ -88,6 +90,7 @@ public class ODEMReader implements GraphReader<DirectedGraph<TypeNode,TypeRefere
 			collectEdgesInContainer(eContainer,vertices,edges,container);
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private void collectTypesInContainer(Element e,	Map<String, TypeNode> vertices, String container) {
 		List<Element> eNamespaces = e.getChildren("namespace");
 		for (Element eNS:eNamespaces) {
@@ -95,6 +98,7 @@ public class ODEMReader implements GraphReader<DirectedGraph<TypeNode,TypeRefere
 			collectTypesInNamespace(eNS,vertices,container,namespace);
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private void collectEdgesInContainer(Element e,	Map<String, TypeNode> vertices, Collection<TypeReference> edges,String container) {
 		List<Element> eNamespaces = e.getChildren("namespace");
 		for (Element eNS:eNamespaces) {
@@ -102,6 +106,7 @@ public class ODEMReader implements GraphReader<DirectedGraph<TypeNode,TypeRefere
 			collectEdgesInNamespace(eNS,vertices,edges,container,namespace);
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private void collectTypesInNamespace(Element e,Map<String, TypeNode> vertices, String container, String namespace) {
 		List<Element> eTypes = e.getChildren("type");
 		for (Element eType:eTypes) {
@@ -116,6 +121,7 @@ public class ODEMReader implements GraphReader<DirectedGraph<TypeNode,TypeRefere
 			vertices.put(name,vertex);
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private void collectEdgesInNamespace(Element e,Map<String, TypeNode> vertices, Collection<TypeReference> edges, String container, String namespace) {
 		List<Element> eTypes = e.getChildren("type");
 		for (Element eType:eTypes) {

@@ -23,14 +23,11 @@ import com.jeantessier.classreader.LoadListener;
 import com.jeantessier.classreader.TransientClassfileLoader;
 import com.jeantessier.dependency.ClassNode;
 import com.jeantessier.dependency.CodeDependencyCollector;
-import com.jeantessier.dependency.ComprehensiveSelectionCriteria;
 import com.jeantessier.dependency.DependencyEvent;
 import com.jeantessier.dependency.DependencyListener;
 import com.jeantessier.dependency.FeatureNode;
 import com.jeantessier.dependency.Node;
 import com.jeantessier.dependency.NodeFactory;
-import com.jeantessier.dependency.SelectionCriteria;
-
 import nz.ac.massey.cs.codeanalysis.TypeNode;
 import nz.ac.massey.cs.codeanalysis.TypeReference;
 import nz.ac.massey.cs.gql4jung.io.ProgressListener;
@@ -108,7 +105,7 @@ public class JarReader {
 		this.fireProgressListener(0,TOTAL);
 		
 		NodeFactory factory = new NodeFactory();
-		SelectionCriteria filter = new ComprehensiveSelectionCriteria();
+		//SelectionCriteria filter = new ComprehensiveSelectionCriteria();
 		CodeDependencyCollector collector = new CodeDependencyCollector(factory);
 		ClassfileLoader loader = new TransientClassfileLoader();
 		List<String> list = new ArrayList<String>();
@@ -283,7 +280,7 @@ public class JarReader {
 				edge.setStart(source);
 				edge.setEnd(target);
 				edge.setType(type);
-				boolean added = graph.addEdge(edge,source,target);
+				//boolean added = graph.addEdge(edge,source,target);
 				/** log for debugging
 				if (start.toString().indexOf("org.apache.log4j.jdbc.JDBCAppender")>-1) {
 					System.out.println("Adding edge " + edge + (added?"success":"failed"));
