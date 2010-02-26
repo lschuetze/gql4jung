@@ -16,11 +16,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-
+import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.GroupByAggregation;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.MotifInstanceAggregation;
 import nz.ac.massey.cs.gql4jung.ResultListener;
+import nz.ac.massey.cs.gql4jung.Vertex;
 /**
  * Utility class that listens to results computed by the GQL engine, 
  * and aggregates them using a MotifInstanceAggregation.
@@ -28,7 +29,7 @@ import nz.ac.massey.cs.gql4jung.ResultListener;
  * in user interfaces.
  * @author Jens Dietrich
  */
-public class QueryResults implements ResultListener, Iterable {
+public class QueryResults<V extends Vertex<E>,E extends Edge<V>> implements ResultListener<V,E>, Iterable<Map.Entry<QueryResults<V,E>.Cursor,MotifInstance<V,E>>> {
 	
 	public QueryResults() {
 		super();
@@ -60,7 +61,7 @@ public class QueryResults implements ResultListener, Iterable {
 		}
 	};
 	*/
-	private LinkedHashMap<Object,List<MotifInstance>> results = new LinkedHashMap<Object,List<MotifInstance>>();
+	private LinkedHashMap<Object,List<MotifInstance<V,E>>> results = new LinkedHashMap<Object,List<MotifInstance<V,E>>>();
 	private List<Object> keys = new ArrayList<Object>();
 	private int majorCursor = -1;
 	private int minorCursor = -1;
@@ -68,6 +69,7 @@ public class QueryResults implements ResultListener, Iterable {
 	private long minTimeBetweenEvents = 50;
 	
 	public interface QueryResultListener {
+		@SuppressWarnings("unchecked")
 		public void resultsChanged(QueryResults source);
 		public void progressMade(int progress,int total);
 	} 
@@ -95,11 +97,11 @@ public class QueryResults implements ResultListener, Iterable {
 		// inform listeners
 		callback();			
 	}
-	public synchronized boolean found(MotifInstance instance) {
+	public synchronized boolean found(MotifInstance<V,E> instance) {
 		Object key = aggregation.getGroupIdentifier(instance);
-		List<MotifInstance> instances = results.get(key);
+		List<MotifInstance<V,E>> instances = results.get(key);
 		if (instances==null) {
-			instances = new ArrayList<MotifInstance>();
+			instances = new ArrayList<MotifInstance<V,E>>();
 			results.put(key,instances);
 			keys.add(key);
 		}
@@ -133,7 +135,7 @@ public class QueryResults implements ResultListener, Iterable {
 		if (groupIndex==-1) return 0;
 		Object key = keys.get(groupIndex);
 		if (key==null) return 0;
-		List<MotifInstance> instances =  results.get(key);
+		List<MotifInstance<V,E>> instances =  results.get(key);
 		return instances==null?0:instances.size();
 	}
 	@Override
@@ -194,11 +196,12 @@ public class QueryResults implements ResultListener, Iterable {
 		return new Cursor(this.majorCursor,this.minorCursor);
 	}
 	
-	public synchronized MotifInstance getInstance(Cursor cursor) {
+	public synchronized MotifInstance<V,E> getInstance(Cursor cursor) {
 		Object key = this.keys.get(cursor.major);
 		return results.get(key).get(cursor.minor);
 	}
 
+	@SuppressWarnings("hiding")
 	class Entry<K,V> implements  Map.Entry<K,V> {
 		
 		public Entry(K key, V value) {
@@ -226,11 +229,11 @@ public class QueryResults implements ResultListener, Iterable {
 		}
 		
 	};
-	public synchronized Iterator<Map.Entry<Cursor,MotifInstance>> iterator() {
+	public synchronized Iterator<Map.Entry<Cursor,MotifInstance<V,E>>> iterator() {
 		// TODO use iterator with lazy initialisation
-		Map<Cursor,MotifInstance> map = new LinkedHashMap<Cursor,MotifInstance>();
+		Map<Cursor,MotifInstance<V,E>> map = new LinkedHashMap<Cursor,MotifInstance<V,E>>();
 		for (int i=0;i<this.keys.size();i++) {
-			List<MotifInstance> instances = this.results.get(keys.get(i));
+			List<MotifInstance<V,E>> instances = this.results.get(keys.get(i));
 			for (int j=0;j<instances.size();j++) {
 				map.put(new Cursor(i,j),instances.get(j));
 			}
