@@ -34,6 +34,7 @@ import com.l2fprod.common.propertysheet.PropertySheetPanel;
  * Dynamic editor for settings.
  * @author Jens Dietrich
  */
+@SuppressWarnings("serial")
 public class PropertyBeanEditor extends JDialog {
 	private PropertySheetPanel sheet = new PropertySheetPanel();
 	private JToolBar toolbar = new JToolBar();

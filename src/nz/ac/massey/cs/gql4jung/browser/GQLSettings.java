@@ -70,9 +70,10 @@ public class GQLSettings implements PropertyBean {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public GQLFactory getGQLFactory() {
 		try {
-			Class clazz = Class.forName(this.gqlFactoryName);
+			Class<GQLFactory> clazz = (Class<GQLFactory>) Class.forName(this.gqlFactoryName);
 			return (GQLFactory)clazz.newInstance();
 		}
 		catch (Exception x){
@@ -107,7 +108,7 @@ public class GQLSettings implements PropertyBean {
 
 	@Override
 	public void reset() {
-		this.gqlFactoryName = this.gqlFactories[0];
+		this.gqlFactoryName = GQLSettings.gqlFactories[0];
 	}
 	@Override
 	public PropertyDescriptor[] getProperties() {

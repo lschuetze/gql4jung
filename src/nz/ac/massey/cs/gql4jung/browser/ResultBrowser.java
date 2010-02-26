@@ -50,6 +50,7 @@ import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.io.ProgressListener;
+import nz.ac.massey.cs.gql4jung.util.QueryResultListener;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
 import nz.ac.massey.cs.gql4jung.util.Cursor;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
@@ -62,6 +63,7 @@ import static java.awt.GridBagConstraints.*;
  * The graph visualisation is based on JUNG. 
  * @author Jens Dietrich
  */
+@SuppressWarnings("serial")
 public class ResultBrowser extends JFrame {
 	
 	static {
@@ -176,9 +178,9 @@ public class ResultBrowser extends JFrame {
 		this.setContentPane(mainPanel);
 		
 		// start listening to events
-		QueryResults.QueryResultListener listener = new QueryResults.QueryResultListener() {
+		QueryResultListener<TypeNode,TypeReference> listener = new QueryResultListener<TypeNode,TypeReference>() {
 			@Override
-			public void resultsChanged(QueryResults source) {
+			public void resultsChanged(QueryResults<TypeNode,TypeReference> source) {
 				if (results.getCursor().major==-1 && results.hasResults()) {
 					actNextMajorInstance();
 				}
@@ -428,7 +430,6 @@ public class ResultBrowser extends JFrame {
 		statusBar.setBorder(BorderFactory.createEtchedBorder());		
 	}
 
-	@SuppressWarnings("serial")
 	private void initActions() {
 		
 		actExit = new AbstractAction("exit") {
@@ -670,7 +671,6 @@ public class ResultBrowser extends JFrame {
 		}
 	}
 
-	@SuppressWarnings("serial")
 	private void initBuildInQuery(final File file) {
         try {
         	InputStream in = new FileInputStream(file);
@@ -1149,10 +1149,6 @@ public class ResultBrowser extends JFrame {
 		JOptionPane.showMessageDialog(this, message, "Error",JOptionPane.ERROR_MESSAGE);
 	}
 
-	private void nyi() {
-		JOptionPane.showMessageDialog(this,"this function is not yet implemented");
-	}
-
 	private void updateActions() {
 
 		boolean querying = queryThread!=null;
@@ -1213,7 +1209,7 @@ public class ResultBrowser extends JFrame {
 		updateActions();
 	};
 	
-	private void displayInstance(final MotifInstance instance) {
+	private void displayInstance(final MotifInstance<TypeNode,TypeReference> instance) {
 		switchToResultView();
 		for (ResultView view:this.resultViewers) {
 			view.display(instance,this.data);

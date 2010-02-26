@@ -29,7 +29,7 @@ public class ServiceBinder {
 	private static Properties settings = new Properties();
 	private static final String PLUGIN_DEFS = "plugins.properties";
 	private static final Logger LOG = Logger.getLogger(ServiceBinder.class); 
-	private static final Map<Class,List<Object>> plugins = new HashMap<Class,List<Object>>();
+	private static final Map<Class<?>,List<?>> plugins = new HashMap<Class<?>,List<?>>();
 	static {
 		try {
 			FileReader reader = new FileReader(PLUGIN_DEFS);
@@ -38,10 +38,11 @@ public class ServiceBinder {
 			Logger.getLogger(ServiceBinder.class).error("cannot read plugin registry "+PLUGIN_DEFS, x);
 		}
 	}
-	public static List getServices(Class type) {
-		List p = plugins.get(type);
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> getServices(Class<T> type) {
+		List<T> p = (List<T>) plugins.get(type);
 		if (p==null) {
-			p = new ArrayList();
+			p = new ArrayList<T>();
 			String defs = settings.getProperty(type.getName());
 			if (defs==null) {
 				LOG.warn("No plugin definitions found for type " + type.getName());
@@ -62,7 +63,7 @@ public class ServiceBinder {
 					}
 					if (service!=null) {
 						if (type.isAssignableFrom(service.getClass())) {
-							p.add(service);
+							p.add((T)service);
 						}
 						else {
 							LOG.warn("Plugin class " + def + " does not implement service " + type);
