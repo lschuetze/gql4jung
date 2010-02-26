@@ -16,7 +16,6 @@ import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.*;
-import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 import org.junit.Test;
 
@@ -29,29 +28,42 @@ public class ValidationTests {
 	
 	public static String SCHEMA = "schema/gql4jung.xsd";
 	
-	private Motif test(String name, boolean shouldFail) throws Exception {
+	private void test(String name, boolean shouldFail) throws Exception {
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = factory.newSchema(new File(SCHEMA));
         Validator validator = schema.newValidator();
         
-        String src = "/test/nz/ac/massey/cs/gql4jung/jmpl/queries/"+name;
+        String src = "/test/nz/ac/massey/cs/codeanalysis/jmpl/queries/"+name;
         InputStream in = this.getClass().getResourceAsStream(src);
         
         Source source = new StreamSource(in);
         validator.validate(source);
         in.close();
         in = this.getClass().getResourceAsStream(src);
-        return new XMLMotifReader().read(in);
+        new XMLMotifReader().read(in);
  
 	}
 	
 	@Test
-	public void test1() throws Exception {
-		Motif motif = test("awd.xml",false);
-		System.out.println(motif);
-
+	public void testAWD() throws Exception {
+		test("awd.xml",false);
 	} 
-	
+	@Test
+	public void testCD() throws Exception {
+		test("cd.xml",false);
+	} 
+	@Test
+	public void testCNS() throws Exception {
+		test("cns.xml",false);
+	} 
+	@Test
+	public void testDB2UI() throws Exception {
+		test("db2ui.xml",false);
+	} 
+	@Test
+	public void testDEGINH() throws Exception {
+		test("deginh.xml",false);
+	} 
 	
 	
 } 
