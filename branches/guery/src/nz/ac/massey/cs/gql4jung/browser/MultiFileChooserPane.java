@@ -38,6 +38,7 @@ import javax.swing.filechooser.FileFilter;
  * @author Jens Dietrich
  */
 
+@SuppressWarnings("serial")
 public class MultiFileChooserPane extends JDialog {
 	private DefaultListModel files = new DefaultListModel();
 	private JList list = new JList();
