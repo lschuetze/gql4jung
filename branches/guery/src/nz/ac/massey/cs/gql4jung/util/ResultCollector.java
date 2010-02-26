@@ -12,20 +12,23 @@ package nz.ac.massey.cs.gql4jung.util;
 
 import java.util.List;
 import java.util.Vector;
+
+import nz.ac.massey.cs.gql4jung.Edge;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.ResultListener;
+import nz.ac.massey.cs.gql4jung.Vertex;
 
-public class ResultCollector implements ResultListener {
+public class ResultCollector<V extends Vertex<E>,E extends Edge<V>> implements ResultListener<V,E> {
 
 	private long creationTime = System.currentTimeMillis();
 	private boolean logProgress = false;
-	private List<MotifInstance> instances = new Vector<MotifInstance>();
+	private List<MotifInstance<V,E>> instances = new Vector<MotifInstance<V,E>>();
 	
-	public List<MotifInstance> getInstances() {
+	public List<MotifInstance<V,E>> getInstances() {
 		return instances;
 	}
 
-	public void setInstances(List<MotifInstance> instances) {
+	public void setInstances(List<MotifInstance<V,E>> instances) {
 		this.instances = instances;
 	}
 
@@ -35,7 +38,7 @@ public class ResultCollector implements ResultListener {
 	}
 
 	@Override
-	public boolean found(MotifInstance instance) {
+	public boolean found(MotifInstance<V,E> instance) {
 		this.instances.add(instance);
 		return true;
 	}
