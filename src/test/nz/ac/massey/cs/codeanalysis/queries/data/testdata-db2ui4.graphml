@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<graph edgedefault="directed" file="">
+<node id="0" container="rt.jar" namespace="javax.swing" name="JFrame" isInterface="false" type="class" isAbstract="false" access="default" isBoundry="true" />
+<node id="1" container="rt.jar" namespace="java.sql" name="Driver"  isInterface="true" type="class" isAbstract="false" access="null" isBoundry="false" />
+<node id="2" container="example.jar" namespace="org.example1" name="MyClass"  isInterface="false" type="class" isAbstract="false" access="null" isBoundry="false" />
+<edge id="edge-1" source="2" target="1" type="uses" />
+<edge id="edge-2" source="2" target="0" type="uses" />
+</graph>
+</graphml>
