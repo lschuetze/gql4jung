@@ -16,7 +16,7 @@
     </xs:element>
 
     <xs:complexType name="select">
-    	<xs:sequence>
+    	<xs:sequence maxOccurs="unbounded" minOccurs="0">
     		<xs:element name="constraint" type="xs:string"></xs:element>
     	</xs:sequence>    	
     	<xs:attribute name="role" type="xs:ID"></xs:attribute>
@@ -27,7 +27,7 @@
     </xs:complexType>
 
     <xs:complexType name="connectedBy">
-    	<xs:sequence>
+    	<xs:sequence  maxOccurs="unbounded" minOccurs="0">
     		<xs:element name="constraint" type="xs:string"></xs:element>
     	</xs:sequence>
     	<xs:attribute name="role" type="xs:ID"></xs:attribute>
