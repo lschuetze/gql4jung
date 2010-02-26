@@ -1,0 +1,16 @@
+<!-- packages with multiple clusters within the package -->
+<motif name="multiple clusters in package">
+    <!--  Cluster implements interface Processor with method process(Graph) -->
+	<annotate class="nz.ac.massey.cs.codeanalysis.processors.Clusterer"/>
+    <select role="class1"/>
+    <select role="class2"/>
+    <constraint>
+    	class1.namespace==class2.namespace
+    </constraint>
+    <constraint>
+    	class1.cluster!=class2.cluster
+    </constraint>
+	<groupBy>
+        <element>class1.namespace</element>
+    </groupBy >
+</motif>
