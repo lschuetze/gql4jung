@@ -19,13 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.Graph;
 import nz.ac.massey.cs.codeanalysis.TypeNode;
@@ -35,9 +29,9 @@ import nz.ac.massey.cs.codeanalysis.io.JarReader;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifReaderException;
-import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
+import nz.ac.massey.cs.gql4jung.impl.GQLImpl;
+import nz.ac.massey.cs.gql4jung.util.QueryResultListener;
 import nz.ac.massey.cs.gql4jung.util.QueryResults;
-import nz.ac.massey.cs.gql4jung.util.QueryResults.QueryResultListener;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 
 /**
@@ -114,8 +108,8 @@ public class AnalysisBatchJob {
 			return;
 		}
 		
-		QueryResults results = new QueryResults();
-		results.addListener(new QueryResultListener() {
+		QueryResults<TypeNode,TypeReference> results = new QueryResults<TypeNode,TypeReference>();
+		results.addListener(new QueryResultListener<TypeNode,TypeReference>() {
 
 			@Override
 			public void progressMade(int progress, int total) {
@@ -123,7 +117,7 @@ public class AnalysisBatchJob {
 			}
 
 			@Override
-			public void resultsChanged(QueryResults source) {
+			public void resultsChanged(QueryResults<TypeNode,TypeReference> source) {
 				
 			}
 			
@@ -151,7 +145,7 @@ public class AnalysisBatchJob {
 	
 	} 
 	
-	private static void printSummary(File querySource, File graphSource,QueryResults results,String time,Graph<TypeNode,TypeReference> graph) throws IOException {
+	private static void printSummary(File querySource, File graphSource,QueryResults<TypeNode,TypeReference> results,String time,Graph<TypeNode,TypeReference> graph) throws IOException {
 		//File summary = new File(SUMMARY);
 		FileWriter out = new FileWriter(SUMMARY,true);
 		/*
@@ -227,7 +221,7 @@ public class AnalysisBatchJob {
 		else throw new IllegalArgumentException("non existing file or wrong file type: "+file.getAbsolutePath());
 
 	}
-
+	/*
 	private static File getOutputFile(File querySource,File graphSource) {
 		String out = OUTPUT_FOLDER + '/' + querySource.getName() + '/' + graphSource.getName() + ".csv";
 		out = removeWhitespaces(out);
@@ -247,5 +241,6 @@ public class AnalysisBatchJob {
 		}
 		return b.toString();
 	}
+	*/
 
 }
