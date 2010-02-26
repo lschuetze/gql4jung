@@ -12,11 +12,11 @@
     	dbclass.namespace=='java.sql' || dbclass.namespace=='org.hibernate'
     </constraint>
    	<connectedBy role="db2ui" from="dblayerclass" to="uilayerclass" minLength="0"/>
-   	<connectedBy role="db link" from="dblayerclass" to="dbclass" maxLength="1"/>
-   	<connectedBy role="ui link" from="uilayerclass" to="uiclass" maxLength="1"/>
-    <groupby>
+   	<connectedBy role="dblink" from="dblayerclass" to="dbclass" maxLength="1"/>
+   	<connectedBy role="uilink" from="uilayerclass" to="uiclass" maxLength="1"/>
+    <groupBy>
         <element>dblayerclass.namespace</element>
         <element>uilayerclass.namespace</element>
-    </groupby>
+    </groupBy>
     
 </motif>
