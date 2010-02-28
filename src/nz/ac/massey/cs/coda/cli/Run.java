@@ -9,7 +9,7 @@
  */
 
 
-package nz.ac.massey.cs.codeanalysis.cli;
+package nz.ac.massey.cs.coda.cli;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,16 +20,16 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Level;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import nz.ac.massey.cs.codeanalysis.TypeNode;
-import nz.ac.massey.cs.codeanalysis.TypeReference;
-import nz.ac.massey.cs.codeanalysis.io.GraphMLReader;
-import nz.ac.massey.cs.codeanalysis.io.JarReader;
+import nz.ac.massey.cs.coda.TypeNode;
+import nz.ac.massey.cs.coda.TypeReference;
+import nz.ac.massey.cs.coda.io.GraphMLReader;
+import nz.ac.massey.cs.coda.io.JarReader;
 import nz.ac.massey.cs.gql4jung.GQL;
 import nz.ac.massey.cs.gql4jung.Motif;
 import nz.ac.massey.cs.gql4jung.MotifReaderException;
 import nz.ac.massey.cs.gql4jung.ResultListener;
-import nz.ac.massey.cs.gql4jung.jmpl.GQLImpl;
-import nz.ac.massey.cs.gql4jung.jmpl.MultiThreadedGQLImpl;
+import nz.ac.massey.cs.gql4jung.impl.GQLImpl;
+import nz.ac.massey.cs.gql4jung.impl.MultiThreadedGQLImpl;
 import nz.ac.massey.cs.gql4jung.xml.XMLMotifReader;
 
 /**
@@ -55,7 +55,7 @@ public class Run {
 	public static final String COMPUTE_VARIANTS = FLAGS[0];
 	
 	// default values
-	public static final String DGQLCLASS = nz.ac.massey.cs.gql4jung.jmpl.GQLImpl.class.getName();
+	public static final String DGQLCLASS = nz.ac.massey.cs.gql4jung.impl.GQLImpl.class.getName();
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -76,7 +76,7 @@ public class Run {
 			}
 		}
 		else if (engine instanceof MultiThreadedGQLImpl) {
-			((MultiThreadedGQLImpl)engine).setNumberOfThreads(i);
+			((MultiThreadedGQLImpl<TypeNode,TypeReference>)engine).setNumberOfThreads(i);
 		}
 		else {
 			engine = new MultiThreadedGQLImpl<TypeNode,TypeReference>(i);
@@ -94,7 +94,7 @@ public class Run {
 		log("Using graph: ",graphSource.getAbsolutePath());
 		
 		File motifSource = (File) param.get(MOTIF);
-		Motif motif = loadMotif(motifSource);
+		Motif<TypeNode,TypeReference> motif = loadMotif(motifSource);
 		log("Using motif: ",motifSource.getAbsolutePath());
 		
 		ResultListener<TypeNode,TypeReference> listener = (ResultListener<TypeNode,TypeReference>) param.get(LISTENER);
