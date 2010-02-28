@@ -8,10 +8,10 @@
  * and limitations under the License.
  */
 
-package nz.ac.massey.cs.codeanalysis.cli;
+package nz.ac.massey.cs.coda.cli;
 
-import nz.ac.massey.cs.codeanalysis.TypeNode;
-import nz.ac.massey.cs.codeanalysis.TypeReference;
+import nz.ac.massey.cs.coda.TypeNode;
+import nz.ac.massey.cs.coda.TypeReference;
 import nz.ac.massey.cs.gql4jung.MotifInstance;
 import nz.ac.massey.cs.gql4jung.ResultListener;
 /**
